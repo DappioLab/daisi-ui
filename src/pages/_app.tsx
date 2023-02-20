@@ -26,7 +26,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <Nav />
         <div className={style.content}>
           <Sidebar />
-          <Component {...pageProps} />;
+          <div className={style.pageContent}>
+            <Component {...pageProps} />;
+          </div>
         </div>
       </Provider>
     </div>
