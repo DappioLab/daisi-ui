@@ -5,15 +5,15 @@ const Nav = () => {
   const router = useRouter();
   return (
     <div className={style.nav}>
-      <div
+      <h3
         onClick={() => {
           router.push("/");
         }}
       >
         Home
-      </div>
-      <div>Nav</div>
-      <div>-</div>
+      </h3>
+      <h3>Nav</h3>
+      <h3>-</h3>
     </div>
   );
 };

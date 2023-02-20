@@ -69,21 +69,22 @@ export async function getStaticProps({ params }: any) {
     props: {
       postData,
     },
+    revalidate: 30,
   };
 }
 
 export default function Post({ postData }: any) {
   return (
-    <div className="bg-gray-800 h-screen p-16 text-gray-100">
-      {/* <div className="text-center font-bold text-3xl">{postData.title}</div>
-      <div className="text-justify my-8 text-gray-200">
+    <div>
+      {/* <div >{postData.title}</div>
+      <div >
         {postData.description}
       </div>
-      <div className="text-gray-400">Published On: {postData.date}</div> */}
-
-      <div className="text-center font-bold text-3xl">{postData.symbol}</div>
-      <div className="text-justify my-8 text-gray-200">{postData.mint}</div>
-      <div className="text-gray-400">Published On: {postData.logoURI}</div>
+      <div >Published On: {postData.date}</div> */}
+      <h1>This is page {postData.symbol}</h1>
+      <div>{postData.symbol}</div>
+      <div>{postData.mint}</div>
+      <div>{postData.logoURI}</div>
     </div>
   );
 }
