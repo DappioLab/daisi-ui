@@ -8,7 +8,33 @@
     height: calc(100% - 8rem) // minus Nav height
   .pageContent
     height: 100%
-    width: calc(100% - 22rem) // minus sidebar width
+    width: 32rem
     overflow: scroll
-    background-color: rgba(0,0,0,.1)
-    padding: 5rem 12rem
+    margin: auto
+    padding: 5rem 0 
+
+
+@media screen and (min-width: 768px)
+  .appContainer
+    .pageContent
+      width: 70rem
+
+@media screen and (min-width: 900px)
+  .appContainer
+    .pageContent
+      width: 80rem
+
+@media screen and (min-width: 1024px)
+  .appContainer
+    .pageContent
+      width: 90rem
+
+@media screen and (min-width: 1440px)
+  .appContainer
+    .pageContent
+      width: 105rem
+
+@media screen and (min-width: 1700px)
+  .appContainer
+    .pageContent
+      width: 120rem

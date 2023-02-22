@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <div className={style.content}>
           <Sidebar />
           <div className={style.pageContent}>
-            <Component {...pageProps} />;
+            <Component {...pageProps} />
           </div>
         </div>
       </Provider>

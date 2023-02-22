@@ -1,5 +1,12 @@
+import PageTitle from "@/components/common/pageTitle";
+import style from "@/styles/cyberConnectPage/index.module.sass";
+
 const CyberConnect = () => {
-  return <div>Cyber Connect page</div>;
+  return (
+    <div className={style.cyberConnect}>
+      <PageTitle title="Cyber Connect" />
+    </div>
+  );
 };
 
 export default CyberConnect;

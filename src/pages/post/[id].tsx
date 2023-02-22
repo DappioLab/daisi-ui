@@ -1,8 +1,8 @@
-import { getData } from "@/graphql/test1/query";
+// import { getData } from "@/graphql/daily/query";
 
 export async function getPostIdList() {
-  let data = await getData();
-
+  // let data = await getData();
+  let data: any[] = [];
   return data.map((item: any, index: any) => {
     return { params: { id: index.toString() } };
   });
@@ -26,7 +26,8 @@ export async function getPostIdList() {
 }
 
 export async function getPostDetails(postId: number) {
-  let data = await getData();
+  // let data = await getData();
+  let data: any[] = [];
 
   // const dataSet = new Map();
   const dataSet: any = {};

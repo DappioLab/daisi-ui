@@ -23,7 +23,12 @@ const Sidebar = () => {
       <div className={style.groupLabel}>Discover</div>
       {routes.map((item) => {
         return (
-          <div className={style.label} onClick={() => router.push(item.route)}>
+          <div
+            className={`${style.label} ${
+              router.asPath === item.route ? style.highlightRoute : ""
+            }`}
+            onClick={() => router.push(item.route)}
+          >
             {item.label}
           </div>
         );

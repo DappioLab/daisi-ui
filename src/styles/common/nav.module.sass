@@ -7,3 +7,30 @@
   background-color: rgba(0,0,0,.13)
   padding: 1rem 3rem
   border: solid .1rem #A8B3CF33
+  .nameBlock
+    display: flex
+    flex-direction: column
+    align-items: flex-start
+    justify-content: center
+    color: white
+  .name
+    font-size: 2.5rem
+    letter-spacing: .2rem
+  .slogan
+    font-size: 1.3rem
+    margin-top: .2rem
+    opacity: .4
+  .menu
+    display: none
+    position: fixed
+    right: 0
+    top: 0
+    z-index: 1
+    background-color: #eee
+    padding: 5rem 0
+  .showMenu
+    display: block
+@media screen and (min-width: 1024px)
+  .nav
+    .menuBtn
+      display: none
