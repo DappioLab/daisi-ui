@@ -1,0 +1,96 @@
+.feedModal
+  .bg
+    width: 100%
+    height: 100%
+    position: fixed
+    background-color: #fff
+    opacity: .2
+    top: 0
+    left: 0
+  .modalContainer
+    position: fixed
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    width: 80%
+    height: 70%
+    background-color: #fff
+    overflow: scroll
+    z-index: 1
+    background-color: rgb(15, 18, 23)
+    padding: 3rem
+    color: white
+    border-radius: 2rem
+    h1
+      font-size: 2.4rem
+      margin-top: 3rem
+  .linkButton
+    position: absolute
+    right: 2rem
+    top: 2rem
+    color: rgb(15, 18, 23)
+    background-color: white
+    padding: .8rem 1.2rem
+    border-radius: 1rem
+    font-weight: 700
+    font-size: 1.6rem
+    &:hover
+      opacity: .8
+    i
+      font-weight: 700
+  .tagBlock
+    display: flex
+    align-items: center
+    justify-content: flex-start
+    margin-top: 3rem
+  .tag
+    border: solid .1rem white
+    margin-right: .5rem
+    padding: .2rem .5rem
+    margin-right: .5rem
+    border-radius: .5rem
+  .timeBlock
+    margin-top: 1rem
+  .coverImage
+    width: 70%
+    max-height: 30rem
+    border-radius: 1rem
+    margin-top: 3rem
+  .quickBtnBlock
+    display: flex
+    align-items: center
+    justify-content: flex-start
+    div
+      margin-right: 2rem
+      border: solid .1rem grey
+      padding: .8rem
+      border-radius: 1rem
+      &:hover
+        cursor: pointer
+        border-color: white
+        i
+          color: white
+    i
+      color: grey
+      font-size: 1.6rem
+  .disabledBtn
+    opacity: .2
+    pointer-events: none
+  .interactNumBlock
+    margin-top: 3rem
+    color: grey
+    font-size: 1.4rem
+    span
+      margin-right: 2rem
+
+@media screen and (min-width: 768px)
+  .feedModal
+    .modalContainer
+      width: 80%
+      height: 70%
+
+@media screen and (min-width: 1440px)
+  .feedModal
+    .modalContainer
+      width: 80rem
+      height: 70rem

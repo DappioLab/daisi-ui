@@ -292,3 +292,32 @@ export const SEARCH_POSTS_QUERY = gql`
   }
   ${FEED_POST_CONNECTION_FRAGMENT}
 `;
+
+export const POST_BY_ID_STATIC_FIELDS_QUERY = gql`
+  query Post($id: ID!) {
+    post(id: $id) {
+      id
+      title
+      permalink
+      image
+      placeholder
+      createdAt
+      readTime
+      tags
+      commentsPermalink
+      numUpvotes
+      numComments
+      source {
+        ...SourceShortInfo
+      }
+      description
+      summary
+      toc {
+        text
+        id
+      }
+      type
+    }
+  }
+  ${SOURCE_SHORT_INFO_FRAGMENT}
+`;
