@@ -1,6 +1,6 @@
 import style from "@/styles/common/nav.module.sass";
-import { useRouter } from "next/router";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 const Nav = () => {
   const router = useRouter();
@@ -35,12 +35,35 @@ const Nav = () => {
         className={`${style.menuBtn}`}
         onClick={() => setShowMenu(!showMenu)}
       >
-        X
+        <div className={style.line}></div>
+        <div className={style.line}></div>
+        <div className={style.line}></div>
       </div>
       <div className={`${style.menu} ${showMenu ? style.showMenu : ""}`}>
-        {routes.map((item) => {
-          return <div>{item.label}</div>;
-        })}
+        <div className={style.bg} onClick={() => setShowMenu(false)}></div>
+        <div className={style.menuContainer}>
+          <div
+            className={style.closeMenuBtn}
+            onClick={() => setShowMenu(false)}
+          >
+            x
+          </div>
+          {routes.map((item) => {
+            return (
+              <div
+                onClick={() => {
+                  router.push(item.route);
+                }}
+                key={item.label}
+                className={`${style.label} ${
+                  router.asPath === item.route ? style.highlightRoute : ""
+                }`}
+              >
+                {item.label}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import testSlice from "./testSlice";
+import dailySlice, { IDailyInitialState } from "./dailySlice";
 
 export interface IRootState {
-  test: any;
+  daily: IDailyInitialState;
 }
 
 export default configureStore({
   reducer: {
-    test: testSlice,
+    daily: dailySlice,
   },
 });

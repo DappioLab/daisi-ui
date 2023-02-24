@@ -27,6 +27,7 @@ const Sidebar = () => {
             className={`${style.label} ${
               router.asPath === item.route ? style.highlightRoute : ""
             }`}
+            key={item.route}
             onClick={() => router.push(item.route)}
           >
             {item.label}

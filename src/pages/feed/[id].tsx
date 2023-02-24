@@ -1,47 +1,10 @@
-import request, { gql } from "graphql-request";
-import { endpoint } from "@/graphql/daily/query";
-
-export const SOURCE_SHORT_INFO_FRAGMENT = gql`
-  fragment SourceShortInfo on Source {
-    id
-    handle
-    name
-    permalink
-    description
-    image
-    type
-    active
-  }
-`;
-
-export const POST_BY_ID_STATIC_FIELDS_QUERY = gql`
-  query Post($id: ID!) {
-    post(id: $id) {
-      id
-      title
-      permalink
-      image
-      placeholder
-      createdAt
-      readTime
-      tags
-      commentsPermalink
-      numUpvotes
-      numComments
-      source {
-        ...SourceShortInfo
-      }
-      description
-      summary
-      toc {
-        text
-        id
-      }
-      type
-    }
-  }
-  ${SOURCE_SHORT_INFO_FRAGMENT}
-`;
+import request from "graphql-request";
+import style from "@/styles/feed/id.module.sass";
+import moment from "moment";
+import {
+  endpoint,
+  POST_BY_ID_STATIC_FIELDS_QUERY,
+} from "@/graphql/daily/query";
 
 export async function getStaticPaths() {
   return { paths: [], fallback: true };
@@ -67,18 +30,34 @@ export async function getStaticProps({ params }: any) {
 
 export default function Feed({ initialData }: any) {
   return (
-    <div>
-      hello world
-      <div>{JSON.stringify(initialData)}</div>
-      {/* <div >{postData.title}</div>
-      <div >
-        {postData.description}
-      </div>
-      <div >Published On: {postData.date}</div> */}
-      {/* <h1>This is page {postData.symbol}</h1>
-      <div>{postData.symbol}</div>
-      <div>{postData.mint}</div>
-      <div>{postData.logoURI}</div> */}
-    </div>
+    <>
+      {initialData && (
+        <div className={style.feedId}>
+          <h1>{initialData.post.title}</h1>
+          <div className={style.tagBlock}>
+            {initialData.post.tags.map((tag: string) => {
+              return (
+                <div key={tag} className={style.tag}>
+                  #{tag}
+                </div>
+              );
+            })}
+          </div>
+          <div className={style.timeBlock}>
+            {moment(initialData.post.createdAt).format("MMMM DD, YYYY")}
+            <span> -{initialData.post.readTime} read time</span>
+          </div>
+          <img
+            src={initialData.post.image}
+            alt="cover"
+            className={style.coverImage}
+          />
+          <div className={style.interactNumBlock}>
+            <span> {initialData.post.numUpvotes} Upvotes</span>
+            <span>{initialData.post.numComments} Comments</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
