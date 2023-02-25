@@ -3,21 +3,36 @@ import { gql } from "graphql-request";
 export const cyberConnectEndpoint = "https://api.cyberconnect.dev/testnet/";
 
 const ESSENCE_FRAGMENT = `
-fragment Essence on Essence {
-  id
-  handle
-  essences(first: $first) {
-    totalCount
-    edges {
-      node {
-        essenceID
-        name
-        symbol
-        tokenURI
+  fragment Essence on Essence {
+    essenceID
+    name
+    symbol
+    tokenURI
+    metadata{
+      metadata_id
+      name
+      description
+      content
+      image
+      issue_date
+    }
+  }
+  `;
+
+const PROFILE_FRAGMENT = `
+  fragment Profile on Profile {
+    id
+    profileID
+    handle
+    essences {
+      edges {
+        node {
+          ...Essence
+        }
       }
     }
   }
-}
+  ${ESSENCE_FRAGMENT}
 `;
 
 export const POST_BY_ID_QUERY = gql`
@@ -35,22 +50,14 @@ export const POST_BY_ID_QUERY = gql`
 `;
 
 export const PROFILES_WITH_POSTS_QUERY = gql`
-  query Profile($first: Int) {
-    profiles(first: $first) {
-      totalCount
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
+  query Profile {
+    profiles {
       edges {
         node {
-          ...Essence
+          ...Profile
         }
-        cursor
       }
     }
   }
-  ${ESSENCE_FRAGMENT}
+  ${PROFILE_FRAGMENT}
 `;
