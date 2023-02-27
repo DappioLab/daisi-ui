@@ -260,7 +260,8 @@ const ExplorePosts = () => {
           );
 
           if (postIx) {
-            console.log(await postIx.instructionMethodBuilder.rpc());
+            let result = await postIx.instructionMethodBuilder.rpc();
+            console.log(result);
             window.location.reload();
           }
         }

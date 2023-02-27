@@ -65,6 +65,7 @@ const Post = (post: postState) => {
   };
   let followButton = null;
   if (
+    post.userProfile.length > 0 &&
     post.userProfile[0].accountKey.toString() != post.post.profile &&
     !post.connections.find((conn) => {
       return conn.toString() == post.post.profile;
@@ -77,7 +78,10 @@ const Post = (post: postState) => {
     );
   }
   let deleteButton = null;
-  if (post.userProfile[0].accountKey.toString() == post.post.profile) {
+  if (
+    post.userProfile.length > 0 &&
+    post.userProfile[0].accountKey.toString() == post.post.profile
+  ) {
     deleteButton = (
       <button className={""} onClick={handleDelete}>
         Delete Post
