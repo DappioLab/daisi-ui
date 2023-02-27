@@ -74,26 +74,26 @@ const ExplorePosts = () => {
         if (wallet.publicKey) {
           const allPostAccounts =
             (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+
           const userPosts = await sdk?.post.getPostAccountsByUser(
             wallet.publicKey
           );
-
           let userPostAccounts = userPosts
             ? await Promise.all(
                 userPosts.map(async (post) => {
                   try {
-                    if (post.account.metadatauri.includes("/ipfs/")) {
+                    if (post.account.metadataUri.includes("/ipfs/")) {
                       let postData = await axios.get(
                         mainGateway +
-                          post.account.metadatauri.substring(
-                            post.account.metadatauri.indexOf("/ipfs/") + 6
+                          post.account.metadataUri.substring(
+                            post.account.metadataUri.indexOf("/ipfs/") + 6
                           )
                       );
                       return {
                         postData,
-                        metadatauri: post.account.metadatauri,
-                        cl_pubkey: post.account.cl_pubkey,
-                        profile: post.account.profile,
+                        metadatauri: post.account.metadataUri,
+                        cl_pubkey: post.publicKey.toString(),
+                        profile: post.account.profile.toString(),
                       };
                     }
                     let postData = await axios.get(post.account.metadataUri);
@@ -103,7 +103,9 @@ const ExplorePosts = () => {
                       cl_pubkey: post.publicKey.toString(),
                       profile: post?.account.profile.toString(),
                     };
-                  } catch (err) {}
+                  } catch (err) {
+                    console.log(err);
+                  }
                 })
               )
             : [];
@@ -142,6 +144,7 @@ const ExplorePosts = () => {
                 } catch (err) {}
               })
           );
+
           setExplore(
             [...userPostAccounts, ...allPostsMetadata]
               .filter((data) => {
@@ -314,6 +317,7 @@ const ExplorePosts = () => {
       </button>
     );
   }
+
   let form = null;
 
   if (profileKey.length > 0) {
