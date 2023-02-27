@@ -31,6 +31,7 @@ const ExplorePosts = () => {
   const [userKey, setUserKey] = useState<PublicKey[]>([]);
   const [postImg, setImg] = useState<File | null>(null);
   const [connections, setConnection] = useState<PublicKey[]>([]);
+  const [followers, setFollower] = useState<PublicKey[]>([]);
   const connection = useMemo(
     () => new Connection("https://api.devnet.solana.com", "confirmed"),
     []
@@ -177,18 +178,22 @@ const ExplorePosts = () => {
     const fetchConnections = async () => {
       try {
         if (wallet.publicKey && profileKey.length > 0) {
-          let profileConnections = (await sdk?.connection.getConnectionsByUser(
-            wallet.publicKey
-          )) as Array<ConnectionAccount>;
+          let connTo = await sdk?.connection.getFollowingsByProfile(
+            profileKey[0].accountKey
+          );
+          let connFrom = await sdk?.connection.getFollowersByProfile(
+            profileKey[0].accountKey
+          );
 
           setConnection(
-            profileConnections
-              .filter((conn) => {
-                return conn.fromprofile == profileKey[0].accountKey.toString();
-              })
-              .map((conn) => {
-                return new PublicKey(conn.toprofile);
-              })
+            (connTo ? connTo : []).map((conn) => {
+              return new PublicKey(conn);
+            })
+          );
+          setFollower(
+            (connFrom ? connFrom : []).map((conn) => {
+              return new PublicKey(conn);
+            })
           );
         }
       } catch (err) {
@@ -346,8 +351,23 @@ const ExplorePosts = () => {
       </form>
     );
   }
+  let userInfo = null;
+  if (profileKey.length > 0) {
+    userInfo = (
+      <div>
+        <p className={style.handle}>
+          <h1>{"@" + profileKey[0].accountKey.toString()}</h1>
+        </p>
+        <p className={style.sub}>
+          Following: {connections.length} Follower: {followers.length}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
+      {userInfo}
       <div>{createProfileButton}</div>
       <div>{form}</div>
       {explore?.map((post: postInterface) => {
