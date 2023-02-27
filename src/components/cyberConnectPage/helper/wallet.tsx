@@ -5,8 +5,6 @@ import detectEthereumProvider from "@metamask/detect-provider";
 
 export const connectWallet = async () => {
   try {
-    console.log("inside connectWallet");
-    console.log("after dispatch");
     /* Function to detect most providers injected at window.ethereum */
     const detectedProvider =
       (await detectEthereumProvider()) as ExternalProvider;
