@@ -27,10 +27,10 @@ const FeedList = () => {
         )
         .reduce((prev: any, curr: any) => prev.concat(curr), []) as IFeed[];
 
-      // sort by new created post
-      feeds = feeds.sort((a, b) =>
-        a.metadata.issue_date > b.metadata.issue_date ? 1 : -1
-      );
+      // TODO: sort by new created post, issue_date="" need to find new param for sorting
+      // feeds = feeds.sort((a, b) =>
+      //   a.metadata.issue_date > b.metadata.issue_date ? 1 : -1
+      // );
 
       setFeedList(feeds);
     };
