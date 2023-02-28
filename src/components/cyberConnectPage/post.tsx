@@ -145,6 +145,12 @@ const Post = () => {
 
       const relayActionId = relayResult.relay.relayActionId;
 
+      setPostInput({
+        nftImageURL: "",
+        content: "",
+        middleware: "free",
+      });
+
       // /* Close Post Modal */
       // handleModal(null, "");
 
