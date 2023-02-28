@@ -4,6 +4,7 @@ import {
   setProvider,
   setAddress,
   setAccessToken,
+  setPrimaryProfile,
 } from "@/redux/cyberConnectSlice";
 import request from "graphql-request";
 import { connectWallet, checkNetwork } from "./helper/wallet";
@@ -11,7 +12,10 @@ import {
   LOGIN_GET_MESSAGE_MUTATION,
   LOGIN_VERIFY_MUTATION,
 } from "@/graphql/cyberConnect/mutation";
-import { cyberConnectEndpoint } from "@/graphql/cyberConnect/query";
+import {
+  PROFILE_BY_ADDRESS_QUERY,
+  cyberConnectEndpoint,
+} from "@/graphql/cyberConnect/query";
 
 const SigninBtn = () => {
   const { address } = useSelector((state: IRootState) => state.cyberConnect);
@@ -61,6 +65,16 @@ const SigninBtn = () => {
 
       /* Set the access token in the state variable */
       dispatch(setAccessToken("bearer " + accessToken));
+
+      const profile = await request(
+        cyberConnectEndpoint,
+        PROFILE_BY_ADDRESS_QUERY,
+        {
+          address,
+        }
+      );
+      const primaryProfile = profile?.address?.wallet?.primaryProfile;
+      dispatch(setPrimaryProfile(primaryProfile));
     } catch (err) {}
   };
 

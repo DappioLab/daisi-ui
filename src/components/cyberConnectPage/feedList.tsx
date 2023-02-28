@@ -5,10 +5,9 @@ import {
 } from "@/graphql/cyberConnect/query";
 import { useEffect, useState } from "react";
 import Feed, { IFeed } from "./feed";
-import { Profile } from "./profile";
 
 const FeedList = () => {
-  const [profileList, setProfileList] = useState<Profile[]>([]);
+  const [feedList, setFeedList] = useState<IFeed[]>([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -16,40 +15,38 @@ const FeedList = () => {
         cyberConnectEndpoint,
         PROFILES_WITH_POSTS_QUERY
       );
-      console.log(res);
-      setProfileList(
-        res.profiles.edges.map((edge: any) => ({
-          profileID: edge.node.profileID,
-          handle: edge.node.handle,
-          avatarUrl: edge.node.avatarUrl,
-          feeds: edge.node.essences
-            ? edge.node.essences.edges
-                .filter((e: { node: IFeed }) => e.node.symbol == "POST")
-                .map((e: { node: IFeed }) => e.node)
-            : [],
-        }))
+      const profiles = res.profiles.edges.map((edge: any) => edge.node);
+      let feeds = profiles
+        .map((p: any) =>
+          p.essences.edges
+            .filter(
+              (e: { node: IFeed }) =>
+                e.node.symbol == "POST" && e.node.metadata != undefined
+            )
+            .map((e: { node: IFeed }) => e.node)
+        )
+        .reduce((prev: any, curr: any) => prev.concat(curr), []) as IFeed[];
+
+      // sort by new created post
+      feeds = feeds.sort((a, b) =>
+        a.metadata.issue_date > b.metadata.issue_date ? 1 : -1
       );
+
+      setFeedList(feeds);
     };
 
     getData();
   }, []);
 
-  const renderProfiles = () => {
-    return profileList
-      .filter((p) => p.feeds.length > 0)
-      .map((p: Profile, index) => {
-        return (
-          <div key={index}>
-            {p.feeds.map((feed) => {
-              console.log(feed);
-              return <Feed feed={feed} handle={p.handle} />;
-            })}
-          </div>
-        );
-      });
+  const renderFeeds = () => {
+    return feedList.map((feed, index) => (
+      <div key={index}>
+        <Feed feed={feed} />
+      </div>
+    ));
   };
 
-  return <div>{renderProfiles()}</div>;
+  return <div>{renderFeeds()}</div>;
 };
 
 export default FeedList;

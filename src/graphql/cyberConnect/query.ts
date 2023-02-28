@@ -16,6 +16,12 @@ const ESSENCE_FRAGMENT = `
       image
       issue_date
     }
+    createdBy{
+      profileID
+      handle
+      avatar
+      metadata
+    }
   }
   `;
 
@@ -60,4 +66,19 @@ export const PROFILES_WITH_POSTS_QUERY = gql`
     }
   }
   ${PROFILE_FRAGMENT}
+`;
+
+export const PROFILE_BY_ADDRESS_QUERY = gql`
+  query Address($address: AddressEVM!) {
+    address(address: $address) {
+      wallet {
+        primaryProfile {
+          profileID
+          handle
+          avatar
+          metadata
+        }
+      }
+    }
+  }
 `;

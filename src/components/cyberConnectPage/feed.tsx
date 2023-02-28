@@ -1,5 +1,6 @@
 import { useState } from "react";
 import style from "../../styles/cyberConnectPage/feed.module.sass";
+import { IProfile } from "@/redux/cyberConnectSlice";
 
 // This only stored on Arweave, didn't launch an Onchain event
 // export interface Post {
@@ -29,6 +30,7 @@ export interface IFeed {
     name: string;
     description: string;
   };
+  createdBy: IProfile;
 }
 
 // Issue EssenceNFT Onchain
@@ -37,7 +39,7 @@ export interface IFeed {
 
 // Implement CyberConnect's EssenceNFT with symbol equal to POST for now,
 // will add Arweave post soon.
-const Feed = ({ feed, handle }: { feed: IFeed; handle: string }) => {
+const Feed = ({ feed }: { feed: IFeed }) => {
   const [feedImage, setFeedImage] = useState(
     feed.metadata && feed.metadata.image
       ? feed.metadata.image
@@ -46,7 +48,7 @@ const Feed = ({ feed, handle }: { feed: IFeed; handle: string }) => {
 
   return (
     <div className={style.feed}>
-      <div className={style.title}>{handle}</div>
+      <div className={style.title}>{feed.createdBy.handle}</div>
       {feed.metadata && feed.metadata.content ? (
         <div className={style.content}>
           {feed.metadata && feed.metadata.content

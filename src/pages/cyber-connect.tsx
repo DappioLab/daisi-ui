@@ -10,6 +10,7 @@ const CyberConnect = () => {
       <PageTitle title="Cyber Connect" />
       <SigninBtn />
       <Post />
+      <hr />
       <FeedList />
     </div>
   );
