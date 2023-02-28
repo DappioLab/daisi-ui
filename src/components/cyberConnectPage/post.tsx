@@ -31,7 +31,7 @@ const Post = () => {
   const auth =
     "Basic " +
     Buffer.from(
-      process.env.INFURA_PUBLIC_KEY + ":" + process.env.INFURA_SECRECT_KEY
+      "2MKOnm6IhNBqLYJIAx1tVNrrP3G" + ":" + "2a192d1d29c89da90a77ad923b813718"
     ).toString("base64");
 
   const ipfsClient = create({
@@ -81,22 +81,20 @@ const Post = () => {
         external_url: "",
         attributes: [],
       };
-      console.log("metadata:", metadata);
 
       const data = JSON.stringify(metadata);
       const res = await ipfsClient.add(data);
       /* Upload metadata to IPFS */
       const ipfsHash = res.path; //await pinJSONToIPFS(metadata);
-      console.log("ipfsHash:", ipfsHash);
 
       /* Get the signer from the provider */
       const signer = provider.getSigner();
 
       /* Create typed data in a readable format */
-      const typedDataResult = await request(
-        cyberConnectEndpoint,
-        CREATE_REGISTER_ESSENCE_TYPED_DATA,
-        {
+      const typedDataResult = await request({
+        url: cyberConnectEndpoint,
+        document: CREATE_REGISTER_ESSENCE_TYPED_DATA,
+        variables: {
           input: {
             /* The profile id under which the Essence is registered */
             profileID: primaryProfile?.profileID,
@@ -111,11 +109,15 @@ const Post = () => {
             /* Set if the Essence should be transferable or not */
             transferable: true,
           },
-        }
-      );
+        },
+        requestHeaders: {
+          Authorization: accessToken,
+          "X-API-KEY": "Cpdjzg8Yv91z5ds7EYFmN8pXQJfMzX4u",
+        },
+      });
 
       const typedData =
-        typedDataResult.data?.createRegisterEssenceTypedData?.typedData;
+        typedDataResult?.createRegisterEssenceTypedData?.typedData;
       const message = typedData.data;
       const typedDataID = typedData.id;
 
@@ -126,14 +128,22 @@ const Post = () => {
       const signature = await signer.provider.send(method, params);
 
       /* Call the relay to broadcast the transaction */
-      const relayResult = await request(cyberConnectEndpoint, RELAY, {
-        input: {
-          typedDataID: typedDataID,
-          signature: signature,
+      const relayResult = await request({
+        url: cyberConnectEndpoint,
+        document: RELAY,
+        variables: {
+          input: {
+            typedDataID: typedDataID,
+            signature: signature,
+          },
+        },
+        requestHeaders: {
+          Authorization: accessToken,
+          "X-API-KEY": "Cpdjzg8Yv91z5ds7EYFmN8pXQJfMzX4u",
         },
       });
 
-      const relayActionId = relayResult.data.relay.relayActionId;
+      const relayActionId = relayResult.relay.relayActionId;
 
       // /* Close Post Modal */
       // handleModal(null, "");

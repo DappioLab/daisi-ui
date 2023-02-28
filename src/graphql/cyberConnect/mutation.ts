@@ -21,3 +21,26 @@ export const LOGIN_VERIFY_MUTATION = gql`
     }
   }
 `;
+
+export const CREATE_REGISTER_ESSENCE_TYPED_DATA = gql`
+  mutation CreateRegisterEssenceTypedData(
+    $input: CreateRegisterEssenceTypedDataInput!
+  ) {
+    createRegisterEssenceTypedData(input: $input) {
+      typedData {
+        id
+        sender
+        data
+        nonce
+      }
+    }
+  }
+`;
+
+export const RELAY = gql`
+  mutation Relay($input: RelayInput!) {
+    relay(input: $input) {
+      relayActionId
+    }
+  }
+`;
