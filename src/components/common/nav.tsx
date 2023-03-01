@@ -1,9 +1,17 @@
 import style from "@/styles/common/nav.module.sass";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "@/redux";
+import { IAuthModalProps } from "./authModal";
+import { updateAuthModalData } from "@/redux/globalSlice";
 
 const Nav = () => {
+  const { userData, isLogin } = useSelector(
+    (state: IRootState) => state.global
+  );
   const router = useRouter();
+  const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
   const [routes, _] = useState([
     {
@@ -20,6 +28,13 @@ const Nav = () => {
     },
   ]);
 
+  const showAuthModal = () => {
+    const data: IAuthModalProps = {
+      showAuthModal: true,
+    };
+    dispatch(updateAuthModalData(data));
+  };
+
   return (
     <div className={style.nav}>
       <div
@@ -30,6 +45,18 @@ const Nav = () => {
       >
         <div className={style.name}>DAISI</div>
         <div className={style.slogan}>Limits of awareness</div>
+      </div>
+      <div
+        className={style.profile}
+        onClick={() => {
+          if (!isLogin) {
+            showAuthModal();
+            return;
+          }
+          router.push(`/profile/${userData?.id}`);
+        }}
+      >
+        <i className="fa fa-user" aria-hidden="true"></i>
       </div>
       <div
         className={`${style.menuBtn}`}

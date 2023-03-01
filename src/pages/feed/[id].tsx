@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: any) {
   const { id } = params;
+
   try {
     const initialData = await request(
       endpoint,
@@ -28,7 +29,7 @@ export async function getStaticProps({ params }: any) {
   } catch (err) {}
 }
 
-export default function Feed({ initialData }: any) {
+const Feed = ({ initialData }: any) => {
   return (
     <>
       {initialData && (
@@ -60,4 +61,6 @@ export default function Feed({ initialData }: any) {
       )}
     </>
   );
-}
+};
+
+export default Feed;

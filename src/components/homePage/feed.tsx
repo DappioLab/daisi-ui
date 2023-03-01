@@ -55,7 +55,7 @@ const Feed = (props: IFeed) => {
             }}
           >
             {/* @ts-ignore */}
-            Read more <i class="fa fa-external-link" aria-hidden="true"></i>
+            Read more <i className="fa fa-external-link" aria-hidden="true"></i>
           </div>
         </a>
       ) : null}

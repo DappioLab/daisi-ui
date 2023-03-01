@@ -4,7 +4,7 @@ import Sidebar from "@/components/common/sidebar";
 import style from "@/styles/_app/index.module.sass";
 import "@/styles/global/index.sass";
 import { Provider } from "react-redux";
-import store from "@/redux";
+import store, { IRootState } from "@/redux";
 import Nav from "@/components/common/nav";
 import { useRouter } from "next/router";
 import nProgress from "nprogress";
@@ -26,11 +26,14 @@ import {
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
+import { useDispatch, useSelector } from "react-redux";
 
 import React, { useMemo } from "react";
+import Global from "@/components/common/global";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
+
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
       nProgress.start();
@@ -38,25 +41,11 @@ export default function App({ Component, pageProps }: AppProps) {
     router.events.on("routeChangeComplete", () => nProgress.done());
     router.events.on("routeChangeError", () => nProgress.done());
   });
+
   const network = WalletAdapterNetwork.Devnet;
-
-  // You can also provide a custom RPC endpoint
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
   const wallets = useMemo(
     () => [
-      /**
-       * Wallets that implement either of these standards will be available automatically.
-       *
-       *   - Solana Mobile Stack Mobile Wallet Adapter Protocol
-       *     (https://github.com/solana-mobile/mobile-wallet-adapter)
-       *   - Solana Wallet Standard
-       *     (https://github.com/solana-labs/wallet-standard)
-       *
-       * If you wish to support a wallet that supports neither of those standards,
-       * instantiate its legacy wallet adapter here. Common legacy adapters can be found
-       * in the npm package `@solana/wallet-adapter-wallets`.
-       */
       new PhantomWalletAdapter({ network }),
       new SlopeWalletAdapter(),
       new SolflareWalletAdapter({ network }),
@@ -65,7 +54,6 @@ export default function App({ Component, pageProps }: AppProps) {
       new SolletWalletAdapter({ network }),
       new SolletExtensionWalletAdapter({ network }),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [network]
   );
 
@@ -91,6 +79,7 @@ export default function App({ Component, pageProps }: AppProps) {
             </ConnectionProvider>
           </div>
         </div>
+        <Global />
       </Provider>
     </div>
   );
