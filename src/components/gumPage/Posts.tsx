@@ -46,6 +46,24 @@ const Post = (post: postState) => {
       console.log(err);
     }
   };
+  const handleUnfollow = async (e: any) => {
+    try {
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+
+      let followIx = await (
+        await post.sdk?.connection.create(
+          post.userProfile[0].accountKey,
+          new PublicKey(post.post.profile),
+          post.userProfile[0].userKey,
+          wallet.publicKey
+        )
+      )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const handleDelete = async (e: any) => {
     try {
       if (!wallet.publicKey) {
@@ -64,6 +82,42 @@ const Post = (post: postState) => {
       console.log(err);
     }
   };
+  const handleLike = async (e: any) => {
+    try {
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      let likeTx = (
+        await post.sdk?.reaction.create(
+          post.userProfile[0].accountKey,
+          new PublicKey(post.post.cl_pubkey),
+          "Like",
+          post.userProfile[0].userKey,
+          wallet.publicKey
+        )
+      )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleDislike = async (e: any) => {
+    try {
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      let likeTx = (
+        await post.sdk?.reaction.create(
+          post.userProfile[0].accountKey,
+          new PublicKey(post.post.cl_pubkey),
+          "Dislike",
+          post.userProfile[0].userKey,
+          wallet.publicKey
+        )
+      )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+    }
+  };
   let followButton = null;
   if (
     post.userProfile.length > 0 &&
@@ -77,6 +131,18 @@ const Post = (post: postState) => {
         Follow
       </button>
     );
+  } else if (
+    post.userProfile.length > 0 &&
+    post.userProfile[0].accountKey.toString() != post.post.profile &&
+    post.connections.find((conn) => {
+      return conn.toString() == post.post.profile;
+    })
+  ) {
+    followButton = (
+      <button className={style.follow} onClick={handleFollow}>
+        Unfollow
+      </button>
+    );
   }
   let deleteButton = null;
   if (
@@ -84,9 +150,24 @@ const Post = (post: postState) => {
     post.userProfile[0].accountKey.toString() == post.post.profile
   ) {
     deleteButton = (
-      <button className={""} onClick={handleDelete}>
-        Delete Post
-      </button>
+      <div>
+        <button className={""} onClick={handleDelete}>
+          Delete Post
+        </button>
+      </div>
+    );
+  }
+  let reactionButton = null;
+  if (post.userProfile.length > 0) {
+    reactionButton = (
+      <div>
+        <button className={""} onClick={handleLike}>
+          Like
+        </button>
+        <button className={""} onClick={handleDislike}>
+          Dislike
+        </button>
+      </div>
     );
   }
   return (
@@ -103,6 +184,7 @@ const Post = (post: postState) => {
             </div>
           );
         })}
+      {reactionButton}
       {deleteButton}
     </div>
   );

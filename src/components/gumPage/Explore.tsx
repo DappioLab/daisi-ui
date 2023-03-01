@@ -24,7 +24,6 @@ export interface ProfileAccount {
 }
 const ExplorePosts = () => {
   const wallet = useWallet();
-
   const [explore, setExplore] = useState<postInterface[]>([]);
   const [postText, setPostText] = useState("");
   const [profileKey, setProfileKey] = useState<ProfileAccount[]>([]);
@@ -40,7 +39,7 @@ const ExplorePosts = () => {
     connection,
     { preflightCommitment: "confirmed" },
     "devnet",
-    GRAPHQL_ENDPOINTS.devnet
+    "https://light-pelican-32.hasura.app/v1/graphql"
   );
   const mainGateway = "https://wei1769.infura-ipfs.io/ipfs/";
   const fetchProfile = async () => {
@@ -185,7 +184,10 @@ const ExplorePosts = () => {
           let connFrom = await sdk?.connection.getFollowersByProfile(
             profileKey[0].accountKey
           );
-
+          let connections = await sdk?.connection.getConnectionsByUser(
+            profileKey[0].userKey
+          );
+          console.log(connTo, connections);
           setConnection(
             (connTo ? connTo : []).map((conn) => {
               return new PublicKey(conn);
@@ -202,9 +204,14 @@ const ExplorePosts = () => {
       }
     };
 
+    const fetchReaction = async () => {
+      let reactionAccounts = await sdk?.reaction.getAllReactions();
+      console.log(reactionAccounts);
+    };
     fetchProfile();
     fetchPostData();
     fetchConnections();
+    fetchReaction();
   }, [wallet.publicKey, profileKey]);
 
   const handleSubmit = async (e: any) => {
@@ -358,9 +365,9 @@ const ExplorePosts = () => {
   if (profileKey.length > 0) {
     userInfo = (
       <div>
-        <p className={style.handle}>
-          <h1>{"@" + profileKey[0].accountKey.toString()}</h1>
-        </p>
+        <h1 className={style.handle}>
+          {"@" + profileKey[0].accountKey.toString()}
+        </h1>
         <p className={style.sub}>
           Following: {connections.length} Follower: {followers.length}
         </p>
