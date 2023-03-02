@@ -18,6 +18,7 @@ export interface postInterface {
   image_url: string;
   profile: string;
 }
+
 interface postState {
   post: postInterface;
   userProfile: ProfileAccount[];

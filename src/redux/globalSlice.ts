@@ -32,13 +32,13 @@ const initialState: IGlobalInitialState = {
     createdDate: "July 10, 2015",
   },
   authModalData: {
-    showAuthModal: true,
+    showAuthModal: false,
   },
   // userData: null,
 };
 
 export const globalSlice = createSlice({
-  name: "global",
+  name: "globalSlice",
   initialState,
   reducers: {
     updateSubmitModalData: (state, action) => {

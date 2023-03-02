@@ -5,23 +5,24 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useDispatch } from "react-redux";
 
 export interface IFeed {
-  article: {
-    node: {
-      id: string;
-      title: string;
-      createdAt: string;
-      readTime: string;
-      image: string;
-      source: {
-        image: string;
-      };
-    };
+  profile?: string; // this field exists in GUM
+  id: string;
+  title: string;
+  createdAt: string;
+  readTime: string;
+  image: string;
+  source: {
+    image: string;
   };
+}
+
+export interface IFeedProps {
+  article: IFeed;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   getPost: (id: string) => Promise<void>;
 }
 
-const Feed = (props: IFeed) => {
+const Feed = (props: IFeedProps) => {
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
 
@@ -33,41 +34,37 @@ const Feed = (props: IFeed) => {
     <div
       className={style.feed}
       onClick={(e) => {
-        updateCurrentID(props.article.node.id);
-        props.getPost(props.article.node.id);
+        updateCurrentID(props.article.id);
+        props.getPost(props.article.id);
         e.preventDefault();
       }}
       onMouseEnter={() => setShowLinkButton(true)}
       onMouseLeave={() => setShowLinkButton(false)}
     >
       <div className={style.articleIcon}>
-        <img src={props.article.node.source.image} alt="icon" />
+        <img src={props.article.source.image} alt="icon" />
       </div>
       {showLinkButton ? (
-        <a
-          href={`https://api.daily.dev/r/${props.article.node.id}`}
-          target="_blank"
-        >
+        <a href={`https://api.daily.dev/r/${props.article.id}`} target="_blank">
           <div
             className={style.linkButton}
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            {/* @ts-ignore */}
             Read more <i className="fa fa-external-link" aria-hidden="true"></i>
           </div>
         </a>
       ) : null}
 
-      <div className={style.title}>{props.article.node.title}</div>
+      <div className={style.title}>{props.article.title}</div>
       <div className={style.space}></div>
       <div className={style.timeBlock}>
-        {moment(props.article.node.createdAt).format("MMMM DD,YYYY")} -{" "}
-        {props.article.node.readTime}m read time
+        {moment(props.article.createdAt).format("MMMM DD,YYYY")} -{" "}
+        {props.article.readTime}m read time
       </div>
       <div className={style.articleImage}>
-        <img src={props.article.node.image} alt="icon" />
+        <img src={props.article.image} alt="icon" />
       </div>
     </div>
   );

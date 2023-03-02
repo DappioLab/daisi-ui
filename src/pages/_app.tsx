@@ -40,7 +40,7 @@ export default function App({ Component, pageProps }: AppProps) {
     });
     router.events.on("routeChangeComplete", () => nProgress.done());
     router.events.on("routeChangeError", () => nProgress.done());
-  });
+  }, [router.pathname]);
 
   const network = WalletAdapterNetwork.Devnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
@@ -69,7 +69,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <Nav />
         <div className={style.content}>
           <Sidebar />
-          <div className={style.pageContent}>
+          <div className={style.page}>
             <ConnectionProvider endpoint={endpoint}>
               <WalletProvider wallets={wallets} autoConnect>
                 <WalletModalProvider>

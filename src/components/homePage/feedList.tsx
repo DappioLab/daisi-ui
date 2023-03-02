@@ -16,7 +16,7 @@ interface IFeedList {
 
 const FeedList = (props: IFeedList) => {
   const [feedOptions, setFeedOptions] = useState({});
-  const { currentId, modalData, feedList } = useSelector(
+  const { currentId, feedList } = useSelector(
     (state: IRootState) => state.daily
   );
   const { ref, inView } = useInView();

@@ -21,7 +21,7 @@ const Block = (block: blockState) => {
 
     fetchData();
   }, [block.block.data]);
-  if (block.block.data.text == "Created in Daisi") {
+  if (block.block.data.text == "Created") {
     return <div></div>;
   }
   if (block.block.data.file) {

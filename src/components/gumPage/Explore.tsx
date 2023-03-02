@@ -175,6 +175,7 @@ const ExplorePosts = () => {
         console.log("error", err);
       }
     };
+
     const fetchConnections = async () => {
       try {
         if (wallet.publicKey && profileKey.length > 0) {
@@ -200,10 +201,12 @@ const ExplorePosts = () => {
         console.log("error", err);
       }
     };
+
     fetchProfile();
     fetchPostData();
     fetchConnections();
   }, [wallet.publicKey, profileKey]);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {

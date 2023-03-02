@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import { IAuthModalProps } from "./authModal";
-import { updateAuthModalData } from "@/redux/globalSlice";
+import { updateAuthModalData, updateLoginStatus } from "@/redux/globalSlice";
 
 const Nav = () => {
   const { userData, isLogin } = useSelector(
@@ -35,6 +35,10 @@ const Nav = () => {
     dispatch(updateAuthModalData(data));
   };
 
+  const logIn = () => {
+    dispatch(updateLoginStatus(true));
+  };
+
   return (
     <div className={style.nav}>
       <div
@@ -46,17 +50,19 @@ const Nav = () => {
         <div className={style.name}>DAISI</div>
         <div className={style.slogan}>Limits of awareness</div>
       </div>
-      <div
-        className={style.profile}
-        onClick={() => {
-          if (!isLogin) {
-            showAuthModal();
-            return;
-          }
-          router.push(`/profile/${userData?.id}`);
-        }}
-      >
-        <i className="fa fa-user" aria-hidden="true"></i>
+      <div className={style.profile}>
+        <button onClick={() => logIn()}>log in</button>
+        <i
+          className="fa fa-user"
+          aria-hidden="true"
+          onClick={() => {
+            if (!isLogin) {
+              showAuthModal();
+              return;
+            }
+            router.push(`/profile/${userData?.id}`);
+          }}
+        ></i>
       </div>
       <div
         className={`${style.menuBtn}`}

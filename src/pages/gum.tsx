@@ -13,7 +13,7 @@ const WalletMultiButtonDynamic = dynamic(
 );
 
 import React, { useMemo } from "react";
-import ExplorePost from "../components/gum/Explore";
+import ExplorePost from "../components/gumPage/Explore";
 // Use require instead of import since order matters
 require("@solana/wallet-adapter-react-ui/styles.css");
 

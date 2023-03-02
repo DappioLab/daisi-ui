@@ -1,0 +1,56 @@
+.horizontalFeed
+  display: flex
+  align-items: flex-start
+  // padding: 1rem
+  border: solid 0.1rem rgb(82, 86, 100)
+  position: relative
+  margin-bottom: 2rem
+  border-radius: 2rem
+  padding: 1rem
+  .articleIcon
+    width: 3rem
+    height: 3rem
+    border-radius: 50%
+    overflow: hidden
+    margin: 2rem
+    img
+      width: 100%
+      height: 100%
+  .titleBlock
+    flex: 1
+    border-left: solid 0.1rem rgb(82, 86, 100)
+  .title
+    color: white
+    font-size: 2rem
+    word-break: break-word
+    display: -webkit-box
+    -webkit-box-orient: vertical
+    overflow: hidden
+    text-overflow: ellipsis
+    -webkit-line-clamp: 3
+    font-weight: 600
+    margin: 2rem 2rem 0 2rem
+  .timeBlock
+    margin: 2rem 2rem 0 2rem
+  .articleImage
+    height: 15rem
+    border-radius: 1rem
+    overflow: hidden
+    margin: 1rem .8rem 2rem .8rem
+    img
+      width: 100%
+      height: 100%
+  .linkButton
+    position: absolute
+    right: 2rem
+    top: 2rem
+    color: rgb(15, 18, 23)
+    background-color: white
+    padding: .8rem 1.2rem
+    border-radius: 1rem
+    font-weight: 700
+    font-size: 1.6rem
+    &:hover
+      opacity: .8
+    i
+      font-weight: 700

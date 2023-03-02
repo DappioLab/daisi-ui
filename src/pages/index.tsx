@@ -3,7 +3,7 @@ import FeedList from "@/components/homePage/feedList";
 import PageTitle from "@/components/common/pageTitle";
 import FeedModal from "@/components/homePage/feedModal";
 import request from "graphql-request";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   endpoint,
   POST_BY_ID_STATIC_FIELDS_QUERY,
@@ -11,6 +11,16 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { updateModalData } from "@/redux/dailySlice";
 import { IRootState } from "@/redux";
+import HorizontalFeed from "@/components/homePage/horizontalFeed";
+import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
+import dynamic from "next/dynamic";
+import { getRss } from "@/utils/rss";
+
+const WalletMultiButtonDynamic = dynamic(
+  async () =>
+    (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
+  { ssr: false }
+);
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -20,7 +30,7 @@ const HomePage = () => {
   const dispatch = useDispatch();
 
   const getCurrentModalIndex = () => {
-    return feedList.findIndex((item) => item.node.id === currentId);
+    return feedList.findIndex((item) => item.id === currentId);
   };
 
   const getPost = async (id: string) => {
@@ -33,13 +43,21 @@ const HomePage = () => {
   };
 
   return (
-    <div className={style.homePage}>
+    <div className={`pageContent ${style.homePage}`}>
+      <div>
+        <WalletMultiButtonDynamic />
+      </div>
       <PageTitle title="Daily" />
-      <FeedList
+      <HorizontalFeedList
         setShowModal={setShowModal}
         getPost={getPost}
         getCurrentModalIndex={getCurrentModalIndex}
       />
+      {/* <FeedList
+        setShowModal={setShowModal}
+        getPost={getPost}
+        getCurrentModalIndex={getCurrentModalIndex}
+      /> */}
       {showModal ? (
         <FeedModal
           setShowModal={setShowModal}

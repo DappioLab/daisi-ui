@@ -9,9 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ethersproject/providers": "^5.7.2",
     "@gumhq/react-sdk": "^1.0.6",
     "@gumhq/sdk": "^1.0.10",
-    "@ethersproject/providers": "^5.7.2",
     "@metamask/detect-provider": "^2.0.0",
     "@next/font": "13.1.6",
     "@reduxjs/toolkit": "^1.9.2",
@@ -36,6 +36,7 @@
     "react-intersection-observer": "^9.4.2",
     "react-is": "^18.2.0",
     "react-redux": "^8.0.5",
+    "rss-parser": "^3.12.0",
     "sass": "^1.58.1",
     "typescript": "4.9.5",
     "uuid": "^9.0.0"

@@ -1,8 +1,9 @@
+import { IFeed } from "@/components/homePage/feed";
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface IDailyInitialState {
   currentId: string | null;
-  feedList: any[];
+  feedList: IFeed[];
   modalData: any;
 }
 
@@ -13,7 +14,7 @@ const initialState: IDailyInitialState = {
 };
 
 export const dailySlice = createSlice({
-  name: "test",
+  name: "dailySlice",
   initialState,
   reducers: {
     updateCurrentId: (state, action) => {

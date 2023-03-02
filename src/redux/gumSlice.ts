@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
 import { SDK } from "@gumhq/sdk";
+
 export interface IGumInitialState {
   user: PublicKey | null;
   sdkInfo: SDK | null;
@@ -12,7 +13,7 @@ const initialState: IGumInitialState = {
 };
 
 export const gumSlice = createSlice({
-  name: "test",
+  name: "gumSlice",
   initialState,
   reducers: {
     updateUserPubKey: (state, action) => {
