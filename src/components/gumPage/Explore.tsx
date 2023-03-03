@@ -1,10 +1,11 @@
 import Post, { postInterface } from "./Posts";
 import React, { useEffect, useState, useMemo } from "react";
 
-import { useGumSDK } from "@/hooks/useGumSDK";
+import { useGumSDK, localGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { useWallet, AnchorWallet } from "@solana/wallet-adapter-react";
-import { GRAPHQL_ENDPOINTS, SDK } from "@gumhq/sdk";
+import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
+import { ReactionType } from "@gumhq/sdk/src/reaction";
 import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
 import { create } from "ipfs-http-client";
@@ -29,17 +30,32 @@ const ExplorePosts = () => {
   const [profileKey, setProfileKey] = useState<ProfileAccount[]>([]);
   const [userKey, setUserKey] = useState<PublicKey[]>([]);
   const [postImg, setImg] = useState<File | null>(null);
-  const [connections, setConnection] = useState<PublicKey[]>([]);
+  const [following, setfollowing] = useState<
+    { follow: PublicKey; cl_pubkey: PublicKey }[]
+  >([]);
   const [followers, setFollower] = useState<PublicKey[]>([]);
+  const [reactions, setReactions] = useState<
+    Map<string, { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]>
+  >(new Map());
   const connection = useMemo(
-    () => new Connection("https://api.devnet.solana.com", "confirmed"),
+    () =>
+      new Connection(
+        "https://lingering-holy-wind.solana-devnet.discover.quiknode.pro/169c1aa008961ed4ec13c040acd5037e8ead18b1/",
+        "confirmed"
+      ),
     []
   );
   const sdk = useGumSDK(
     connection,
     { preflightCommitment: "confirmed" },
     "devnet",
-    "https://light-pelican-32.hasura.app/v1/graphql"
+    GRAPHQL_ENDPOINTS.devnet
+  );
+  const sdk2 = localGumSDK(
+    connection,
+    { preflightCommitment: "confirmed" },
+    "devnet",
+    GRAPHQL_ENDPOINTS.devnet
   );
   const mainGateway = "https://wei1769.infura-ipfs.io/ipfs/";
   const fetchProfile = async () => {
@@ -75,12 +91,10 @@ const ExplorePosts = () => {
           const allPostAccounts =
             (await sdk?.post.getAllPosts()) as Array<PostAccount>;
 
-          const userPosts = await sdk?.post.getPostAccountsByUser(
-            wallet.publicKey
-          );
-          let userPostAccounts = userPosts
+          const allPostLocal = await sdk2.post.getPostAccounts();
+          let userPostAccounts = allPostLocal
             ? await Promise.all(
-                userPosts.map(async (post) => {
+                allPostLocal.map(async (post) => {
                   try {
                     if (post.account.metadataUri.includes("/ipfs/")) {
                       let postData = await axios.get(
@@ -178,24 +192,25 @@ const ExplorePosts = () => {
     const fetchConnections = async () => {
       try {
         if (wallet.publicKey && profileKey.length > 0) {
-          let connTo = await sdk?.connection.getFollowingsByProfile(
+          let following = await sdk2?.connection.getALlConnectionAccounts(
             profileKey[0].accountKey
           );
-          let connFrom = await sdk?.connection.getFollowersByProfile(
+          let followers = await sdk2?.connection.getALlConnectionAccounts(
+            undefined,
             profileKey[0].accountKey
           );
-          let connections = await sdk?.connection.getConnectionsByUser(
-            profileKey[0].userKey
-          );
-          console.log(connTo, connections);
-          setConnection(
-            (connTo ? connTo : []).map((conn) => {
-              return new PublicKey(conn);
+
+          setfollowing(
+            (following ? following : []).map((conn) => {
+              return {
+                follow: conn.account.toProfile,
+                cl_pubkey: conn.publicKey,
+              };
             })
           );
           setFollower(
-            (connFrom ? connFrom : []).map((conn) => {
-              return new PublicKey(conn);
+            (followers ? followers : []).map((conn) => {
+              return conn.account.fromProfile;
             })
           );
         }
@@ -205,9 +220,26 @@ const ExplorePosts = () => {
     };
 
     const fetchReaction = async () => {
-      let reactionAccounts = await sdk?.reaction.getAllReactions();
-      console.log(reactionAccounts);
+      let reactionAccounts = await sdk2.reaction.getAllReactionAccounts();
+      let map = new Map<
+        string,
+        { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]
+      >();
+      reactionAccounts.forEach((account) => {
+        map.set(account.account.toPost.toString(), [
+          {
+            from: account.account.fromProfile,
+            type: account.account.reactionType,
+            cl_pubkey: account.publicKey,
+          },
+          ...(map.has(account.account.toPost.toString())
+            ? map.get(account.account.toPost.toString())!
+            : []),
+        ]);
+      });
+      setReactions(map);
     };
+
     fetchProfile();
     fetchPostData();
     fetchConnections();
@@ -318,7 +350,15 @@ const ExplorePosts = () => {
       console.log(err);
     }
   };
-
+  const handleAirdrop = async (e: any) => {
+    if (wallet.publicKey) {
+      let result = await connection.requestAirdrop(
+        wallet.publicKey,
+        1 * 10 ** 9
+      );
+      console.log(result);
+    }
+  };
   if (wallet.connected && userKey.length <= 0) {
     createProfileButton = (
       <button onClick={handleCreateProfile} className="">
@@ -369,7 +409,7 @@ const ExplorePosts = () => {
           {"@" + profileKey[0].accountKey.toString()}
         </h1>
         <p className={style.sub}>
-          Following: {connections.length} Follower: {followers.length}
+          Following: {following.length} Follower: {followers.length}
         </p>
       </div>
     );
@@ -377,6 +417,9 @@ const ExplorePosts = () => {
 
   return (
     <div>
+      <div>
+        <button onClick={handleAirdrop}>Airdrop 1 Sol</button>
+      </div>
       {userInfo}
       <div>{createProfileButton}</div>
       <div>{form}</div>
@@ -386,9 +429,10 @@ const ExplorePosts = () => {
             <Post
               post={post}
               setData={setExplore}
-              userProfile={profileKey}
+              userProfile={profileKey[0]}
               sdk={sdk}
-              connections={connections}
+              following={following}
+              reactions={reactions.get(post.cl_pubkey)}
             />
           </div>
         );

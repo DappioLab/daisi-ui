@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
-    "@gumhq/react-sdk": "^1.0.7",
-    "@gumhq/sdk": "^1.0.11",
+    "@gumhq/react-sdk": "^1.0.8",
+    "@gumhq/sdk": "^1.0.12",
     "@gumhq/ui-components": "^2.0.4",
     "@metamask/detect-provider": "^2.0.0",
     "@next/font": "13.1.6",

@@ -7,6 +7,7 @@ import { PublicKey } from "@solana/web3.js";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SDK } from "@gumhq/sdk";
+import { ReactionType } from "@gumhq/sdk/src/reaction";
 
 export interface postInterface {
   metadatauri: string;
@@ -21,14 +22,20 @@ export interface postInterface {
 
 interface postState {
   post: postInterface;
-  userProfile: ProfileAccount[];
-  connections: PublicKey[];
+  userProfile: ProfileAccount;
+  following: { follow: PublicKey; cl_pubkey: PublicKey }[];
+  reactions?: { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[];
   sdk: SDK | null;
   setData: Dispatch<SetStateAction<postInterface[]>>;
 }
 
 const Post = (post: postState) => {
   const wallet = useWallet();
+
+  let reactionsFromUser = post.reactions.filter((reaction) => {
+    if (post.userProfile.accountKey)
+      return reaction.from.equals(post.userProfile.accountKey);
+  });
   const handleFollow = async (e: any) => {
     try {
       if (!wallet.publicKey) {
@@ -36,9 +43,9 @@ const Post = (post: postState) => {
       }
       let followIx = await (
         await post.sdk?.connection.create(
-          post.userProfile[0].accountKey,
+          post.userProfile.accountKey,
           new PublicKey(post.post.profile),
-          post.userProfile[0].userKey,
+          post.userProfile.userKey,
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
@@ -51,15 +58,18 @@ const Post = (post: postState) => {
       if (!wallet.publicKey) {
         throw "wallet Not Connected";
       }
-
-      let followIx = await (
-        await post.sdk?.connection.create(
-          post.userProfile[0].accountKey,
+      let reactionPubkey = post.following.find((follow) => {
+        return follow.follow.toString() == post.post.profile;
+      });
+      let unFollowIx = await (
+        await post.sdk?.connection.delete(
+          reactionPubkey.cl_pubkey,
+          post.userProfile.accountKey,
           new PublicKey(post.post.profile),
-          post.userProfile[0].userKey,
+          post.userProfile.userKey,
           wallet.publicKey
         )
-      )?.instructionMethodBuilder.rpc();
+      )?.rpc();
     } catch (err) {
       console.log(err);
     }
@@ -72,8 +82,8 @@ const Post = (post: postState) => {
       let deleteTx = await post.sdk?.post
         .delete(
           new PublicKey(post.post.cl_pubkey),
-          post.userProfile[0].accountKey,
-          post.userProfile[0].userKey,
+          post.userProfile.accountKey,
+          post.userProfile.userKey,
           wallet.publicKey
         )
         ?.rpc();
@@ -89,13 +99,55 @@ const Post = (post: postState) => {
       }
       let likeTx = (
         await post.sdk?.reaction.create(
-          post.userProfile[0].accountKey,
+          post.userProfile.accountKey,
           new PublicKey(post.post.cl_pubkey),
           "Like",
-          post.userProfile[0].userKey,
+          post.userProfile.userKey,
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const deleteLike = async (e: any) => {
+    try {
+      let account = reactionsFromUser.find((reaction) => {
+        return Object.keys(reaction.type).includes("like");
+      }).cl_pubkey;
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      let deleteLikeTx = (
+        await post.sdk?.reaction.delete(
+          account,
+          new PublicKey(post.post.cl_pubkey),
+          post.userProfile.accountKey,
+          post.userProfile.userKey,
+          wallet.publicKey
+        )
+      )?.rpc();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const deleteDislike = async (e: any) => {
+    try {
+      let account = reactionsFromUser.find((reaction) => {
+        return Object.keys(reaction.type).includes("dislike");
+      }).cl_pubkey;
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      let deleteLikeTx = (
+        await post.sdk?.reaction.delete(
+          account,
+          new PublicKey(post.post.cl_pubkey),
+          post.userProfile.accountKey,
+          post.userProfile.userKey,
+          wallet.publicKey
+        )
+      )?.rpc();
     } catch (err) {
       console.log(err);
     }
@@ -107,10 +159,10 @@ const Post = (post: postState) => {
       }
       let likeTx = (
         await post.sdk?.reaction.create(
-          post.userProfile[0].accountKey,
+          post.userProfile.accountKey,
           new PublicKey(post.post.cl_pubkey),
           "Dislike",
-          post.userProfile[0].userKey,
+          post.userProfile.userKey,
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
@@ -120,10 +172,10 @@ const Post = (post: postState) => {
   };
   let followButton = null;
   if (
-    post.userProfile.length > 0 &&
-    post.userProfile[0].accountKey.toString() != post.post.profile &&
-    !post.connections.find((conn) => {
-      return conn.toString() == post.post.profile;
+    post.userProfile &&
+    post.userProfile.accountKey.toString() != post.post.profile &&
+    !post.following.find((conn) => {
+      return conn.follow.toString() == post.post.profile;
     })
   ) {
     followButton = (
@@ -132,22 +184,22 @@ const Post = (post: postState) => {
       </button>
     );
   } else if (
-    post.userProfile.length > 0 &&
-    post.userProfile[0].accountKey.toString() != post.post.profile &&
-    post.connections.find((conn) => {
-      return conn.toString() == post.post.profile;
+    post.userProfile &&
+    post.userProfile.accountKey.toString() != post.post.profile &&
+    post.following.find((conn) => {
+      return conn.follow.toString() == post.post.profile;
     })
   ) {
     followButton = (
-      <button className={style.follow} onClick={handleFollow}>
+      <button className={style.follow} onClick={handleUnfollow}>
         Unfollow
       </button>
     );
   }
   let deleteButton = null;
   if (
-    post.userProfile.length > 0 &&
-    post.userProfile[0].accountKey.toString() == post.post.profile
+    post.userProfile &&
+    post.userProfile.accountKey.toString() == post.post.profile
   ) {
     deleteButton = (
       <div>
@@ -158,18 +210,48 @@ const Post = (post: postState) => {
     );
   }
   let reactionButton = null;
-  if (post.userProfile.length > 0) {
+  if (post.userProfile) {
+    let likeButton = (
+      <button className={""} onClick={handleLike}>
+        Like
+      </button>
+    );
+    let disLikeButton = (
+      <button className={""} onClick={handleDislike}>
+        Dislike
+      </button>
+    );
+
+    if (
+      reactionsFromUser.find((reaction) => {
+        return Object.keys(reaction.type).includes("like");
+      })
+    ) {
+      likeButton = (
+        <button className={""} onClick={deleteLike}>
+          revoke Like
+        </button>
+      );
+    }
+    if (
+      reactionsFromUser.find((reaction) => {
+        return Object.keys(reaction.type).includes("dislike");
+      })
+    ) {
+      disLikeButton = (
+        <button className={""} onClick={deleteDislike}>
+          revoke Dislike
+        </button>
+      );
+    }
     reactionButton = (
       <div>
-        <button className={""} onClick={handleLike}>
-          Like
-        </button>
-        <button className={""} onClick={handleDislike}>
-          Dislike
-        </button>
+        {likeButton}
+        {disLikeButton}
       </div>
     );
   }
+
   return (
     <div className={style.feed}>
       <div className={style.title}>
@@ -184,6 +266,9 @@ const Post = (post: postState) => {
             </div>
           );
         })}
+      <div className={style.reaction}>
+        {"reactions: " + (post.reactions ? post.reactions.length : 0)}
+      </div>
       {reactionButton}
       {deleteButton}
     </div>
