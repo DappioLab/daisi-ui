@@ -78,6 +78,16 @@ export const PROFILE_BY_ADDRESS_QUERY = gql`
           avatar
           metadata
         }
+        profiles {
+          edges {
+            node {
+              profileID
+              handle
+              avatar
+              metadata
+            }
+          }
+        }
       }
     }
   }
