@@ -31,11 +31,13 @@ interface postState {
 
 const Post = (post: postState) => {
   const wallet = useWallet();
-
-  let reactionsFromUser = post.reactions.filter((reaction) => {
-    if (post.userProfile.accountKey)
-      return reaction.from.equals(post.userProfile.accountKey);
-  });
+  let reactionsFromUser = [];
+  if (post.reactions) {
+    reactionsFromUser = post.reactions.filter((reaction) => {
+      if (post.userProfile)
+        return reaction.from.equals(post.userProfile.accountKey);
+    });
+  }
   const handleFollow = async (e: any) => {
     try {
       if (!wallet.publicKey) {
