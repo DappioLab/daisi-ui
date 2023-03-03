@@ -111,7 +111,34 @@ export class Post {
       authority: owner,
     });
   }
-
+  public async reply(
+    replyTo: anchor.web3.PublicKey,
+    metadataUri: String,
+    profileAccount: anchor.web3.PublicKey,
+    userAccount: anchor.web3.PublicKey,
+    owner: anchor.web3.PublicKey
+  ) {
+    const metadata = await axios.get(metadataUri as string);
+    const postMetadata = new PostMetadata(metadata.data);
+    if (!postMetadata.validate()) {
+      throw new Error("Invalid post metadata");
+    }
+    const randomHash = randomBytes(32);
+    const instructionMethodBuilder = this.sdk.program.methods
+      .createComment(metadataUri, randomHash)
+      .accounts({
+        profile: profileAccount,
+        user: userAccount,
+        authority: owner,
+        replyTo: replyTo,
+      });
+    const pubKeys = await instructionMethodBuilder.pubkeys();
+    const postPDA = pubKeys.post as anchor.web3.PublicKey;
+    return {
+      instructionMethodBuilder,
+      postPDA,
+    };
+  }
   // GraphQL Query methods
 
   public async getAllPosts() {
@@ -122,6 +149,7 @@ export class Post {
           metadatauri
           profile
           randomhash
+          replyto
         }
       }
     `;

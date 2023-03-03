@@ -8,16 +8,28 @@ import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
 import { ReactionType } from "@gumhq/sdk/src/reaction";
 import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
-import { create } from "ipfs-http-client";
+import { ipfsClient, mainGateway } from "./storage";
 
 interface PostAccount {
   cl_pubkey: string;
   metadatauri: string;
   profile: string;
+  replyto?: string;
 }
-interface ConnectionAccount {
-  fromprofile: string;
-  toprofile: string;
+export interface ConnectionInterface {
+  follow: PublicKey;
+  cl_pubkey: PublicKey;
+}
+export interface ReactionInterface {
+  from: PublicKey;
+  type: ReactionType;
+  cl_pubkey: PublicKey;
+  replyTo?: PublicKey;
+}
+export interface ReplyInterface {
+  from: PublicKey;
+  text: string;
+  cl_pubkey: PublicKey;
 }
 export interface ProfileAccount {
   accountKey: PublicKey;
@@ -30,13 +42,14 @@ const ExplorePosts = () => {
   const [profileKey, setProfileKey] = useState<ProfileAccount[]>([]);
   const [userKey, setUserKey] = useState<PublicKey[]>([]);
   const [postImg, setImg] = useState<File | null>(null);
-  const [following, setfollowing] = useState<
-    { follow: PublicKey; cl_pubkey: PublicKey }[]
-  >([]);
+  const [following, setfollowing] = useState<ConnectionInterface[]>([]);
   const [followers, setFollower] = useState<PublicKey[]>([]);
-  const [reactions, setReactions] = useState<
-    Map<string, { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]>
-  >(new Map());
+  const [reactions, setReactions] = useState<Map<string, ReactionInterface[]>>(
+    new Map()
+  );
+  const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
+    new Map()
+  );
   const connection = useMemo(
     () =>
       new Connection(
@@ -57,7 +70,7 @@ const ExplorePosts = () => {
     "devnet",
     GRAPHQL_ENDPOINTS.devnet
   );
-  const mainGateway = "https://wei1769.infura-ipfs.io/ipfs/";
+
   const fetchProfile = async () => {
     if (wallet.publicKey) {
       let profileKeys = await sdk?.profile.getProfileAccountsByUser(
@@ -89,8 +102,8 @@ const ExplorePosts = () => {
       try {
         if (wallet.publicKey) {
           const allPostAccounts =
-            (await sdk?.post.getAllPosts()) as Array<PostAccount>;
-
+            (await sdk2?.post.getAllPosts()) as Array<PostAccount>;
+          let replyMap = new Map<string, ReplyInterface[]>();
           const allPostLocal = await sdk2.post.getPostAccounts();
           let userPostAccounts = allPostLocal
             ? await Promise.all(
@@ -106,16 +119,22 @@ const ExplorePosts = () => {
                       return {
                         postData,
                         metadatauri: post.account.metadataUri,
-                        cl_pubkey: post.publicKey.toString(),
-                        profile: post.account.profile.toString(),
+                        cl_pubkey: post.publicKey,
+                        profile: post.account.profile as PublicKey,
+                        replyTo: post.account.replyTo
+                          ? (post.account.replyTo as PublicKey)
+                          : null,
                       };
                     }
                     let postData = await axios.get(post.account.metadataUri);
                     return {
                       postData,
                       metadatauri: post.account.metadataUri,
-                      cl_pubkey: post.publicKey.toString(),
-                      profile: post?.account.profile.toString(),
+                      cl_pubkey: post.publicKey,
+                      profile: post?.account.profile as PublicKey,
+                      replyTo: post.account.replyTo
+                        ? (post.account.replyTo as PublicKey)
+                        : null,
                     };
                   } catch (err) {
                     console.log(err);
@@ -123,11 +142,12 @@ const ExplorePosts = () => {
                 })
               )
             : [];
+
           let allPostsMetadata = await Promise.all(
             allPostAccounts
               .filter((post) => {
                 return !userPostAccounts.find((userPost) => {
-                  return post.cl_pubkey == userPost?.cl_pubkey;
+                  return post.cl_pubkey == userPost?.cl_pubkey.toString();
                 });
               })
               .map(async (post) => {
@@ -142,8 +162,11 @@ const ExplorePosts = () => {
                     return {
                       postData,
                       metadatauri: post.metadatauri,
-                      cl_pubkey: post.cl_pubkey,
-                      profile: post.profile,
+                      cl_pubkey: new PublicKey(post.cl_pubkey),
+                      profile: new PublicKey(post.profile),
+                      replyTo: post.replyto
+                        ? new PublicKey(post.replyto)
+                        : null,
                     };
                   }
 
@@ -152,8 +175,9 @@ const ExplorePosts = () => {
                   return {
                     postData,
                     metadatauri: post.metadatauri,
-                    cl_pubkey: post.cl_pubkey,
-                    profile: post.profile,
+                    cl_pubkey: new PublicKey(post.cl_pubkey),
+                    profile: new PublicKey(post.profile),
+                    replyTo: post.replyto ? new PublicKey(post.replyto) : null,
                   };
                 } catch (err) {}
               })
@@ -178,11 +202,29 @@ const ExplorePosts = () => {
                 return {
                   ...postCotext,
                   metadatauri: data?.metadatauri,
-                  cl_pubkey: data ? data.cl_pubkey : "",
-                  profile: data ? data.profile : "",
+                  cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
+                  profile: data ? data.profile : PublicKey.default,
                 };
               })
           );
+          [...userPostAccounts, ...allPostsMetadata]
+            .filter((data) => {
+              return data.replyTo && data.postData.data.content.content;
+            })
+            .forEach((data) => {
+              replyMap.set(data.replyTo.toString(), [
+                {
+                  from: data.profile,
+                  text: data.postData.data.content.content,
+                  cl_pubkey: data.cl_pubkey,
+                },
+                ...(replyMap.has(data.replyTo.toString())
+                  ? replyMap.get(data.replyTo.toString())
+                  : []),
+              ]);
+            });
+
+          setReply(replyMap);
         }
       } catch (err) {
         console.log("error", err);
@@ -221,6 +263,7 @@ const ExplorePosts = () => {
 
     const fetchReaction = async () => {
       let reactionAccounts = await sdk2.reaction.getAllReactionAccounts();
+      // let reactions = await sdk.reaction.getAllReactions();
       let map = new Map<
         string,
         { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]
@@ -276,20 +319,6 @@ const ExplorePosts = () => {
         digestEncoding: "hex",
         parentDigest: "",
       };
-      const projectId = "2MIhwQuXI2ocuaxhWO3nrq8HxmV";
-      const projectSecret = "58614cce0653d63460abcf0d9d983be8";
-      const auth =
-        "Basic " +
-        Buffer.from(projectId + ":" + projectSecret).toString("base64");
-      const ipfsClient = create({
-        host: "ipfs.infura.io",
-        port: 5001,
-        protocol: "https",
-        apiPath: "/api/v0",
-        headers: {
-          authorization: auth,
-        },
-      });
       if (postImg) {
         let uploadedPic = await ipfsClient.add(postImg);
         data.content.blocks.push({
@@ -425,14 +454,15 @@ const ExplorePosts = () => {
       <div>{form}</div>
       {explore?.map((post: postInterface) => {
         return (
-          <div key={post.cl_pubkey} className="">
+          <div key={post.cl_pubkey.toString()} className="">
             <Post
               post={post}
               setData={setExplore}
               userProfile={profileKey[0]}
-              sdk={sdk}
+              sdk={sdk2}
               following={following}
-              reactions={reactions.get(post.cl_pubkey)}
+              reactions={reactions.get(post.cl_pubkey.toString())}
+              replies={replies.get(post.cl_pubkey.toString())}
             />
           </div>
         );
