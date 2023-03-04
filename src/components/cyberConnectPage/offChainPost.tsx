@@ -28,7 +28,10 @@ const OffChainPost = () => {
         provider: provider,
         signingMessageEntity: "CyberConnect",
       });
-      const res = await cyberConnect.createPost(post);
+      const res = await cyberConnect.createPost({
+        ...post,
+        author: primaryProfile.handle,
+      });
       setPost({
         title: "",
         body: "",
