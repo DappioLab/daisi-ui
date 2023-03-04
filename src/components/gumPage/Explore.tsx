@@ -1,7 +1,7 @@
 import Post, { postInterface } from "./Posts";
 import React, { useEffect, useState, useMemo } from "react";
 
-import { useGumSDK, localGumSDK } from "@/hooks/useGumSDK";
+import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { useWallet, AnchorWallet } from "@solana/wallet-adapter-react";
 import { GRAPHQL_ENDPOINTS } from "../../gpl-core/src";
@@ -64,12 +64,6 @@ const ExplorePosts = () => {
     "devnet",
     GRAPHQL_ENDPOINTS.devnet
   );
-  const sdk2 = localGumSDK(
-    connection,
-    { preflightCommitment: "confirmed" },
-    "devnet",
-    GRAPHQL_ENDPOINTS.devnet
-  );
 
   const fetchProfile = async () => {
     if (wallet.publicKey) {
@@ -102,9 +96,9 @@ const ExplorePosts = () => {
       try {
         if (wallet.publicKey) {
           const allPostAccounts =
-            (await sdk2?.post.getAllPosts()) as Array<PostAccount>;
+            (await sdk?.post.getAllPosts()) as Array<PostAccount>;
           let replyMap = new Map<string, ReplyInterface[]>();
-          const allPostLocal = await sdk2.post.getPostAccounts();
+          const allPostLocal = await sdk.post.getPostAccounts();
           let userPostAccounts = allPostLocal
             ? await Promise.all(
                 allPostLocal.map(async (post) => {
@@ -234,10 +228,10 @@ const ExplorePosts = () => {
     const fetchConnections = async () => {
       try {
         if (wallet.publicKey && profileKey.length > 0) {
-          let following = await sdk2?.connection.getALlConnectionAccounts(
+          let following = await sdk?.connection.getALlConnectionAccounts(
             profileKey[0].accountKey
           );
-          let followers = await sdk2?.connection.getALlConnectionAccounts(
+          let followers = await sdk?.connection.getALlConnectionAccounts(
             undefined,
             profileKey[0].accountKey
           );
@@ -262,7 +256,7 @@ const ExplorePosts = () => {
     };
 
     const fetchReaction = async () => {
-      let reactionAccounts = await sdk2.reaction.getAllReactionAccounts();
+      let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
       // let reactions = await sdk.reaction.getAllReactions();
       let map = new Map<
         string,
@@ -459,7 +453,7 @@ const ExplorePosts = () => {
               post={post}
               setData={setExplore}
               userProfile={profileKey[0]}
-              sdk={sdk2}
+              sdk={sdk}
               following={following}
               reactions={reactions.get(post.cl_pubkey.toString())}
               replies={replies.get(post.cl_pubkey.toString())}

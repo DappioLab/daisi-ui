@@ -16,14 +16,3 @@ export const useGumSDK = (
 
   return sdk;
 };
-export const localGumSDK = (
-  connection: Connection,
-  opts: ConfirmOptions,
-  cluster: Cluster,
-  gplUrl: string
-) => {
-  const anchorWallet = useAnchorWallet() as AnchorWallet;
-  let gpl = new GraphQLClient(gplUrl);
-  let sdk = new LocalSDK(anchorWallet, connection, opts, cluster, gpl);
-  return sdk;
-};
