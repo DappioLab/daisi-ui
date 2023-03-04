@@ -3,7 +3,7 @@ import FeedList from "@/components/homePage/feedList";
 import PageTitle from "@/components/common/pageTitle";
 import FeedModal from "@/components/homePage/feedModal";
 import request from "graphql-request";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   endpoint,
   POST_BY_ID_STATIC_FIELDS_QUERY,
@@ -14,7 +14,6 @@ import { IRootState } from "@/redux";
 import HorizontalFeed from "@/components/homePage/horizontalFeed";
 import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
 import dynamic from "next/dynamic";
-import { getRss } from "@/utils/rss";
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -30,7 +29,8 @@ const HomePage = () => {
   const dispatch = useDispatch();
 
   const getCurrentModalIndex = () => {
-    return feedList.findIndex((item) => item.id === currentId);
+    return 0;
+    // return feedList.findIndex((item) => item.id === currentId);
   };
 
   const getPost = async (id: string) => {

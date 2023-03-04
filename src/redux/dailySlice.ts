@@ -1,9 +1,29 @@
-import { IFeed } from "@/components/homePage/feed";
+// import { IFeed } from "@/components/homePage/feed";
 import { createSlice } from "@reduxjs/toolkit";
+
+export interface IRssSourceData {
+  sourceTitle: string;
+  sourceDescription: string;
+  sourceLink: string;
+  sourceIcon: string;
+}
+
+export interface IRssSourceItem {
+  sourceTitle: string;
+  sourceDescription: string;
+  sourceLink: string;
+  sourceImage: string;
+  created: string;
+}
+
+export interface IParsedRssData extends IRssSourceData {
+  items: IRssSourceItem[];
+}
 
 export interface IDailyInitialState {
   currentId: string | null;
-  feedList: IFeed[];
+  // feedList: IFeed[];
+  feedList: IParsedRssData[];
   modalData: any;
 }
 
