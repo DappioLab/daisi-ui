@@ -1,5 +1,5 @@
 import { IFeed } from "@/components/homePage/feed";
-import { SDK } from "@gumhq/sdk";
+import { SDK } from "../gpl-core/src";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import axios from "axios";

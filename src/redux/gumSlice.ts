@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
-import { SDK } from "@gumhq/sdk";
+import { SDK } from "../gpl-core/src";
 
 export interface IGumInitialState {
   user: PublicKey | null;

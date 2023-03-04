@@ -79,7 +79,7 @@ export class Connection {
         cl_pubkey
       }
     `;
-    const result = await this.sdk.gqlClient?.request(query);
+    const result: any = await this.sdk.gqlClient?.request(query);
     return result.gum_0_1_0_decoded_connection;
   }
 
@@ -99,7 +99,7 @@ export class Connection {
         }
       }
     `;
-    const result = await this.sdk.gqlClient.request(query);
+    const result: any = await this.sdk.gqlClient.request(query);
     return result.gum_0_1_0_decoded_connection;
   }
 

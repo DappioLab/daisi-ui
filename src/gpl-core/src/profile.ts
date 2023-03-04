@@ -146,7 +146,7 @@ export class Profile {
           cl_pubkey
         }
       }`;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_profile;
   }
 
@@ -164,7 +164,7 @@ export class Profile {
         }
       }
       `;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_profile;
   }
 
@@ -179,7 +179,7 @@ export class Profile {
         }
       }
     `;
-    const data = await this.sdk.gqlClient.request(query, { namespace: namespaceString });
+    const data: any = await this.sdk.gqlClient.request(query, { namespace: namespaceString });
     return data.gum_0_1_0_decoded_profile;
   }
 
@@ -201,7 +201,7 @@ export class Profile {
         }
       }
     `;
-    const data = await this.sdk.gqlClient.request(query, { namespace: namespaceString });
+    const data: any = await this.sdk.gqlClient.request(query, { namespace: namespaceString });
     return data.gum_0_1_0_decoded_profile;
   }
 }

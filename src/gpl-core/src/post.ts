@@ -153,7 +153,7 @@ export class Post {
         }
       }
     `;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_post;
   }
 
@@ -173,7 +173,7 @@ export class Post {
           randomhash
         }
       }`;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_post;
   }
 
@@ -186,7 +186,7 @@ export class Post {
           profile
         }
       }`;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_post;
   }
 
@@ -206,7 +206,7 @@ export class Post {
           profile
         }
       }`;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_post;
   }
 
@@ -224,7 +224,7 @@ export class Post {
           profile
         }
       }`;
-    const data = await this.sdk.gqlClient.request(query);
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_post;
   }
 }

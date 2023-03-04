@@ -12,7 +12,7 @@ import { PublicKey } from "@solana/web3.js";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SDK } from "./../../gpl-core/src";
-import { ReactionType } from "@gumhq/sdk/src/reaction";
+import { ReactionType } from "../../gpl-core/src/reaction";
 import { ipfsClient, mainGateway } from "./storage";
 export interface postInterface {
   metadatauri: string;

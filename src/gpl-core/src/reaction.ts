@@ -85,7 +85,7 @@ export class Reaction {
         }
       }
     `;
-    const result = await this.sdk.gqlClient.request(query);
+    const result: any = await this.sdk.gqlClient.request(query);
     return result.gum_0_1_0_decoded_reaction;
   }
 
@@ -100,7 +100,7 @@ export class Reaction {
         }
       }
     `;
-    const result = await this.sdk.gqlClient.request(query, {
+    const result: any = await this.sdk.gqlClient.request(query, {
       postAccount: postAccount.toBase58(),
     });
     return result.gum_0_1_0_decoded_reaction;

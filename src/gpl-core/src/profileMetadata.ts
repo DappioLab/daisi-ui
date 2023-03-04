@@ -19,21 +19,27 @@ export class ProfileMetadata {
   }
 
   public async get(profileMetadataAccount: anchor.web3.PublicKey) {
-    return await this.sdk.program.account.profileMetadata.fetch(profileMetadataAccount);
+    return await this.sdk.program.account.profileMetadata.fetch(
+      profileMetadataAccount
+    );
   }
 
   /**
    * @deprecated This function is slow and may cause performance issues. Consider using getProfileMetadataByUser instead.
    */
-  public async getProfileMetadataAccountsByUser(user: anchor.web3.PublicKey): Promise<anchor.ProgramAccount<any>[]> {
+  public async getProfileMetadataAccountsByUser(
+    user: anchor.web3.PublicKey
+  ): Promise<anchor.ProgramAccount<any>[]> {
     const profiles = await this.sdk.profile.getProfileAccountsByUser(user);
     const profilePDAs = profiles.map((p) => p.publicKey);
     let profileMetadataList = [];
     for (const profilePDA of profilePDAs) {
-      const profileMetadata = await this.sdk.program.account.profileMetadata.all([
-        { memcmp: { offset: 8, bytes: profilePDA.toBase58() } },
-      ])
-      if (profileMetadata.length > 0) profileMetadataList = [...profileMetadataList, profileMetadata];
+      const profileMetadata =
+        await this.sdk.program.account.profileMetadata.all([
+          { memcmp: { offset: 8, bytes: profilePDA.toBase58() } },
+        ]);
+      if (profileMetadata.length > 0)
+        profileMetadataList = [...profileMetadataList, profileMetadata];
     }
     return profileMetadataList;
   }
@@ -42,9 +48,10 @@ export class ProfileMetadata {
     metadataUri: String,
     profileAccount: anchor.web3.PublicKey,
     userAccount: anchor.web3.PublicKey,
-    owner: anchor.web3.PublicKey) {
+    owner: anchor.web3.PublicKey
+  ) {
     // Validate Profile Metadata before creating
-    if (!await this.validateProfileMetadata(metadataUri as string)) {
+    if (!(await this.validateProfileMetadata(metadataUri as string))) {
       throw new Error("Invalid profile metadata");
     }
 
@@ -68,7 +75,8 @@ export class ProfileMetadata {
     profileMetadataAccount: anchor.web3.PublicKey,
     profileAccount: anchor.web3.PublicKey,
     userAccount: anchor.web3.PublicKey,
-    owner: anchor.web3.PublicKey) {
+    owner: anchor.web3.PublicKey
+  ) {
     return this.sdk.program.methods
       .updateProfileMetadata(metadataUri)
       .accounts({
@@ -83,15 +91,14 @@ export class ProfileMetadata {
     profileMetadataAccount: anchor.web3.PublicKey,
     profileAccount: anchor.web3.PublicKey,
     userAccount: anchor.web3.PublicKey,
-    owner: anchor.web3.PublicKey) {
-    return this.sdk.program.methods
-      .deleteProfileMetadata()
-      .accounts({
-        profileMetadata: profileMetadataAccount,
-        profile: profileAccount,
-        user: userAccount,
-        authority: owner,
-      });
+    owner: anchor.web3.PublicKey
+  ) {
+    return this.sdk.program.methods.deleteProfileMetadata().accounts({
+      profileMetadata: profileMetadataAccount,
+      profile: profileAccount,
+      user: userAccount,
+      authority: owner,
+    });
   }
 
   public async validateProfileMetadata(metadataUri: string): Promise<boolean> {
@@ -104,7 +111,12 @@ export class ProfileMetadata {
       const { data } = await axios.get<ProfileMetadataType>(metadataUri);
 
       // Check if all required fields are present
-      const requiredFields: Array<keyof ProfileMetadataType> = ["name", "bio", "username", "avatar"];
+      const requiredFields: Array<keyof ProfileMetadataType> = [
+        "name",
+        "bio",
+        "username",
+        "avatar",
+      ];
       for (const field of requiredFields) {
         if (!data[field]) {
           throw new Error(`${field} is required but missing`);
@@ -159,38 +171,55 @@ export class ProfileMetadata {
           metadatauri
           profile
         }
-      }`
-    const data = await this.sdk.gqlClient.request(query);
+      }
+    `;
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_profilemetadata;
   }
 
-  public async getProfileMetadataByUser(userPubKey: anchor.web3.PublicKey): Promise<any> {
+  public async getProfileMetadataByUser(
+    userPubKey: anchor.web3.PublicKey
+  ): Promise<any> {
     const profiles = await this.sdk.profile.getProfilesByUser(userPubKey);
-    const profilePDAs = profiles.map((p) => p.cl_pubkey) as anchor.web3.PublicKey[];
+    const profilePDAs = profiles.map(
+      (p) => p.cl_pubkey
+    ) as anchor.web3.PublicKey[];
     const query = gql`
       query GetProfileMetadataByUser {
-        gum_0_1_0_decoded_profilemetadata(where: {profile: {_in: [${profilePDAs.map((pda) => `"${pda}"`).join(",")}] }}) {
+        gum_0_1_0_decoded_profilemetadata(where: {profile: {_in: [${profilePDAs
+          .map((pda) => `"${pda}"`)
+          .join(",")}] }}) {
           cl_pubkey
           metadatauri
           profile
         }
-      }`
-    const data = await this.sdk.gqlClient.request(query);
+      }`;
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_profilemetadata;
   }
 
-  public async getProfileMetadataByUserAndNamespace(userPubKey: anchor.web3.PublicKey, namespace: Namespace): Promise<any> {
-    const profiles = await this.sdk.profile.getProfilesByUserAndNamespace(userPubKey, namespace);
-    const profilePDAs = profiles.map((p) => p.cl_pubkey) as anchor.web3.PublicKey[];
+  public async getProfileMetadataByUserAndNamespace(
+    userPubKey: anchor.web3.PublicKey,
+    namespace: Namespace
+  ): Promise<any> {
+    const profiles = await this.sdk.profile.getProfilesByUserAndNamespace(
+      userPubKey,
+      namespace
+    );
+    const profilePDAs = profiles.map(
+      (p) => p.cl_pubkey
+    ) as anchor.web3.PublicKey[];
     const query = gql`
       query GetProfileMetadataByUserAndNamespace {
-        gum_0_1_0_decoded_profilemetadata(where: {profile: {_in: [${profilePDAs.map((pda) => `"${pda}"`).join(",")}] }}) {
+        gum_0_1_0_decoded_profilemetadata(where: {profile: {_in: [${profilePDAs
+          .map((pda) => `"${pda}"`)
+          .join(",")}] }}) {
           cl_pubkey
           metadatauri
           profile
         }
-      }`
-    const data = await this.sdk.gqlClient.request(query);
+      }`;
+    const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_profilemetadata;
   }
 }
