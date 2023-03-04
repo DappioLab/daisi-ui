@@ -9,7 +9,15 @@ import { ReactionType } from "../../gpl-core/src/reaction";
 import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
 import { ipfsClient, mainGateway } from "./storage";
-
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateUserAccounts,
+  updateUserProfile,
+  updateFollowers,
+  updateFollowing,
+  updateReactions,
+} from "../../redux/gumSlice";
+import { IRootState } from "@/redux";
 interface PostAccount {
   cl_pubkey: string;
   metadatauri: string;
@@ -32,24 +40,23 @@ export interface ReplyInterface {
   cl_pubkey: PublicKey;
 }
 export interface ProfileAccount {
-  accountKey: PublicKey;
-  userKey: PublicKey;
+  profile: PublicKey;
+  user: PublicKey;
+  wallet: PublicKey;
 }
 const ExplorePosts = () => {
   const wallet = useWallet();
+  const dispatch = useDispatch();
+  const { userProfile, following, followers, reactions, userAccounts } =
+    useSelector((state: IRootState) => state.gum);
   const [explore, setExplore] = useState<postInterface[]>([]);
   const [postText, setPostText] = useState("");
-  const [profileKey, setProfileKey] = useState<ProfileAccount[]>([]);
-  const [userKey, setUserKey] = useState<PublicKey[]>([]);
+
   const [postImg, setImg] = useState<File | null>(null);
-  const [following, setfollowing] = useState<ConnectionInterface[]>([]);
-  const [followers, setFollower] = useState<PublicKey[]>([]);
-  const [reactions, setReactions] = useState<Map<string, ReactionInterface[]>>(
-    new Map()
-  );
-  const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
-    new Map()
-  );
+  // parts for reply
+  // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
+  //   new Map()
+  // );
   const connection = useMemo(
     () =>
       new Connection(
@@ -58,7 +65,8 @@ const ExplorePosts = () => {
       ),
     []
   );
-  const sdk = useGumSDK(
+
+  let sdk = useGumSDK(
     connection,
     { preflightCommitment: "confirmed" },
     "devnet",
@@ -70,102 +78,95 @@ const ExplorePosts = () => {
       let profileKeys = await sdk?.profile.getProfileAccountsByUser(
         wallet.publicKey
       );
-      if (profileKey.length <= 0 && profileKeys && profileKeys.length > 0) {
-        setProfileKey(
-          profileKeys.map((pa) => {
-            return {
-              accountKey: pa.publicKey,
-              userKey: pa.account.user,
-            };
-          })
+      if (!userProfile && profileKeys && profileKeys.length > 0) {
+        dispatch(
+          updateUserProfile(
+            profileKeys
+              .map((pa) => {
+                return {
+                  profile: pa.publicKey,
+                  user: pa.account.user,
+                  wallet: wallet.publicKey,
+                };
+              })
+              .sort()[0]
+          )
         );
       }
       let userKeys = await sdk?.user.getUserAccountsByUser(wallet.publicKey);
       if (userKeys && userKeys.length > 0) {
-        setUserKey(
-          userKeys.map((pa) => {
-            return pa.publicKey;
-          })
+        dispatch(
+          updateUserAccounts(
+            userKeys.map((account) => {
+              return account.publicKey;
+            })
+          )
         );
       }
     }
   };
-
-  useEffect(() => {
-    const fetchPostData = async () => {
-      try {
-        if (wallet.publicKey) {
-          const allPostAccounts =
-            (await sdk?.post.getAllPosts()) as Array<PostAccount>;
-          let replyMap = new Map<string, ReplyInterface[]>();
-          const allPostLocal = await sdk.post.getPostAccounts();
-          let userPostAccounts = allPostLocal
-            ? await Promise.all(
-                allPostLocal.map(async (post) => {
-                  try {
-                    if (post.account.metadataUri.includes("/ipfs/")) {
-                      let postData = await axios.get(
-                        mainGateway +
-                          post.account.metadataUri.substring(
-                            post.account.metadataUri.indexOf("/ipfs/") + 6
-                          )
-                      );
-                      return {
-                        postData,
-                        metadatauri: post.account.metadataUri,
-                        cl_pubkey: post.publicKey,
-                        profile: post.account.profile as PublicKey,
-                        replyTo: post.account.replyTo
-                          ? (post.account.replyTo as PublicKey)
-                          : null,
-                      };
-                    }
-                    let postData = await axios.get(post.account.metadataUri);
-                    return {
-                      postData,
-                      metadatauri: post.account.metadataUri,
-                      cl_pubkey: post.publicKey,
-                      profile: post?.account.profile as PublicKey,
-                      replyTo: post.account.replyTo
-                        ? (post.account.replyTo as PublicKey)
-                        : null,
-                    };
-                  } catch (err) {
-                    console.log(err);
-                  }
-                })
-              )
-            : [];
-
-          let allPostsMetadata = await Promise.all(
-            allPostAccounts
-              .filter((post) => {
-                return !userPostAccounts.find((userPost) => {
-                  return post.cl_pubkey == userPost?.cl_pubkey.toString();
-                });
-              })
-              .map(async (post) => {
+  const fetchPostData = async () => {
+    try {
+      if (wallet.publicKey) {
+        const allPostAccounts =
+          (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+        // parts for reply
+        // let replyMap = new Map<string, ReplyInterface[]>();
+        const allPostLocal = await sdk.post.getPostAccounts();
+        let userPostAccounts = allPostLocal
+          ? await Promise.all(
+              allPostLocal.map(async (post) => {
                 try {
-                  if (post.metadatauri.includes("/ipfs/")) {
+                  if (post.account.metadataUri.includes("/ipfs/")) {
                     let postData = await axios.get(
                       mainGateway +
-                        post.metadatauri.substring(
-                          post.metadatauri.indexOf("/ipfs/") + 6
+                        post.account.metadataUri.substring(
+                          post.account.metadataUri.indexOf("/ipfs/") + 6
                         )
                     );
                     return {
                       postData,
-                      metadatauri: post.metadatauri,
-                      cl_pubkey: new PublicKey(post.cl_pubkey),
-                      profile: new PublicKey(post.profile),
-                      replyTo: post.replyto
-                        ? new PublicKey(post.replyto)
+                      metadatauri: post.account.metadataUri,
+                      cl_pubkey: post.publicKey,
+                      profile: post.account.profile as PublicKey,
+                      replyTo: post.account.replyTo
+                        ? (post.account.replyTo as PublicKey)
                         : null,
                     };
                   }
+                  let postData = await axios.get(post.account.metadataUri);
+                  return {
+                    postData,
+                    metadatauri: post.account.metadataUri,
+                    cl_pubkey: post.publicKey,
+                    profile: post?.account.profile as PublicKey,
+                    replyTo: post.account.replyTo
+                      ? (post.account.replyTo as PublicKey)
+                      : null,
+                  };
+                } catch (err) {
+                  console.log(err);
+                }
+              })
+            )
+          : [];
 
-                  let postData = await axios.get(post.metadatauri);
-
+        let allPostsMetadata = await Promise.all(
+          allPostAccounts
+            .filter((post) => {
+              return !userPostAccounts.find((userPost) => {
+                return post.cl_pubkey == userPost?.cl_pubkey.toString();
+              });
+            })
+            .map(async (post) => {
+              try {
+                if (post.metadatauri.includes("/ipfs/")) {
+                  let postData = await axios.get(
+                    mainGateway +
+                      post.metadatauri.substring(
+                        post.metadatauri.indexOf("/ipfs/") + 6
+                      )
+                  );
                   return {
                     postData,
                     metadatauri: post.metadatauri,
@@ -173,115 +174,130 @@ const ExplorePosts = () => {
                     profile: new PublicKey(post.profile),
                     replyTo: post.replyto ? new PublicKey(post.replyto) : null,
                   };
-                } catch (err) {}
-              })
-          );
+                }
 
-          setExplore(
-            [...userPostAccounts, ...allPostsMetadata]
-              .filter((data) => {
-                let postCotext = data?.postData.data as postInterface;
-                return (
-                  data?.postData.status == 200 &&
-                  postCotext.content.blocks?.find((block) => {
-                    return (
-                      block.type == "header" &&
-                      block.data.text == "Created in Daisi"
-                    );
-                  })
-                );
-              })
-              .map((data) => {
-                let postCotext = data?.postData.data as postInterface;
+                let postData = await axios.get(post.metadatauri);
+
                 return {
-                  ...postCotext,
-                  metadatauri: data?.metadatauri,
-                  cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
-                  profile: data ? data.profile : PublicKey.default,
+                  postData,
+                  metadatauri: post.metadatauri,
+                  cl_pubkey: new PublicKey(post.cl_pubkey),
+                  profile: new PublicKey(post.profile),
+                  replyTo: post.replyto ? new PublicKey(post.replyto) : null,
                 };
-              })
-          );
+              } catch (err) {}
+            })
+        );
+
+        setExplore(
           [...userPostAccounts, ...allPostsMetadata]
             .filter((data) => {
-              return data.replyTo && data.postData.data.content.content;
+              let postCotext = data?.postData.data as postInterface;
+              return (
+                data?.postData.status == 200 &&
+                postCotext.content.blocks?.find((block) => {
+                  return (
+                    block.type == "header" &&
+                    block.data.text == "Created in Daisi"
+                  );
+                })
+              );
             })
-            .forEach((data) => {
-              replyMap.set(data.replyTo.toString(), [
-                {
-                  from: data.profile,
-                  text: data.postData.data.content.content,
-                  cl_pubkey: data.cl_pubkey,
-                },
-                ...(replyMap.has(data.replyTo.toString())
-                  ? replyMap.get(data.replyTo.toString())
-                  : []),
-              ]);
-            });
+            .map((data) => {
+              let postCotext = data?.postData.data as postInterface;
+              return {
+                ...postCotext,
+                metadatauri: data?.metadatauri,
+                cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
+                profile: data ? data.profile : PublicKey.default,
+              };
+            })
+        );
+        // parts for reply
+        // [...userPostAccounts, ...allPostsMetadata]
+        //   .filter((data) => {
+        //     return data.replyTo && data.postData.data.content.content;
+        //   })
+        //   .forEach((data) => {
+        //     replyMap.set(data.replyTo.toString(), [
+        //       {
+        //         from: data.profile,
+        //         text: data.postData.data.content.content,
+        //         cl_pubkey: data.cl_pubkey,
+        //       },
+        //       ...(replyMap.has(data.replyTo.toString())
+        //         ? replyMap.get(data.replyTo.toString())
+        //         : []),
+        //     ]);
+        //   });
 
-          setReply(replyMap);
-        }
-      } catch (err) {
-        console.log("error", err);
+        // setReply(replyMap);
       }
-    };
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+  const fetchConnections = async () => {
+    try {
+      if (wallet.publicKey && userProfile) {
+        let following = await sdk?.connection.getALlConnectionAccounts(
+          userProfile.profile
+        );
+        let followers = await sdk?.connection.getALlConnectionAccounts(
+          undefined,
+          userProfile.profile
+        );
 
-    const fetchConnections = async () => {
-      try {
-        if (wallet.publicKey && profileKey.length > 0) {
-          let following = await sdk?.connection.getALlConnectionAccounts(
-            profileKey[0].accountKey
-          );
-          let followers = await sdk?.connection.getALlConnectionAccounts(
-            undefined,
-            profileKey[0].accountKey
-          );
-
-          setfollowing(
+        dispatch(
+          updateFollowing(
             (following ? following : []).map((conn) => {
               return {
                 follow: conn.account.toProfile,
                 cl_pubkey: conn.publicKey,
               };
             })
-          );
-          setFollower(
+          )
+        );
+        dispatch(
+          updateFollowers(
             (followers ? followers : []).map((conn) => {
               return conn.account.fromProfile;
             })
-          );
-        }
-      } catch (err) {
-        console.log("error", err);
+          )
+        );
       }
-    };
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+  const fetchReaction = async () => {
+    let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
+    // let reactions = await sdk.reaction.getAllReactions();
+    let map = new Map<
+      string,
+      { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]
+    >();
+    reactionAccounts.forEach((account) => {
+      map.set(account.account.toPost.toString(), [
+        {
+          from: account.account.fromProfile,
+          type: account.account.reactionType,
+          cl_pubkey: account.publicKey,
+        },
+        ...(map.has(account.account.toPost.toString())
+          ? map.get(account.account.toPost.toString())!
+          : []),
+      ]);
+    });
+    dispatch(updateReactions(map));
+  };
 
-    const fetchReaction = async () => {
-      let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
-      // let reactions = await sdk.reaction.getAllReactions();
-      let map = new Map<
-        string,
-        { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]
-      >();
-      reactionAccounts.forEach((account) => {
-        map.set(account.account.toPost.toString(), [
-          {
-            from: account.account.fromProfile,
-            type: account.account.reactionType,
-            cl_pubkey: account.publicKey,
-          },
-          ...(map.has(account.account.toPost.toString())
-            ? map.get(account.account.toPost.toString())!
-            : []),
-        ]);
-      });
-      setReactions(map);
-    };
-
+  useEffect(() => {
     fetchProfile();
     fetchPostData();
     fetchConnections();
     fetchReaction();
-  }, [wallet.publicKey, profileKey]);
+  }, [wallet.connected, userProfile]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -324,11 +340,11 @@ const ExplorePosts = () => {
       let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
 
       if (wallet.publicKey) {
-        if (profileKey.length > 0) {
+        if (userProfile) {
           let postIx = await sdk?.post.create(
             mainGateway + uploadMetadata.path,
-            profileKey[0].accountKey,
-            profileKey[0].userKey,
+            userProfile.profile,
+            userProfile.user,
             wallet.publicKey
           );
 
@@ -352,10 +368,14 @@ const ExplorePosts = () => {
         throw "wallet Not Connected";
       }
 
-      if (userKey.length > 0) {
+      if (userAccounts.length > 0) {
         console.log("creating profile");
         let result = await (
-          await sdk?.profile.create(userKey[0], "Personal", wallet.publicKey)
+          await sdk?.profile.create(
+            userAccounts[0],
+            "Personal",
+            wallet.publicKey
+          )
         )?.instructionMethodBuilder.rpc();
         console.log(result);
         await fetchProfile();
@@ -382,13 +402,13 @@ const ExplorePosts = () => {
       console.log(result);
     }
   };
-  if (wallet.connected && userKey.length <= 0) {
+  if (wallet.connected && userAccounts.length <= 0) {
     createProfileButton = (
       <button onClick={handleCreateProfile} className="">
         Create User
       </button>
     );
-  } else if (wallet.connected && profileKey.length <= 0) {
+  } else if (wallet.connected && !userProfile) {
     createProfileButton = (
       <button onClick={handleCreateProfile} className="">
         Create Profile
@@ -398,7 +418,7 @@ const ExplorePosts = () => {
 
   let form = null;
 
-  if (profileKey.length > 0) {
+  if (userProfile) {
     form = (
       <form>
         <textarea
@@ -425,12 +445,10 @@ const ExplorePosts = () => {
     );
   }
   let userInfo = null;
-  if (profileKey.length > 0) {
+  if (userProfile) {
     userInfo = (
       <div>
-        <h1 className={style.handle}>
-          {"@" + profileKey[0].accountKey.toString()}
-        </h1>
+        <h1 className={style.handle}>{"@" + userProfile.profile.toString()}</h1>
         <p className={style.sub}>
           Following: {following.length} Follower: {followers.length}
         </p>
@@ -449,15 +467,7 @@ const ExplorePosts = () => {
       {explore?.map((post: postInterface) => {
         return (
           <div key={post.cl_pubkey.toString()} className="">
-            <Post
-              post={post}
-              setData={setExplore}
-              userProfile={profileKey[0]}
-              sdk={sdk}
-              following={following}
-              reactions={reactions.get(post.cl_pubkey.toString())}
-              replies={replies.get(post.cl_pubkey.toString())}
-            />
+            <Post post={post} sdk={sdk} setData={setExplore} />
           </div>
         );
       })}

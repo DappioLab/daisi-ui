@@ -1,30 +1,69 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
 import { SDK } from "../gpl-core/src";
-
+import {
+  ConnectionInterface,
+  ReactionInterface,
+  ProfileAccount,
+} from "@/components/gumPage/Explore";
 export interface IGumInitialState {
-  user: PublicKey | null;
-  sdkInfo: SDK | null;
+  userProfile: ProfileAccount | null;
+  userAccounts: PublicKey[];
+  following: ConnectionInterface[];
+  followers: PublicKey[];
+  reactions: Map<string, ReactionInterface[]>;
 }
 
 const initialState: IGumInitialState = {
-  user: null,
-  sdkInfo: null,
+  userProfile: null,
+  userAccounts: [],
+  following: [],
+  followers: [],
+  reactions: new Map(),
 };
 
 export const gumSlice = createSlice({
   name: "gumSlice",
   initialState,
   reducers: {
-    updateUserPubKey: (state, action) => {
-      state.user = action.payload;
+    updateUserProfile: (
+      state,
+      action: {
+        payload: ProfileAccount;
+      }
+    ) => {
+      state.userProfile = action.payload;
     },
-    updateSDK: (state, action) => {
-      state.sdkInfo = action.payload;
+    updateUserAccounts: (
+      state,
+      action: {
+        payload: PublicKey[];
+      }
+    ) => {
+      state.userAccounts = action.payload;
+    },
+
+    updateFollowing: (state, action: { payload: ConnectionInterface[] }) => {
+      state.following = action.payload;
+    },
+    updateFollowers: (state, action: { payload: PublicKey[] }) => {
+      state.followers = action.payload;
+    },
+    updateReactions: (
+      state,
+      action: { payload: Map<string, ReactionInterface[]> }
+    ) => {
+      state.reactions = action.payload;
     },
   },
 });
 
-export const { updateUserPubKey, updateSDK } = gumSlice.actions;
+export const {
+  updateUserAccounts,
+  updateUserProfile,
+  updateFollowing,
+  updateFollowers,
+  updateReactions,
+} = gumSlice.actions;
 
 export default gumSlice.reducer;
