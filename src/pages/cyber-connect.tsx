@@ -1,4 +1,5 @@
 import PageTitle from "@/components/common/pageTitle";
+import OffChainFeedList from "@/components/cyberConnectPage/arweaveFeedList";
 import FeedList from "@/components/cyberConnectPage/feedList";
 import OffChainPost from "@/components/cyberConnectPage/offChainPost";
 import Post from "@/components/cyberConnectPage/post";
@@ -22,6 +23,8 @@ const CyberConnect = () => {
           {/* <Post /> */}
           <hr />
           <OffChainPost />
+          <hr />
+          <OffChainFeedList />
         </div>
       ) : (
         <div>
@@ -30,7 +33,7 @@ const CyberConnect = () => {
         </div>
       )}
 
-      <FeedList />
+      {/* <FeedList /> */}
     </div>
   );
 };
