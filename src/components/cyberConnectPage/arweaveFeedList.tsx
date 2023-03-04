@@ -1,6 +1,5 @@
 import {
   POST_BY_ADDRESS_QUERY,
-  POST_BY_ID_QUERY,
   cyberConnectEndpoint,
 } from "@/graphql/cyberConnect/query";
 import { IRootState } from "@/redux";
@@ -8,6 +7,7 @@ import request from "graphql-request";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import LikeDislikeBtn from "./likeDislikeBtn";
 
 export interface Content {
   contentID: string;
@@ -41,14 +41,14 @@ const OffChainFeedList = () => {
         const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
           address,
         });
-        console.log("res:", res);
+
         const feeds = res.address.wallet.profiles.edges
           .map((e: any) => e.node)
           .reduce((prev: any, curr: any) => prev.concat(curr), [])
           .filter((n: any) => n.posts.edges.length > 0)
           .map((n: any) => n.posts.edges.map((e: any) => e.node))
           .reduce((prev: any, curr: any) => prev.concat(curr), []);
-        // console.log("feeds:", feeds);
+
         setFeedList(feeds);
       } catch (err) {
         console.error(err);
@@ -68,6 +68,10 @@ const OffChainFeedList = () => {
               {moment(feed.createdAt).format("MMMM DD,YYYY")}
             </h2>
             <h3>{feed.body}</h3>
+            {feed.likeCount}
+            <LikeDislikeBtn contendId={feed.contentID} isLike={true} />
+            {feed.dislikeCount}
+            <LikeDislikeBtn contendId={feed.contentID} isLike={false} />
             <hr />
           </div>
         );
