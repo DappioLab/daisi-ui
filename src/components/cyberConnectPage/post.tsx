@@ -117,6 +117,7 @@ const Post = () => {
       });
 
       const typedData =
+        // @ts-ignore
         typedDataResult?.createRegisterEssenceTypedData?.typedData;
       const message = typedData.data;
       const typedDataID = typedData.id;
@@ -143,6 +144,7 @@ const Post = () => {
         },
       });
 
+      // @ts-ignore
       const relayActionId = relayResult.relay.relayActionId;
 
       setPostInput({

@@ -23,10 +23,9 @@ const FeedList = (props: IFeedList) => {
   const dispatch = useDispatch();
 
   const getAnonymousList = async () => {
-    const res = await request(endpoint, ANONYMOUS_FEED_QUERY, feedOptions);
-
-    setFeedOptions({ after: res.page.pageInfo.endCursor });
-    dispatch(updateFeedList([...feedList, ...res.page.edges]));
+    // const res = await request(endpoint, ANONYMOUS_FEED_QUERY, feedOptions);
+    // setFeedOptions({ after: res.page.pageInfo.endCursor });
+    // dispatch(updateFeedList([...feedList, ...res.page.edges]));
   };
 
   useEffect(() => {
@@ -48,7 +47,7 @@ const FeedList = (props: IFeedList) => {
 
   return (
     <div className={style.feedList}>
-      {feedList.map((item, index) => {
+      {/* {feedList.map((item, index) => {
         return (
           <div key={index} ref={ref}>
             <Feed
@@ -58,7 +57,7 @@ const FeedList = (props: IFeedList) => {
             />
           </div>
         );
-      })}
+      })} */}
     </div>
   );
 };

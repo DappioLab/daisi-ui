@@ -46,6 +46,7 @@ const SigninBtn = () => {
           domain: "daisi.social",
         }
       );
+      // @ts-ignore
       const message = messageResult?.loginGetMessage?.message;
 
       /* Get the signature for the message signed with the wallet */
@@ -61,6 +62,8 @@ const SigninBtn = () => {
           signature: signature,
         }
       );
+
+      // @ts-ignore
       const accessToken = accessTokenResult?.loginVerify?.accessToken;
 
       /* Set the access token in the state variable */
@@ -73,6 +76,8 @@ const SigninBtn = () => {
           address,
         }
       );
+
+      // @ts-ignore
       const primaryProfile = profile?.address?.wallet?.primaryProfile;
       dispatch(setPrimaryProfile(primaryProfile));
     } catch (err) {}

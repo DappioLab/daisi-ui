@@ -31,6 +31,8 @@ export interface IProfile {
 
 export const getData = async () => {
   const res = await request(cyberConnectEndpoint, PROFILES_WITH_POSTS_QUERY);
+  // @ts-ignore
+
   const profiles = res.profiles.edges.map((edge: any) => edge.node);
   let feeds = profiles
     .map((p: any) =>

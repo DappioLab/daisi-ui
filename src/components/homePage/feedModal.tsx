@@ -32,6 +32,7 @@ const FeedModal = (props: IFeedModal) => {
       return;
     }
 
+    // @ts-ignore
     const targetPostId = feedList[updatedIndex].node.id;
     dispatch(updateCurrentId(targetPostId));
 
