@@ -4,17 +4,17 @@ import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useDispatch } from "react-redux";
 
-// export interface IFeed {
-//   profile?: string; // this field exists in GUM
-//   id: string;
-//   title: string;
-//   createdAt: string;
-//   readTime: string;
-//   image: string;
-//   source: {
-//     image: string;
-//   };
-// }
+export interface IFeed {
+  //   profile?: string; // this field exists in GUM
+  //   id: string;
+  //   title: string;
+  //   createdAt: string;
+  //   readTime: string;
+  //   image: string;
+  //   source: {
+  //     image: string;
+  //   };
+}
 
 // export interface IFeedProps {
 //   article: IFeed;

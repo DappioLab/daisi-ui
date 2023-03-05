@@ -16,7 +16,7 @@ export interface IUser {
 }
 
 export async function getUserList() {
-  const users = await axios.get("http://68.183.184.205:8000/api/user/all");
+  const users = await axios.get("http://68.183.184.205:8000//api/user/all");
   return users.data.map((item: IUser) => {
     const obj = {
       params: {
@@ -29,11 +29,11 @@ export async function getUserList() {
 
 export async function getUserDetails(address: string) {
   let dataSet: any = {};
-  const users = await axios.get("http://68.183.184.205:8000/api/user/all");
+  const users = await axios.get("http://68.183.184.205:8000//api/user/all");
 
   for (let item of users.data) {
     const user = await axios.get(
-      `http://68.183.184.205:8000/api/user/${item.address}`
+      `http://68.183.184.205:8000//api/user/${item.address}`
     );
     dataSet[item.address] = user.data;
   }
@@ -69,7 +69,7 @@ export default function Feed({ user }: { user: IUser }) {
     }
 
     const res = await axios.put(
-      `http://68.183.184.205:8000/api/user/follow/${userData.id}`,
+      `http://68.183.184.205:8000//api/user/follow/${userData.id}`,
       { target_id: user.id }
     );
 
