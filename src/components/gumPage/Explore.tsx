@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { useWallet, AnchorWallet } from "@solana/wallet-adapter-react";
-import { GRAPHQL_ENDPOINTS } from "../../gpl-core/src";
+import { GRAPHQL_ENDPOINTS, SDK } from "../../gpl-core/src";
 import { ReactionType } from "../../gpl-core/src/reaction";
 import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
@@ -44,14 +44,17 @@ export interface ProfileAccount {
   user: PublicKey;
   wallet: PublicKey;
 }
+export const CREATED_IN_DAISI_TAG = "Created in Daisi";
+
 const ExplorePosts = () => {
   const wallet = useWallet();
   const dispatch = useDispatch();
-  const { userProfile, following, followers, reactions, userAccounts } =
-    useSelector((state: IRootState) => state.gum);
+  const { userProfile, following, followers, userAccounts } = useSelector(
+    (state: IRootState) => state.gum
+  );
   const [explore, setExplore] = useState<postInterface[]>([]);
   const [postText, setPostText] = useState("");
-
+  const [postTitle, setPostTitle] = useState("");
   const [postImg, setImg] = useState<File | null>(null);
   // parts for reply
   // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
@@ -198,7 +201,7 @@ const ExplorePosts = () => {
                 postCotext.content.blocks?.find((block) => {
                   return (
                     block.type == "header" &&
-                    block.data.text == "Created in Daisi"
+                    block.data.text == CREATED_IN_DAISI_TAG
                   );
                 })
               );
@@ -291,16 +294,14 @@ const ExplorePosts = () => {
     });
     dispatch(updateReactions(map));
   };
+  const createGumPost = async (
+    title: string,
+    description: string,
+    imageLink?: string
+  ) => {
+    let postId = "";
+    let ipfsLink = "";
 
-  useEffect(() => {
-    fetchProfile();
-    fetchPostData();
-    fetchConnections();
-    fetchReaction();
-  }, [wallet.connected, userProfile]);
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
     try {
       let data: any = {
         content: {
@@ -308,13 +309,18 @@ const ExplorePosts = () => {
             {
               id: "0",
               type: "header",
-              data: { text: "Created in Daisi", level: 2 },
+              data: { text: CREATED_IN_DAISI_TAG, level: 0 },
             },
             {
               id: "1",
+              type: "header",
+              data: { text: title, level: 1 },
+            },
+            {
+              id: "2",
               type: "paragraph",
               data: {
-                text: postText,
+                text: description,
               },
             },
           ],
@@ -329,20 +335,19 @@ const ExplorePosts = () => {
         digestEncoding: "hex",
         parentDigest: "",
       };
-      if (postImg) {
-        let uploadedPic = await ipfsClient.add(postImg);
+      if (imageLink) {
         data.content.blocks.push({
-          id: "2",
+          id: "3",
           type: "image",
-          data: { file: { url: mainGateway + uploadedPic.path } },
+          data: { file: { url: imageLink } },
         });
       }
       let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
-
+      ipfsLink = mainGateway + uploadMetadata.path;
       if (wallet.publicKey) {
         if (userProfile) {
           let postIx = await sdk?.post.create(
-            mainGateway + uploadMetadata.path,
+            ipfsLink,
             userProfile.profile,
             userProfile.user,
             wallet.publicKey
@@ -351,12 +356,38 @@ const ExplorePosts = () => {
           if (postIx) {
             let result = await postIx.instructionMethodBuilder.rpc();
             console.log(result);
-            window.location.reload();
+            postId = postIx.postPDA.toString();
           }
         }
+        return { success: true, postId, postLink: ipfsLink };
       } else {
         alert("Wallet Not connected");
       }
+    } catch (err) {
+      console.log(err);
+      return { success: false, postId, postLink: ipfsLink };
+    }
+  };
+  const uploadImage = async (imageFile: File) => {
+    let uploadedPic = await ipfsClient.add(postImg);
+    return mainGateway + uploadedPic.path;
+  };
+  useEffect(() => {
+    fetchProfile();
+    fetchPostData();
+    fetchConnections();
+    fetchReaction();
+  }, [wallet.connected, userProfile]);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    try {
+      let result = await createGumPost(
+        postTitle,
+        postText,
+        postImg ? await uploadImage(postImg) : null
+      );
+      console.log(result.success);
     } catch (err) {
       console.log(err);
     }
@@ -421,6 +452,12 @@ const ExplorePosts = () => {
   if (userProfile) {
     form = (
       <form>
+        <textarea
+          onChange={(e) => setPostTitle(e.target.value)}
+          itemType="text"
+          placeholder="Title"
+          className={style.post}
+        ></textarea>
         <textarea
           onChange={(e) => setPostText(e.target.value)}
           itemType="text"
