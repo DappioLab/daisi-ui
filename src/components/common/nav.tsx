@@ -44,20 +44,31 @@ const Nav = () => {
         <div className={style.slogan}>Limits of awareness</div>
       </div>
       <div className={style.profile}>
-        <i
+        {!isLogin ? (
+          <div
+            className={style.tab}
+            onClick={() => {
+              showAuthModal();
+            }}
+          >
+            Sign in
+          </div>
+        ) : (
+          <div
+            className={style.tab}
+            onClick={() => {
+              router.push(`/profile/${userData?.address}`);
+            }}
+          >
+            Profile
+          </div>
+        )}
+        {/* <i
           className="fa fa-user"
           aria-hidden="true"
-          onClick={() => {
-            if (!isLogin) {
-              showAuthModal();
-              return;
-            }
-            router.push(`/profile/${userData?.address}`);
-          }}
-        ></i>
+        ></i> */}
         {isLogin && userData ? (
-          <div onClick={() => showAuthModal()}>
-            ID as
+          <div className={style.idBlock} onClick={() => showAuthModal()}>
             <span> {userData.address.substring(0, 6)}</span>
             <span>...</span>
             <span>{userData.address.slice(-6)}</span>

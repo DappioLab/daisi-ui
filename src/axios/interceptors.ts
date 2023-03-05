@@ -5,18 +5,17 @@ export interface IAxiosError extends AxiosError {
 }
 
 const service = axios.create({
-  baseURL: "http://68.183.184.205:8000",
-  // baseURL: "https://68.183.184.205:8000/",
+  baseURL: `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}`,
   timeout: 1000 * 10,
 });
 
 service.interceptors.request.use(
   (config) => {
-    let token = localStorage.getItem("access_token");
+    // let token = localStorage.getItem("access_token");
 
-    if (token) {
-      config.headers.Authorization = `${token}`;
-    }
+    // if (token) {
+    //   config.headers.Authorization = `${token}`;
+    // }
     return config;
   },
   (error) => {

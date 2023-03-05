@@ -1,9 +1,8 @@
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
-import AuthModal, { IAuthData } from "./authModal";
+import AuthModal from "./authModal";
 import SubmitModal from "./submitModal";
 import style from "@/styles/common/global.module.sass";
-import { useEffect } from "react";
 
 const Global = () => {
   const { submitModalData, showAuthModal } = useSelector(

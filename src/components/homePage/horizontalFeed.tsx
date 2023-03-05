@@ -72,17 +72,17 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         <div className={style.title}>{props.article.itemTitle}</div>
         <div className={style.space}></div>
         <div className={style.timeBlock}>
-          {moment(props.article.created).format("MMMM DD,YYYY")} -{" "}
+          {moment(props.article.created).format("MMMM DD,YYYY")}
         </div>
         <br />
         <br />
         <div className={style.socialActionBlock} onClick={() => updateLike()}>
           {userData && props.article.likes.includes(userData.id) ? (
-            <div style={{ fontSize: "2rem" }}>
+            <div style={{ fontSize: "1.6rem" }}>
               <i className="fa fa-heart " aria-hidden="true"></i>
             </div>
           ) : (
-            <div style={{ fontSize: "2rem" }}>
+            <div style={{ fontSize: "1.6rem" }}>
               <i className="fa fa-heart-o"></i>
             </div>
           )}

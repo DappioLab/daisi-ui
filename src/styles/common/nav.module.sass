@@ -74,17 +74,30 @@
     pointer-events: none
   .profile
     display: none
-    cursor: pointer
-    i
-      font-size: 2.2rem
-      color: white
+    .tab
+      font-size: 1.6rem
+      &:hover
+        cursor: pointer
+        opacity: .8
+    // i
+    //   font-size: 2.2rem
+    //   color: white
+  .idBlock
+    border-radius: 2rem
+    padding: .8rem 1.2rem
+    border: solid .1rem 
+    margin-left: 3rem
+    &:hover
+      cursor: pointer
+      opacity: .8
     
 @media screen and (min-width: 1024px)
   .nav
     .menuBtn
       display: none
     .profile
-      display: block
+      display: flex
+      align-items: center
 
 @keyframes menuAnimation
     0%

@@ -1,0 +1,52 @@
+.userListModal
+  position: relative
+  .bg
+    width: 100%
+    height: 100%
+    position: fixed
+    top: 0
+    left: 0
+    background-color: #fff
+    opacity: .1
+    z-index: 1
+  .modalContainer
+    border: solid .1rem rgb(82, 86, 100)
+    width: 50rem
+    height: 50rem
+    background-color: grey
+    position: fixed
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    background-color: #fff
+    overflow: scroll
+    z-index: 1
+    background-color: rgb(15, 18, 23)
+    color: white
+    border-radius: 2rem
+    overflow: scroll
+  .tabBlock
+    display: flex
+    align-items: center
+  .tab
+    margin: 2rem 2rem 0 2rem
+    padding: 1rem 
+    opacity: .5
+    &:hover
+      cursor: pointer
+      opacity: .8
+  .selectedTab
+    opacity: 1    
+  .listItem
+    border: solid .1rem grey
+    border-radius: 2rem
+    margin: 2rem 
+    padding: 1rem 2rem
+  .followBtn
+    border-radius: 5rem
+    padding: .8rem 1.2rem
+    width: fit-content
+    background-color: #fff
+    cursor: pointer
+    color: #333333
+    font-weight: 600
