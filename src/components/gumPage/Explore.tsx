@@ -1,6 +1,6 @@
 import Post, { postInterface } from "./Posts";
 import React, { useEffect, useState, useMemo } from "react";
-
+import API from "@/axios/api";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { useWallet, AnchorWallet } from "@solana/wallet-adapter-react";
@@ -53,9 +53,12 @@ const ExplorePosts = () => {
     (state: IRootState) => state.gum
   );
   const [explore, setExplore] = useState<postInterface[]>([]);
-  const [postText, setPostText] = useState("");
-  const [postTitle, setPostTitle] = useState("");
-  const [postImg, setImg] = useState<File | null>(null);
+  const [postLink, setPostLink] = useState("");
+  // const [postImg, setImg] = useState<File | null>(null);
+  const [username, setUserName] = useState("");
+  const [description, setDescription] = useState("");
+  const [profileImg, setProfileImg] = useState<File | null>(null);
+  const [profileEdit, setProfileEdit] = useState(false);
   // parts for reply
   // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
   //   new Map()
@@ -294,11 +297,7 @@ const ExplorePosts = () => {
     });
     dispatch(updateReactions(map));
   };
-  const createGumPost = async (
-    title: string,
-    description: string,
-    imageLink?: string
-  ) => {
+  const createGumPost = async (postLink: string) => {
     let postId = "";
     let ipfsLink = "";
 
@@ -314,14 +313,7 @@ const ExplorePosts = () => {
             {
               id: "1",
               type: "header",
-              data: { text: title, level: 1 },
-            },
-            {
-              id: "2",
-              type: "paragraph",
-              data: {
-                text: description,
-              },
+              data: { text: postLink, level: 3 },
             },
           ],
         },
@@ -335,13 +327,6 @@ const ExplorePosts = () => {
         digestEncoding: "hex",
         parentDigest: "",
       };
-      if (imageLink) {
-        data.content.blocks.push({
-          id: "3",
-          type: "image",
-          data: { file: { url: imageLink } },
-        });
-      }
       let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
       ipfsLink = mainGateway + uploadMetadata.path;
       if (wallet.publicKey) {
@@ -369,8 +354,49 @@ const ExplorePosts = () => {
     }
   };
   const uploadImage = async (imageFile: File) => {
-    let uploadedPic = await ipfsClient.add(postImg);
+    let uploadedPic = await ipfsClient.add(imageFile);
     return mainGateway + uploadedPic.path;
+  };
+  const createGumProfile = async (
+    username: string,
+    description: string,
+    profilePicture?: string
+  ) => {
+    let data = {
+      name: username,
+      bio: description,
+      username: username,
+      avatar: profilePicture ? profilePicture : "",
+    };
+    try {
+      let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
+      if (wallet.publicKey && userProfile) {
+        let addProfileTx = await (
+          await sdk.profileMetadata.create(
+            mainGateway + uploadMetadata.path,
+            userProfile.profile,
+            userProfile.user,
+            wallet.publicKey
+          )
+        ).instructionMethodBuilder.rpc();
+        console.log(addProfileTx);
+        return { success: true };
+      }
+    } catch (err) {
+      console.log(err);
+      return { success: false };
+    }
+  };
+  const handleUpdateProfile = async (e: any) => {
+    let imageLink = null;
+    if (profileImg) {
+      imageLink = await uploadImage(profileImg);
+    }
+    console.log(imageLink);
+    let updateGum = await createGumProfile(username, description, imageLink);
+    if (updateGum.success) {
+      //Update user profile
+    }
   };
   useEffect(() => {
     fetchProfile();
@@ -382,12 +408,10 @@ const ExplorePosts = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      let result = await createGumPost(
-        postTitle,
-        postText,
-        postImg ? await uploadImage(postImg) : null
-      );
-      console.log(result.success);
+      let result = await createGumPost(postLink);
+      if (result.success) {
+        // Post to DB
+      }
     } catch (err) {
       console.log(err);
     }
@@ -453,19 +477,13 @@ const ExplorePosts = () => {
     form = (
       <form>
         <textarea
-          onChange={(e) => setPostTitle(e.target.value)}
+          onChange={(e) => setPostLink(e.target.value)}
           itemType="text"
-          placeholder="Title"
-          className={style.post}
-        ></textarea>
-        <textarea
-          onChange={(e) => setPostText(e.target.value)}
-          itemType="text"
-          placeholder="What's happening"
+          placeholder="Submit Link"
           className={style.post}
         ></textarea>
 
-        <input
+        {/* <input
           type="file"
           name="myImage"
           onChange={(event) => {
@@ -473,7 +491,7 @@ const ExplorePosts = () => {
               setImg(event.target.files[0]);
             }
           }}
-        />
+        /> */}
 
         <button onClick={handleSubmit} className="">
           Post
@@ -492,6 +510,35 @@ const ExplorePosts = () => {
       </div>
     );
   }
+  let editProfile = (
+    <form>
+      <textarea
+        onChange={(e) => setUserName(e.target.value)}
+        itemType="text"
+        placeholder="Username"
+        className={style.post}
+      ></textarea>
+      <textarea
+        onChange={(e) => setDescription(e.target.value)}
+        itemType="text"
+        placeholder="Description"
+        className={style.post}
+      ></textarea>
+      <input
+        type="file"
+        name="myImage"
+        onChange={(event) => {
+          if (event.target.files) {
+            setProfileImg(event.target.files[0]);
+          }
+        }}
+      />
+
+      <button onClick={handleUpdateProfile} className="">
+        update
+      </button>
+    </form>
+  );
 
   return (
     <div>
@@ -500,6 +547,16 @@ const ExplorePosts = () => {
       </div>
       {userInfo}
       <div>{createProfileButton}</div>
+      <div>
+        <button
+          onClick={() => {
+            setProfileEdit(profileEdit ? false : true);
+          }}
+        >
+          Edit Profile
+        </button>
+        {profileEdit && editProfile}
+      </div>
       <div>{form}</div>
       {explore?.map((post: postInterface) => {
         return (

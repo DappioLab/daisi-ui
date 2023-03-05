@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import API from "@/axios/api";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Block, { BlockInterface } from "./Block";
 import {
@@ -35,11 +36,12 @@ interface postState {
 
 const Post = (post: postState) => {
   const wallet = useWallet();
-  const [reply, setReply] = useState("");
-  const [open, setOpen] = useState(false);
+  // const [reply, setReply] = useState("");
+  // const [open, setOpen] = useState(false);
   const { userProfile, following, followers, reactions } = useSelector(
     (state: IRootState) => state.gum
   );
+  const { userData } = useSelector((state: IRootState) => state.global);
   const sdk = post.sdk;
   let reactionsFromUser: {
     from: PublicKey;
@@ -52,8 +54,7 @@ const Post = (post: postState) => {
       if (userProfile) return reaction.from.equals(userProfile.profile);
     });
   }
-
-  const handleFollow = async (e: any) => {
+  const createGunFollow = async (profile: string) => {
     try {
       if (!wallet.publicKey) {
         throw "wallet Not Connected";
@@ -61,11 +62,47 @@ const Post = (post: postState) => {
       let followIx = await (
         await sdk?.connection.create(
           userProfile.profile,
-          new PublicKey(post.post.profile),
+          new PublicKey(profile),
           userProfile.user,
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+      return { success: false };
+    }
+    return { success: true };
+  };
+  const createGunLike = async (post: string) => {
+    try {
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      let likeTx = (
+        await sdk?.reaction.create(
+          userProfile.profile,
+          new PublicKey(post),
+          "Like",
+          userProfile.user,
+          wallet.publicKey
+        )
+      )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+      return { success: false };
+    }
+    return { success: true };
+  };
+  const handleFollow = async (e: any) => {
+    try {
+      let result = await createGunFollow(post.post.profile.toString());
+      if (result.success && userData) {
+        let followOnDb = await API.updateUserFollowData({
+          id: userData.id,
+          targetId: post.post.profile.toString(),
+        });
+        console.log(followOnDb);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -111,18 +148,14 @@ const Post = (post: postState) => {
   };
   const handleLike = async (e: any) => {
     try {
-      if (!wallet.publicKey) {
-        throw "wallet Not Connected";
+      let result = await createGunLike(post.post.cl_pubkey.toString());
+      if (result.success) {
+        let likeOnDb = await API.updateRssItemLike(
+          post.post.cl_pubkey.toString(),
+          userData.id
+        );
+        console.log(likeOnDb);
       }
-      let likeTx = (
-        await sdk?.reaction.create(
-          userProfile.profile,
-          post.post.cl_pubkey,
-          "Like",
-          userProfile.user,
-          wallet.publicKey
-        )
-      )?.instructionMethodBuilder.rpc();
     } catch (err) {
       console.log(err);
     }
@@ -181,31 +214,31 @@ const Post = (post: postState) => {
       console.log(err);
     }
   };
-  const handleReply = async (e: any) => {
-    let data: any = {
-      content: { content: reply },
-      type: "text",
-      authorship: {
-        signature: "0",
-        publicKey: "0",
-      },
-      contentDigest: "0",
-      signatureEncoding: "base64",
-      digestEncoding: "hex",
-      parentDigest: "",
-    };
-    let replyUrl = await ipfsClient.add(JSON.stringify(data));
-    let replyTx = await (
-      await sdk.post.reply(
-        post.post.cl_pubkey,
-        mainGateway + replyUrl.path,
-        userProfile.profile,
-        userProfile.user,
-        wallet.publicKey
-      )
-    ).instructionMethodBuilder.rpc();
-    console.log(replyTx);
-  };
+  // const handleReply = async (e: any) => {
+  //   let data: any = {
+  //     content: { content: reply },
+  //     type: "text",
+  //     authorship: {
+  //       signature: "0",
+  //       publicKey: "0",
+  //     },
+  //     contentDigest: "0",
+  //     signatureEncoding: "base64",
+  //     digestEncoding: "hex",
+  //     parentDigest: "",
+  //   };
+  //   let replyUrl = await ipfsClient.add(JSON.stringify(data));
+  //   let replyTx = await (
+  //     await sdk.post.reply(
+  //       post.post.cl_pubkey,
+  //       mainGateway + replyUrl.path,
+  //       userProfile.profile,
+  //       userProfile.user,
+  //       wallet.publicKey
+  //     )
+  //   ).instructionMethodBuilder.rpc();
+  //   console.log(replyTx);
+  // };
   let followButton = null;
   if (
     userProfile &&
@@ -292,21 +325,21 @@ const Post = (post: postState) => {
     );
   }
   let replyForm = null;
-  if (open) {
-    replyForm = (
-      <div>
-        <form>
-          <textarea
-            onChange={(e) => setReply(e.target.value)}
-            itemType="text"
-            placeholder="Reply"
-            className={style.replyform}
-          ></textarea>
-        </form>
-        <button onClick={handleReply}>Submit</button>
-      </div>
-    );
-  }
+  // if (open) {
+  //   replyForm = (
+  //     <div>
+  //       <form>
+  //         <textarea
+  //           onChange={(e) => setReply(e.target.value)}
+  //           itemType="text"
+  //           placeholder="Reply"
+  //           className={style.replyform}
+  //         ></textarea>
+  //       </form>
+  //       <button onClick={handleReply}>Submit</button>
+  //     </div>
+  //   );
+  // }
   return (
     <div className={style.feed}>
       <div className={style.title}>
@@ -339,7 +372,7 @@ const Post = (post: postState) => {
           );
         })} */
       }
-      <div>
+      {/* <div>
         <button
           onClick={() => {
             setOpen(open ? false : true);
@@ -348,7 +381,7 @@ const Post = (post: postState) => {
           Reply
         </button>
         {replyForm}
-      </div>
+      </div> */}
       {deleteButton}
     </div>
   );
