@@ -1,13 +1,9 @@
-import * as apiUrl from "./api-url";
-import axios from "./interceptors";
+import * as USER from "./user";
+import * as RSS from "./rss";
 
 const API = {
-  getRssData() {
-    return axios({
-      method: "GET",
-      url: `${apiUrl.RSS_DATA}/all_resources`,
-    });
-  },
+  ...USER,
+  ...RSS,
 };
 
 export default API;

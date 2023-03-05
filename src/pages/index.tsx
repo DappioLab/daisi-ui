@@ -13,19 +13,10 @@ import { updateModalData } from "@/redux/dailySlice";
 import { IRootState } from "@/redux";
 import HorizontalFeed from "@/components/homePage/horizontalFeed";
 import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
-import dynamic from "next/dynamic";
-
-const WalletMultiButtonDynamic = dynamic(
-  async () =>
-    (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
-  { ssr: false }
-);
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
-  const { currentId, feedList } = useSelector(
-    (state: IRootState) => state.daily
-  );
+  const { feedList } = useSelector((state: IRootState) => state.daily);
   const dispatch = useDispatch();
 
   const getCurrentModalIndex = () => {
@@ -44,9 +35,6 @@ const HomePage = () => {
 
   return (
     <div className={`pageContent ${style.homePage}`}>
-      <div>
-        <WalletMultiButtonDynamic />
-      </div>
       <PageTitle title="Daily" />
       <HorizontalFeedList
         setShowModal={setShowModal}

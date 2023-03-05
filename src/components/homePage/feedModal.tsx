@@ -1,7 +1,6 @@
 import style from "@/styles/homePage/feedModal.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
-import { updateCurrentId } from "@/redux/dailySlice";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -34,7 +33,6 @@ const FeedModal = (props: IFeedModal) => {
 
     // @ts-ignore
     const targetPostId = feedList[updatedIndex].node.id;
-    dispatch(updateCurrentId(targetPostId));
 
     const url = `/feed/${targetPostId}`;
     history.replaceState({}, "", url);

@@ -59,27 +59,27 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <div className={style.appContainer}>
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        ></link>
+      </Head>
       <Provider store={store}>
-        <Head>
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-          ></link>
-        </Head>
-        <Nav />
-        <div className={style.content}>
-          <Sidebar />
-          <div className={style.page}>
-            <ConnectionProvider endpoint={endpoint}>
-              <WalletProvider wallets={wallets} autoConnect>
-                <WalletModalProvider>
+        <ConnectionProvider endpoint={endpoint}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>
+              <Nav />
+              <div className={style.content}>
+                <Sidebar />
+                <div className={style.page}>
                   <Component {...pageProps} />
-                </WalletModalProvider>
-              </WalletProvider>
-            </ConnectionProvider>
-          </div>
-        </div>
-        <Global />
+                </div>
+              </div>
+              <Global />
+            </WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
       </Provider>
     </div>
   );

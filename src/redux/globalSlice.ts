@@ -1,20 +1,14 @@
-import { IAuthModalProps } from "@/components/common/authModal";
+import { IAuthData, IAuthModal } from "@/components/common/authModal";
 import { ISubmitModalProps } from "@/components/common/submitModal";
+import { IUser } from "@/pages/profile/[address]";
 import { createSlice } from "@reduxjs/toolkit";
-
-export interface IUserData {
-  name: string;
-  id: string;
-  bio: string;
-  avatar: string;
-  createdDate: string;
-}
 
 export interface IGlobalInitialState {
   submitModalData: ISubmitModalProps;
   isLogin: boolean;
-  userData: IUserData | null;
-  authModalData: IAuthModalProps;
+  userData: IUser | null;
+  showAuthModal: boolean;
+  currentAddress: string | null;
 }
 
 const initialState: IGlobalInitialState = {
@@ -23,18 +17,19 @@ const initialState: IGlobalInitialState = {
     title: "",
     description: "",
   },
-  isLogin: false,
   userData: {
-    name: "Benson Name",
-    id: "1",
-    bio: "hello world, this is a bio example",
-    avatar: "/avatar.jpeg",
-    createdDate: "July 10, 2015",
+    id: "",
+    username: "",
+    description: "",
+    profilePicture: "/avatar.jpeg",
+    address: "",
+    createdAt: "",
+    followers: [],
+    followings: [],
   },
-  authModalData: {
-    showAuthModal: false,
-  },
-  // userData: null,
+  isLogin: false,
+  showAuthModal: false,
+  currentAddress: null,
 };
 
 export const globalSlice = createSlice({
@@ -50,8 +45,11 @@ export const globalSlice = createSlice({
     updateUserData: (state, action) => {
       state.userData = action.payload;
     },
-    updateAuthModalData: (state, action) => {
-      state.authModalData = action.payload;
+    updateAuthModal: (state, action) => {
+      state.showAuthModal = action.payload;
+    },
+    updateCurrentAddress: (state, action) => {
+      state.currentAddress = action.payload;
     },
   },
 });
@@ -60,7 +58,8 @@ export const {
   updateSubmitModalData,
   updateLoginStatus,
   updateUserData,
-  updateAuthModalData,
+  updateAuthModal,
+  updateCurrentAddress,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

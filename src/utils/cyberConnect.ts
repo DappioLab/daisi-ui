@@ -3,7 +3,7 @@ import {
   cyberConnectEndpoint,
   PROFILES_WITH_POSTS_QUERY,
 } from "@/graphql/cyberConnect/query";
-import { IFeed } from "@/components/homePage/feed";
+// import { IFeed } from "@/components/homePage/feed";
 
 export interface ICyberConnectFeed {
   essenceID: string;
@@ -52,7 +52,7 @@ export const getData = async () => {
 
 export const parseCyberConnectData = (raw: ICyberConnectFeed[]) => {
   const cyberConnectParsedData = raw.map((item) => {
-    const obj: IFeed = {
+    const obj = {
       title: item.createdBy.handle,
       id: "",
       createdAt: "",

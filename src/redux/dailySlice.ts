@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface IRssSourceData {
+  id: string;
   sourceTitle: string;
   sourceDescription: string;
   sourceLink: string;
@@ -9,26 +10,30 @@ export interface IRssSourceData {
 }
 
 export interface IRssSourceItem {
-  sourceTitle: string;
-  sourceDescription: string;
-  sourceLink: string;
-  sourceImage: string;
+  id: string;
+  itemTitle: string;
+  itemDescription: string;
+  itemLink: string;
+  itemImage: string;
   created: string;
+  likes: string[];
+  forwards: string[];
 }
 
-export interface IParsedRssData extends IRssSourceData {
+export interface IParsedRssData extends IRssSourceItem {
+  source: IRssSourceData;
+}
+
+export interface IApiRssListResponse extends IRssSourceData {
   items: IRssSourceItem[];
 }
 
 export interface IDailyInitialState {
-  currentId: string | null;
-  // feedList: IFeed[];
   feedList: IParsedRssData[];
   modalData: any;
 }
 
 const initialState: IDailyInitialState = {
-  currentId: null,
   feedList: [],
   modalData: null,
 };
@@ -37,9 +42,6 @@ export const dailySlice = createSlice({
   name: "dailySlice",
   initialState,
   reducers: {
-    updateCurrentId: (state, action) => {
-      state.currentId = action.payload;
-    },
     updateFeedList: (state, action) => {
       state.feedList = action.payload;
     },
@@ -49,7 +51,6 @@ export const dailySlice = createSlice({
   },
 });
 
-export const { updateCurrentId, updateFeedList, updateModalData } =
-  dailySlice.actions;
+export const { updateFeedList, updateModalData } = dailySlice.actions;
 
 export default dailySlice.reducer;

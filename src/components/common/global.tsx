@@ -1,22 +1,26 @@
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
-import AuthModal from "./authModal";
+import AuthModal, { IAuthData } from "./authModal";
 import SubmitModal from "./submitModal";
+import style from "@/styles/common/global.module.sass";
+import { useEffect } from "react";
 
 const Global = () => {
-  const { submitModalData, authModalData } = useSelector(
+  const { submitModalData, showAuthModal } = useSelector(
     (state: IRootState) => state.global
   );
 
   return (
-    <div>
+    <div className={style.global}>
       {submitModalData.showSubmitModal && (
         <SubmitModal
           title={submitModalData.title}
           description={submitModalData.description}
         />
       )}
-      {authModalData.showAuthModal && <AuthModal />}
+      <div className={showAuthModal ? style.show : style.hidden}>
+        <AuthModal />
+      </div>
     </div>
   );
 };

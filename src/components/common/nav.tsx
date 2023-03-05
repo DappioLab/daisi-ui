@@ -1,10 +1,10 @@
 import style from "@/styles/common/nav.module.sass";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
-import { IAuthModalProps } from "./authModal";
-import { updateAuthModalData, updateLoginStatus } from "@/redux/globalSlice";
+import { updateAuthModal, updateLoginStatus } from "@/redux/globalSlice";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const Nav = () => {
   const { userData, isLogin } = useSelector(
@@ -29,14 +29,7 @@ const Nav = () => {
   ]);
 
   const showAuthModal = () => {
-    const data: IAuthModalProps = {
-      showAuthModal: true,
-    };
-    dispatch(updateAuthModalData(data));
-  };
-
-  const logIn = () => {
-    dispatch(updateLoginStatus(true));
+    dispatch(updateAuthModal(true));
   };
 
   return (
@@ -51,7 +44,6 @@ const Nav = () => {
         <div className={style.slogan}>Limits of awareness</div>
       </div>
       <div className={style.profile}>
-        <button onClick={() => logIn()}>log in</button>
         <i
           className="fa fa-user"
           aria-hidden="true"
@@ -60,9 +52,17 @@ const Nav = () => {
               showAuthModal();
               return;
             }
-            router.push(`/profile/${userData?.id}`);
+            router.push(`/profile/${userData?.address}`);
           }}
         ></i>
+        {isLogin && userData ? (
+          <div onClick={() => showAuthModal()}>
+            ID as
+            <span> {userData.address.substring(0, 6)}</span>
+            <span>...</span>
+            <span>{userData.address.slice(-6)}</span>
+          </div>
+        ) : null}
       </div>
       <div
         className={`${style.menuBtn}`}

@@ -1,20 +1,20 @@
 import style from "@/styles/homePage/feed.module.sass";
 import moment from "moment";
-import { IRssSourceItem, updateCurrentId } from "@/redux/dailySlice";
+import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useDispatch } from "react-redux";
 
-export interface IFeed {
-  profile?: string; // this field exists in GUM
-  id: string;
-  title: string;
-  createdAt: string;
-  readTime: string;
-  image: string;
-  source: {
-    image: string;
-  };
-}
+// export interface IFeed {
+//   profile?: string; // this field exists in GUM
+//   id: string;
+//   title: string;
+//   createdAt: string;
+//   readTime: string;
+//   image: string;
+//   source: {
+//     image: string;
+//   };
+// }
 
 // export interface IFeedProps {
 //   article: IFeed;
@@ -23,18 +23,14 @@ export interface IFeed {
 // }
 
 export interface IFeedProps {
-  article: IRssSourceItem;
+  article: IParsedRssData;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getPost: (id: string) => Promise<void>;
+  // getPost: (id: string) => Promise<void>;
 }
 
 const Feed = (props: IFeedProps) => {
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
-
-  const updateCurrentID = async (id: string) => {
-    dispatch(updateCurrentId(id));
-  };
 
   return (
     <div>hello world</div>

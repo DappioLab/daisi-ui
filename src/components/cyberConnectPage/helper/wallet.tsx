@@ -1,4 +1,3 @@
-import React from "react";
 import { Web3Provider, ExternalProvider } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
