@@ -15,7 +15,7 @@ const UserList = () => {
     }
 
     const res = await axios.put(
-      `http://68.183.184.205:8000//api/user/follow/${userData.id}`,
+      `https://68.183.184.205:8000//api/user/follow/${userData.id}`,
       { target_id }
     );
   };
