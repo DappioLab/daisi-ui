@@ -1,6 +1,6 @@
 import API from "@/axios/api";
 import style from "@/styles/homePage/horizontalFeedList.module.sass";
-import HorizontalFeed from "./horizontalFeed";
+import HorizontalFeed, { EFeedType } from "./horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
@@ -58,6 +58,8 @@ const HorizontalFeedList = (props: IFeedList) => {
         });
       });
 
+      console.log(parsedData, "parsedData");
+
       dispatch(updateFeedList(parsedData));
     })();
   }, []);
@@ -67,7 +69,12 @@ const HorizontalFeedList = (props: IFeedList) => {
       {feedList.map((item, index) => {
         return (
           <div key={`${index}`}>
-            <HorizontalFeed article={item} setShowModal={props.setShowModal} />
+            <HorizontalFeed
+              article={item}
+              setShowModal={props.setShowModal}
+              type={EFeedType.RSS_ITEM}
+            />
+            t
           </div>
         );
       })}

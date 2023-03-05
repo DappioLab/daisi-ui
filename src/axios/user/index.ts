@@ -48,3 +48,17 @@ export const updateUserFollowData = (userData: {
     data: { target_id: userData.targetId },
   });
 };
+
+export const getUserPosts = (userId: string) => {
+  return axios({
+    method: "GET",
+    url: `${apiUrl.USER}/${userId}/posts`,
+  });
+};
+export const updateUserPostLike = (itemId: string, userId: string) => {
+  return axios({
+    method: "PUT",
+    url: `${apiUrl.USER}/update_item_like/${itemId}`,
+    data: { user_id: userId },
+  });
+};

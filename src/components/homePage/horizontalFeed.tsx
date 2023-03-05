@@ -7,11 +7,18 @@ import {
 } from "@/redux/dailySlice";
 import style from "@/styles/homePage/horizontalFeed.module.sass";
 import moment from "moment";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IFeedProps } from "./feed";
 
+export enum EFeedType {
+  USER_POST = "USER POST",
+  RSS_ITEM = "RSS ITEM",
+}
+
 interface IHorizontalFeedProps extends IFeedProps {
+  type: EFeedType;
   // sourceData: IRssSourceData;
 }
 
@@ -22,28 +29,33 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
   );
   const { feedList } = useSelector((state: IRootState) => state.daily);
   const dispatch = useDispatch();
-
+  const router = useRouter();
   const updateLike = async () => {
-    if (!userData || !isLogin) {
+    if (!userData?.id || !isLogin) {
       alert("Please login");
       return;
     }
 
-    const updatedItem = await API.updateRssItemLike(
-      props.article.id,
-      userData.id
-    );
+    if (props.type === EFeedType.USER_POST) {
+      await API.updateUserPostLike(props.article.id, userData.id);
+      window.location.reload();
+    } else {
+      const updatedItem = await API.updateRssItemLike(
+        props.article.id,
+        userData.id
+      );
 
-    if (updatedItem) {
-      const updatedList = feedList.map((item) => {
-        if (item.id === updatedItem.data._id) {
-          const obj = JSON.parse(JSON.stringify(item));
-          obj.likes = updatedItem.data.likes;
-          return obj;
-        }
-        return item;
-      });
-      dispatch(updateFeedList(updatedList));
+      if (updatedItem) {
+        const updatedList = feedList.map((item) => {
+          if (item.id === updatedItem.data._id) {
+            const obj = JSON.parse(JSON.stringify(item));
+            obj.likes = updatedItem.data.likes;
+            return obj;
+          }
+          return item;
+        });
+        dispatch(updateFeedList(updatedList));
+      }
     }
   };
 
