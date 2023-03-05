@@ -37,6 +37,7 @@ const CreateProfile = () => {
         },
       });
       const typedDataID =
+        //@ts-ignore
         createProfileTypedDataResult?.createCreateProfileTypedData?.typedDataID;
 
       const relayResult = await request({
@@ -54,6 +55,7 @@ const CreateProfile = () => {
         },
       });
 
+      //@ts-ignore
       const relayActionId = relayResult.relay.relayActionId;
       console.log("relayActionId:", relayActionId);
 
@@ -73,7 +75,15 @@ const CreateProfile = () => {
         value={handle}
         onChange={(e) => setHandle(e.target.value)}
         placeholder="What's your handle?"
+        pattern="^[a-z0-9_]{1,20}$"
+        required
       />
+      {handle && !/^[a-z0-9_]{1,20}$/.test(handle) && (
+        <div className="error-message">
+          Input value must be between 1 and 20 lowercase letters, digits or
+          underscores.
+        </div>
+      )}
       <h2>Avatar URL</h2>
       <input
         value={avatar}
