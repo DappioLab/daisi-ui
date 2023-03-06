@@ -182,7 +182,7 @@ export async function getStaticPaths() {
   const paths = await getUserList();
   return {
     paths,
-    fallback: false,
+    fallback: true,
   };
 }
 
