@@ -37,6 +37,14 @@ export const CREATE_REGISTER_ESSENCE_TYPED_DATA = gql`
   }
 `;
 
+export const CREATE_PROFILE_TYPED_DATA = gql`
+  mutation createProfile($input: CreateCreateProfileTypedDataInput!) {
+    createCreateProfileTypedData(input: $input) {
+      typedDataID
+    }
+  }
+`;
+
 export const RELAY = gql`
   mutation Relay($input: RelayInput!) {
     relay(input: $input) {

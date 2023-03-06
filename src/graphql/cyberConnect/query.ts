@@ -42,15 +42,58 @@ const PROFILE_FRAGMENT = `
 `;
 
 export const POST_BY_ID_QUERY = gql`
-  query getPost($id: String!) {
-    post(id: $id) {
-      id
-      author
-      title
-      body
-      createdAt
-      updatedAt
-      arweaveTxHash
+  query getPostByID($id: String!) {
+    content(id: $id) {
+      ... on Post {
+        contentID
+        title
+        body
+        digest
+        authorHandle
+        authorAddress
+        arweaveTxHash
+        createdAt
+        updatedAt
+        commentCount
+        likeCount
+        dislikeCount
+      }
+    }
+  }
+`;
+
+export const POST_BY_ADDRESS_QUERY = gql`
+  query getPostByAddress($address: AddressEVM!) {
+    address(address: $address) {
+      wallet {
+        profiles {
+          edges {
+            node {
+              posts {
+                edges {
+                  node {
+                    contentID
+                    ... on Post {
+                      contentID
+                      title
+                      body
+                      digest
+                      authorHandle
+                      authorAddress
+                      arweaveTxHash
+                      createdAt
+                      updatedAt
+                      commentCount
+                      likeCount
+                      dislikeCount
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -77,6 +120,53 @@ export const PROFILE_BY_ADDRESS_QUERY = gql`
           handle
           avatar
           metadata
+        }
+        profiles {
+          edges {
+            node {
+              profileID
+              handle
+              avatar
+              metadata
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_POSTS_QUERY = gql`
+  query getAllPosts {
+    profiles {
+      edges {
+        node {
+          handle
+          owner {
+            address
+          }
+          posts {
+            edges {
+              node {
+                contentID
+                ... on Post {
+                  contentID
+                  authorHandle
+                  authorAddress
+                  title
+                  body
+                  digest
+                  arweaveTxHash
+                  createdAt
+                  updatedAt
+                  commentCount
+                  likeCount
+                  dislikeCount
+                }
+              }
+            }
+          }
+          postCount
         }
       }
     }
