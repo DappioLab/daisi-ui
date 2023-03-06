@@ -5,4 +5,4 @@
   package = "@netlify/plugin-nextjs"
 
 [functions]
-  included_files = ["profile/**"]
+  included_files = ["src/pages/profile/**"]
