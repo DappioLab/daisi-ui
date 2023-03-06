@@ -70,7 +70,6 @@ const Feed = ({ user }: { user: IUser }) => {
     <div className={style.profileId}>
       {!router.isFallback ? (
         <>
-          {" "}
           <div className={style.userInfo}>
             <div className={style.avatar}>
               <img src="/avatar.jpeg" alt="avatar" />
@@ -201,6 +200,6 @@ export async function getStaticProps({ params }: any) {
     props: {
       user,
     },
-    revalidate: 1,
+    revalidate: 30,
   };
 }
