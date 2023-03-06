@@ -209,7 +209,7 @@ export async function getStaticPaths() {
   const paths = await getUserList();
   return {
     paths,
-    fallback: true,
+    fallback: false,
   };
 }
 
@@ -225,7 +225,7 @@ export async function getStaticProps({ params }: any) {
     props: {
       user,
     },
-    revalidate: 1, // netlify minimum is 60
+    // revalidate: 1, // netlify minimum is 60
     notFound,
   };
 }
