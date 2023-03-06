@@ -62,9 +62,9 @@ const Feed = ({ user }: { user: IUser }) => {
     setUserPosts(parsedData);
   };
 
-  useEffect(() => {
-    getUserPosts();
-  }, []);
+  // useEffect(() => {
+  //   getUserPosts();
+  // }, []);
 
   return (
     <div className={style.profileId}>
@@ -200,6 +200,6 @@ export async function getStaticProps({ params }: any) {
     props: {
       user,
     },
-    revalidate: 30,
+    revalidate: 0,
   };
 }
