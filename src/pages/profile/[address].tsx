@@ -9,9 +9,9 @@ import { updateUserData } from "@/redux/globalSlice";
 import style from "@/styles/profile/id.module.sass";
 import axios from "axios";
 import moment from "moment";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 export interface IUser {
   id: string;
@@ -68,7 +68,7 @@ const Feed = ({ user }: { user: IUser }) => {
 
   return (
     <div className={style.profileId}>
-      {user && (
+      {!router.isFallback ? (
         <>
           {" "}
           <div className={style.userInfo}>
@@ -142,6 +142,8 @@ const Feed = ({ user }: { user: IUser }) => {
             })}{" "}
           </div>
         </>
+      ) : (
+        <div>Loading</div>
       )}
     </div>
   );
@@ -199,6 +201,6 @@ export async function getStaticProps({ params }: any) {
     props: {
       user,
     },
-    revalidate: 30,
+    revalidate: 1,
   };
 }
