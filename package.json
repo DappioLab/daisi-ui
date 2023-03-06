@@ -10,10 +10,9 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
-    "@gumhq/react-sdk": "^1.0.6",
-    "@gumhq/sdk": "^1.0.10",
     "@metamask/detect-provider": "^2.0.0",
     "@next/font": "13.1.6",
+    "@project-serum/anchor": "^0.26.0",
     "@reduxjs/toolkit": "^1.9.2",
     "@solana/wallet-adapter-react": "^0.15.29",
     "@solana/wallet-adapter-react-ui": "^0.9.28",
