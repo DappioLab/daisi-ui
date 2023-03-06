@@ -42,6 +42,7 @@ const OffChainFeedList = () => {
           address,
         });
 
+        // @ts-ignore
         const feeds = res.address.wallet.profiles.edges
           .map((e: any) => e.node)
           .reduce((prev: any, curr: any) => prev.concat(curr), [])
