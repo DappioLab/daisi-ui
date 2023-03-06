@@ -68,74 +68,81 @@ const Feed = ({ user }: { user: IUser }) => {
 
   return (
     <div className={style.profileId}>
-      <div className={style.userInfo}>
-        <div className={style.avatar}>
-          <img src="/avatar.jpeg" alt="avatar" />
-        </div>
-        <div className={style.userInfoBlock}>
-          <div className={style.userName}>{user.username}</div>
-          <div className={style.userId}>
-            <span>@{user.address.substring(0, 6)}</span>
-            <span>...</span>
-            <span>{user.address.slice(-6)}</span>
-          </div>
-          <div className={style.userBio}>
-            {!user.description ? "-" : user.description}
-          </div>
-          <br />
-          <div className={style.followDataBlock}>
-            <div
-              onClick={() => {
-                setUserListType(EUserListType.FOLLOWINGS);
-                setShowUserList(true);
-              }}
-            >
-              {user.followings.length} Followings
+      {user && (
+        <>
+          {" "}
+          <div className={style.userInfo}>
+            <div className={style.avatar}>
+              <img src="/avatar.jpeg" alt="avatar" />
             </div>
-            <div
-              onClick={() => {
-                setUserListType(EUserListType.FOLLOWERS);
-                setShowUserList(true);
-              }}
-            >
-              {user.followers.length} Followers
-            </div>
-          </div>
-          <div className={style.userJoinedDate}>
-            Joined {moment(user.createdAt).format("MMMM DD, YYYY")}
-          </div>
-          {userData?.id && userData.id !== user.id ? (
-            <div className={style.followBtnBlock}>
-              <div
-                className={style.followBtn}
-                onClick={() => updateUserFollowData()}
-              >
-                {user.followers.includes(userData.id) ? "Following" : "Follow"}
+            <div className={style.userInfoBlock}>
+              <div className={style.userName}>{user.username}</div>
+              <div className={style.userId}>
+                <span>@{user.address.substring(0, 6)}</span>
+                <span>...</span>
+                <span>{user.address.slice(-6)}</span>
               </div>
+              <div className={style.userBio}>
+                {!user.description ? "-" : user.description}
+              </div>
+              <br />
+              <div className={style.followDataBlock}>
+                <div
+                  onClick={() => {
+                    setUserListType(EUserListType.FOLLOWINGS);
+                    setShowUserList(true);
+                  }}
+                >
+                  {user.followings.length} Followings
+                </div>
+                <div
+                  onClick={() => {
+                    setUserListType(EUserListType.FOLLOWERS);
+                    setShowUserList(true);
+                  }}
+                >
+                  {user.followers.length} Followers
+                </div>
+              </div>
+              <div className={style.userJoinedDate}>
+                Joined {moment(user.createdAt).format("MMMM DD, YYYY")}
+              </div>
+              {userData?.id && userData.id !== user.id ? (
+                <div className={style.followBtnBlock}>
+                  <div
+                    className={style.followBtn}
+                    onClick={() => updateUserFollowData()}
+                  >
+                    {user.followers.includes(userData.id)
+                      ? "Following"
+                      : "Follow"}
+                  </div>
+                </div>
+              ) : null}
+              {showUserList && (
+                <UserList
+                  setShowUserList={setShowUserList}
+                  userListType={userListType}
+                  setUserListType={setUserListType}
+                />
+              )}
             </div>
-          ) : null}
-          {showUserList && (
-            <UserList
-              setShowUserList={setShowUserList}
-              userListType={userListType}
-              setUserListType={setUserListType}
-            />
-          )}
-        </div>
-      </div>
-      <div>
-        {userPosts.map((item, index) => {
-          return (
-            <div key={`${index}`}>
-              <HorizontalFeed
-                article={item}
-                setShowModal={() => {}}
-                type={EFeedType.USER_POST}
-              />
-            </div>
-          );
-        })}{" "}
-      </div>
+          </div>
+          <div>
+            {userPosts.map((item, index) => {
+              return (
+                <div key={`${index}`}>
+                  <HorizontalFeed
+                    article={item}
+                    setShowModal={() => {}}
+                    type={EFeedType.USER_POST}
+                  />
+                </div>
+              );
+            })}{" "}
+          </div>
+        </>
+      )}
     </div>
   );
 };
