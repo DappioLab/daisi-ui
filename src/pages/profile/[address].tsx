@@ -29,6 +29,7 @@ const Feed = ({ user }: { user: IUser }) => {
   const [showUserList, setShowUserList] = useState(false);
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
+  const [fetchedUser, setFetchedUser] = useState<IUser | null>(null);
   const router = useRouter();
 
   const updateUserFollowData = async () => {
@@ -41,6 +42,9 @@ const Feed = ({ user }: { user: IUser }) => {
   };
 
   const getUserPosts = async () => {
+    if (!user) {
+      return;
+    }
     const res: IApiRssListResponse[] = (await API.getUserPosts(user.id)).data;
 
     let parsedData: any = [];
@@ -62,27 +66,42 @@ const Feed = ({ user }: { user: IUser }) => {
     setUserPosts(parsedData);
   };
 
-  // useEffect(() => {
-  //   getUserPosts();
-  // }, []);
+  const getUser = async () => {
+    const address = router.query.address;
+
+    if (!address) {
+      return;
+    }
+
+    const user = await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/api/user/${address}`
+    );
+
+    setFetchedUser(user.data);
+  };
+
+  useEffect(() => {
+    getUser();
+    getUserPosts();
+  }, []);
 
   return (
     <div className={style.profileId}>
-      {!router.isFallback ? (
+      {fetchedUser && user ? (
         <>
           <div className={style.userInfo}>
             <div className={style.avatar}>
               <img src="/avatar.jpeg" alt="avatar" />
             </div>
             <div className={style.userInfoBlock}>
-              <div className={style.userName}>{user.username}</div>
+              <div className={style.userName}>{fetchedUser.username}</div>
               <div className={style.userId}>
-                <span>@{user.address.substring(0, 6)}</span>
+                <span>@{fetchedUser.address.substring(0, 6)}</span>
                 <span>...</span>
-                <span>{user.address.slice(-6)}</span>
+                <span>{fetchedUser.address.slice(-6)}</span>
               </div>
               <div className={style.userBio}>
-                {!user.description ? "-" : user.description}
+                {!fetchedUser.description ? "-" : fetchedUser.description}
               </div>
               <br />
               <div className={style.followDataBlock}>
@@ -92,7 +111,7 @@ const Feed = ({ user }: { user: IUser }) => {
                     setShowUserList(true);
                   }}
                 >
-                  {user.followings.length} Followings
+                  {fetchedUser.followings.length} Followings
                 </div>
                 <div
                   onClick={() => {
@@ -100,19 +119,19 @@ const Feed = ({ user }: { user: IUser }) => {
                     setShowUserList(true);
                   }}
                 >
-                  {user.followers.length} Followers
+                  {fetchedUser.followers.length} Followers
                 </div>
               </div>
               <div className={style.userJoinedDate}>
-                Joined {moment(user.createdAt).format("MMMM DD, YYYY")}
+                Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
               </div>
-              {userData?.id && userData.id !== user.id ? (
+              {userData?.id && userData.id !== fetchedUser.id ? (
                 <div className={style.followBtnBlock}>
                   <div
                     className={style.followBtn}
                     onClick={() => updateUserFollowData()}
                   >
-                    {user.followers.includes(userData.id)
+                    {fetchedUser.followers.includes(userData.id)
                       ? "Following"
                       : "Follow"}
                   </div>
@@ -195,11 +214,18 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
-  const user = await getUserDetails(params.address);
+  let user = null;
+  try {
+    user = await getUserDetails(params.address);
+  } catch (err) {}
+
+  const notFound = user ? false : true;
+
   return {
     props: {
       user,
     },
-    revalidate: 1,
+    revalidate: 1, // netlify minimum is 60
+    notFound,
   };
 }
