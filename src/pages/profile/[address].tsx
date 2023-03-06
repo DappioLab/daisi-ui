@@ -42,9 +42,6 @@ const Feed = ({ user }: { user: IUser }) => {
   };
 
   const getUserPosts = async () => {
-    if (!user) {
-      return;
-    }
     const res: IApiRssListResponse[] = (await API.getUserPosts(user.id)).data;
 
     let parsedData: any = [];
