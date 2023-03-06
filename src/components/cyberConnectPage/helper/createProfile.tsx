@@ -5,7 +5,7 @@ import {
 import request from "graphql-request";
 import { CYBERCONNECT_ENDPOINT, X_API_KEY } from "../constants";
 import { IPFSHTTPClient } from "ipfs-http-client";
-import { GET_RELAY_ACTION_STATUS_QUERY } from "@/graphql/cyberConnect/query";
+// import { GET_RELAY_ACTION_STATUS_QUERY } from "@/graphql/cyberConnect/query";
 
 export const createProfile = async ({
   handle,
@@ -107,23 +107,23 @@ export const createProfile = async ({
 };
 
 export const checkRelayActionStatus = async (relayActionId: string) => {
-  const res = await request(
-    CYBERCONNECT_ENDPOINT,
-    GET_RELAY_ACTION_STATUS_QUERY,
-    { relayActionId }
-  );
-  //@ts-ignore
-  if (res.reason) {
-    return {
-      status: "Failed",
-      //@ts-ignore
-      message: res.reason,
-    };
-  } else {
-    return {
-      status: "SUCCESS",
-      //@ts-ignore
-      message: `https://testnet.bscscan.com/tx/${res.txHash}`,
-    };
-  }
+  // const res = await request(
+  //   CYBERCONNECT_ENDPOINT,
+  //   GET_RELAY_ACTION_STATUS_QUERY,
+  //   { relayActionId }
+  // );
+  // //@ts-ignore
+  // if (res.reason) {
+  //   return {
+  //     status: "Failed",
+  //     //@ts-ignore
+  //     message: res.reason,
+  //   };
+  // } else {
+  //   return {
+  //     status: "SUCCESS",
+  //     //@ts-ignore
+  //     message: `https://testnet.bscscan.com/tx/${res.txHash}`,
+  //   };
+  // }
 };

@@ -24,6 +24,7 @@ const Profile = () => {
       );
       console.log(profile);
       setMyProfiles(
+        // @ts-ignore
         profile?.address?.wallet?.profiles?.edges?.map((e: any) => e.node)
       );
     };
