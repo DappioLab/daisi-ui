@@ -4,11 +4,21 @@ import { ARWEAVE_ENDPOINT, DAISI_DB_ENDPOINT } from "../constants";
 
 export const createPost = async (
   userId: string,
+  title: string,
+  description: string,
   summitLink: string,
   handle: string,
   cyberConnectClient: CyberConnect
 ) => {
   try {
+    if (!title) {
+      alert("title can't be undefined!");
+      return;
+    }
+    if (!description) {
+      alert("description can't be undefined!");
+      return;
+    }
     if (!summitLink) {
       alert("summitLink can't be undefined!");
       return;
@@ -22,7 +32,6 @@ export const createPost = async (
       return;
     }
 
-    const title = `${handle}'s Post @ Daisi`;
     const res = await cyberConnectClient.createPost({
       title,
       body: summitLink,
