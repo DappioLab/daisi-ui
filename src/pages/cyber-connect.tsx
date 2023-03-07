@@ -1,5 +1,5 @@
 import PageTitle from "@/components/common/pageTitle";
-import OffChainFeedList from "@/components/cyberConnectPage/arweaveFeedList";
+import PostList from "@/components/cyberConnectPage/postList";
 import FeedList from "@/components/cyberConnectPage/EssenceList";
 import OffChainPost from "@/components/cyberConnectPage/offChainPost";
 import Post from "@/components/cyberConnectPage/post";
@@ -17,18 +17,14 @@ const CyberConnect = () => {
     <div className={style.cyberConnect}>
       <PageTitle title="Cyber Connect" />
 
-      {accessToken && address ? (
-        <div>
-          {/* <Profile /> */}
-          {/* <Post /> */}
-          <hr />
-          <OffChainPost />
-          <hr />
-          <OffChainFeedList />
-        </div>
-      ) : (
-        <></>
-      )}
+      <div>
+        {/* <Profile /> */}
+        {/* <Post /> */}
+        <hr />
+        <OffChainPost />
+        <hr />
+        <PostList />
+      </div>
 
       {/* <FeedList /> */}
     </div>

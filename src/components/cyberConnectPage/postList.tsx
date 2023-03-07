@@ -7,7 +7,8 @@ import request from "graphql-request";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import LikeDislikeBtn from "./likeDislikeBtn";
+import { like } from "./helper/like";
+import { useRouter } from "next/router";
 
 export interface Content {
   contentID: string;
@@ -29,17 +30,22 @@ export interface Post extends Content {
   comments: Content[];
 }
 
-const OffChainFeedList = () => {
-  const { address } = useSelector((state: IRootState) => state.cyberConnect);
-  const [feedList, setFeedList] = useState<Post[]>([]);
+const PostList = () => {
+  const {
+    cyberConnectClient,
+    profile,
+    address: myAddress,
+  } = useSelector((state: IRootState) => state.cyberConnect);
+  const [postList, setPostList] = useState<Post[]>([]);
+  const router = useRouter();
+  let address = router.query.address;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // TODO: Replace query with all post schema
-
         const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
-          address,
+          address: address ?? myAddress ?? "",
         });
 
         // @ts-ignore
@@ -50,7 +56,7 @@ const OffChainFeedList = () => {
           .map((n: any) => n.posts.edges.map((e: any) => e.node))
           .reduce((prev: any, curr: any) => prev.concat(curr), []);
 
-        setFeedList(feeds);
+        setPostList(feeds);
       } catch (err) {
         console.error(err);
       }
@@ -59,20 +65,32 @@ const OffChainFeedList = () => {
   }, []);
   return (
     <div>
-      {feedList.map((feed) => {
+      {postList.map((post) => {
         return (
           <div>
-            <h2>{feed.title}</h2>{" "}
+            <h2>{post.title}</h2>{" "}
             <h2>
-              by {feed.authorHandle.slice(0, -3)}
+              by {post.authorHandle.slice(0, -3)}
               {" - "}
-              {moment(feed.createdAt).format("MMMM DD,YYYY")}
+              {moment(post.createdAt).format("MMMM DD,YYYY")}
             </h2>
-            <h3>{feed.body}</h3>
-            {feed.likeCount}
-            <LikeDislikeBtn contendId={feed.contentID} isLike={true} />
-            {feed.dislikeCount}
-            <LikeDislikeBtn contendId={feed.contentID} isLike={false} />
+            <h3>{post.body}</h3>
+            {post.likeCount}
+            <button
+              onClick={() => {
+                like(post.contentID, cyberConnectClient, true);
+              }}
+            >
+              Like
+            </button>
+            {post.dislikeCount}
+            <button
+              onClick={() => {
+                like(post.contentID, cyberConnectClient, true);
+              }}
+            >
+              Dislike
+            </button>
             <hr />
           </div>
         );
@@ -81,4 +99,4 @@ const OffChainFeedList = () => {
   );
 };
 
-export default OffChainFeedList;
+export default PostList;

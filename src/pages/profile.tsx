@@ -15,7 +15,7 @@ import HorizontalFeed, {
 } from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
 import ExplorePosts from "@/components/gumPage/ExploreMigrated";
-import OffChainFeedList from "@/components/cyberConnectPage/arweaveFeedList";
+import PostList from "@/components/cyberConnectPage/postList";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
   const { userData } = useSelector((state: IRootState) => state.global);
@@ -135,7 +135,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
           )}
           {provider && (
             <div>
-              <OffChainFeedList />
+              <PostList />
             </div>
           )}
         </>
