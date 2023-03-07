@@ -172,3 +172,31 @@ export const GET_ALL_POSTS_QUERY = gql`
     }
   }
 `;
+
+export const GET_RELAY_ACTION_STATUS_QUERY = gql`
+  query RalayAction($relayActionId: ID!) {
+    relayActionStatus(relayActionId: $relayActionId) {
+      ... on RelayActionQueued {
+        reason
+        queuedAt
+      }
+      ... on RelayActionStatusResult {
+        txHash
+        txStatus
+        returnData {
+          ... on RegisterEssenceReturnData {
+            profileID
+            essenceID
+            name
+            symbol
+            essenceTokenURI
+          }
+        }
+      }
+      ... on RelayActionError {
+        reason
+        lastKnownTxHash
+      }
+    }
+  }
+`;
