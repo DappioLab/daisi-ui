@@ -1,14 +1,10 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
 
-const follow = async ({
-  handle,
-  cyberConnect,
-  isFollow, // true => follow the handle; false => unfollow the handle
-}: {
-  handle: string;
-  cyberConnect: CyberConnect;
-  isFollow: boolean;
-}) => {
+export const follow = async (
+  handle: string,
+  cyberConnect: CyberConnect,
+  isFollow: boolean // true => follow the handle; false => unfollow the handle
+) => {
   try {
     if (isFollow) {
       await cyberConnect.follow(handle);

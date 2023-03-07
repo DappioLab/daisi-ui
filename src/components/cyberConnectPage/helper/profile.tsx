@@ -7,17 +7,12 @@ import { CYBERCONNECT_ENDPOINT, X_API_KEY } from "../constants";
 import { IPFSHTTPClient } from "ipfs-http-client";
 // import { GET_RELAY_ACTION_STATUS_QUERY } from "@/graphql/cyberConnect/query";
 
-export const createProfile = async ({
-  handle,
-  address,
-  accessToken,
-  ipfsClient,
-}: {
-  handle: string;
-  address: string;
-  accessToken: string;
-  ipfsClient: IPFSHTTPClient;
-}) => {
+export const createProfile = async (
+  handle: string,
+  address: string,
+  accessToken: string,
+  ipfsClient: IPFSHTTPClient
+) => {
   try {
     if (!handle) {
       alert("handle can't be undefined!");

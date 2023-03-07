@@ -2,17 +2,12 @@ import CyberConnect from "@cyberlab/cyberconnect-v2";
 import axios from "axios";
 import { ARWEAVE_ENDPOINT, DAISI_DB_ENDPOINT } from "../constants";
 
-export const createPost = async ({
-  userId,
-  summitLink,
-  handle,
-  cyberConnectClient,
-}: {
-  userId: string;
-  summitLink: string;
-  handle: string;
-  cyberConnectClient: CyberConnect;
-}) => {
+export const createPost = async (
+  userId: string,
+  summitLink: string,
+  handle: string,
+  cyberConnectClient: CyberConnect
+) => {
   try {
     if (!summitLink) {
       alert("summitLink can't be undefined!");
