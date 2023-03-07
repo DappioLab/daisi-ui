@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Web3Provider } from "@ethersproject/providers";
+import { IPFSHTTPClient } from "ipfs-http-client";
+import CyberConnect from "@cyberlab/cyberconnect-v2";
 
 export interface IProfile {
   profileID: number;
@@ -13,6 +15,8 @@ export interface ICyberConnectInitialState {
   accessToken: string | null;
   provider: Web3Provider | null;
   primaryProfile: IProfile | null;
+  cyberConnectClient: CyberConnect | null;
+  ipfsClient: IPFSHTTPClient | null;
 }
 
 const initialState: ICyberConnectInitialState = {
@@ -20,6 +24,8 @@ const initialState: ICyberConnectInitialState = {
   accessToken: null,
   provider: null,
   primaryProfile: null,
+  cyberConnectClient: null,
+  ipfsClient: null,
 };
 
 const cyberConnectSlice = createSlice({
@@ -38,9 +44,21 @@ const cyberConnectSlice = createSlice({
     setPrimaryProfile(state, action) {
       state.primaryProfile = action.payload;
     },
+    setCyberConnectClient(state, action) {
+      state.cyberConnectClient = action.payload;
+    },
+    setIpfsClient(state, action) {
+      state.ipfsClient = action.payload;
+    },
   },
 });
 
-export const { setAddress, setProvider, setAccessToken, setPrimaryProfile } =
-  cyberConnectSlice.actions;
+export const {
+  setAddress,
+  setProvider,
+  setAccessToken,
+  setPrimaryProfile,
+  setCyberConnectClient,
+  setIpfsClient,
+} = cyberConnectSlice.actions;
 export default cyberConnectSlice.reducer;
