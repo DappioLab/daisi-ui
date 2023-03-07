@@ -4,7 +4,7 @@ import {
   PROFILES_WITH_POSTS_QUERY,
 } from "@/graphql/cyberConnect/query";
 import { useEffect, useState } from "react";
-import Feed, { IFeed } from "./feed";
+import Feed, { IFeed } from "./essence";
 
 const FeedList = () => {
   const [feedList, setFeedList] = useState<IFeed[]>([]);
