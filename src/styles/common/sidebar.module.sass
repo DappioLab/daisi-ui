@@ -1,3 +1,5 @@
+@import '../global/colors'
+
 .sidebar
   width: 22rem
   height: 100%
@@ -12,13 +14,15 @@
   .label
     padding: 1rem 3rem
     &:hover
-      background-color: rgba(0,0,0,.5)
+      background-color: $grey
       cursor: pointer
-      color: white
+      color: $white
   .highlightRoute
-    background-color: rgba(0,0,0,.5)
+    background-color: $grey
+    // opacity: .9
+    // background-color: rgba(0,0,0,.5)
     cursor: pointer
-    color: white
+    color: $white
 
 @media screen and (min-width: 1024px)
   .sidebar

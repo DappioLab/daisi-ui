@@ -6,6 +6,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface IGlobalInitialState {
   submitModalData: ISubmitModalProps;
   isLogin: boolean;
+  isLoading: boolean;
   userData: IUser | null;
   showAuthModal: boolean;
   currentAddress: string | null;
@@ -28,6 +29,7 @@ const initialState: IGlobalInitialState = {
     followings: [],
   },
   isLogin: false,
+  isLoading: false,
   showAuthModal: false,
   currentAddress: null,
 };
@@ -51,6 +53,9 @@ export const globalSlice = createSlice({
     updateCurrentAddress: (state, action) => {
       state.currentAddress = action.payload;
     },
+    updateLoadingStatus: (state, action) => {
+      state.isLoading = action.payload;
+    },
   },
 });
 
@@ -60,6 +65,7 @@ export const {
   updateUserData,
   updateAuthModal,
   updateCurrentAddress,
+  updateLoadingStatus,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

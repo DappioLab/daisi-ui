@@ -1,9 +1,12 @@
+
+@import '../global/colors'
+  
 .feed
   border: solid .1rem #A8B3CF33
   width: 32rem
   height: 38rem
   border-radius: 2rem
-  background-color: rgb(29, 31, 37)
+  background-color: $black
   display: flex
   flex-direction: column
   position: relative
@@ -18,7 +21,7 @@
       width: 100%
       height: 100%
   .title
-    color: white
+    color: $white
     font-size: 2rem
     word-break: break-word
     display: -webkit-box
@@ -32,7 +35,7 @@
     flex: 1
   .timeBlock
     margin: 1rem 0 0 2rem
-    color: white
+    color: $white
   .articleImage
     height: 15rem
     border-radius: 1rem
@@ -45,8 +48,8 @@
     position: absolute
     right: 2rem
     top: 2rem
-    color: rgb(15, 18, 23)
-    background-color: white
+    color: $black
+    background-color: $white
     padding: .8rem 1.2rem
     border-radius: 1rem
     font-weight: 700

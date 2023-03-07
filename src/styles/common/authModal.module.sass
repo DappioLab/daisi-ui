@@ -1,3 +1,5 @@
+@import '../global/colors'
+  
 .authModal
   .bg
     width: 100%
@@ -5,21 +7,22 @@
     position: fixed
     top: 0
     left: 0
-    background-color: #fff
+    background-color: $white
     opacity: .1
     z-index: 1
   .modalContainer
-    border: solid .1rem rgb(82, 86, 100)
-    width: 50rem
-    height: 50rem
+    border: solid .1rem $grey2
+    padding: 5rem
+    // width: 50rem
+    // height: 50rem
     background-color: grey
     position: fixed
     top: 50%
     left: 50%
     transform: translate(-50%, -50%)
-    background-color: #fff
+    background-color: $white
     overflow: scroll
     z-index: 1
-    background-color: rgb(15, 18, 23)
-    color: white
+    background-color: $black
+    color: $white
     border-radius: 2rem

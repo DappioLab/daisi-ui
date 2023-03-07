@@ -3,8 +3,9 @@ import axios from "axios";
 import { IUser } from "@/pages/profile/[address]";
 import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import style from "@/styles/common/userListModal.module.sass";
+import { updateLoadingStatus } from "@/redux/globalSlice";
 
 export interface IUserListModalProps {
   userListType: EUserListType | null;
@@ -19,6 +20,7 @@ export enum EUserListType {
 const UserListModal = (props: IUserListModalProps) => {
   const { userData } = useSelector((state: IRootState) => state.global);
   const [userList, setUserList] = useState<IUser[]>([]);
+  const dispatch = useDispatch();
 
   const updateUserFollowData = async (targetId: string) => {
     if (!userData) {
@@ -44,9 +46,11 @@ const UserListModal = (props: IUserListModalProps) => {
       return;
     }
 
+    props.setUserListType(EUserListType.FOLLOWINGS);
+    dispatch(updateLoadingStatus(true));
     const res = await API.getFollowingListByAddress(userData?.address);
     setUserList(res.data);
-    props.setUserListType(EUserListType.FOLLOWINGS);
+    dispatch(updateLoadingStatus(false));
   };
 
   const getFollowerUserList = async () => {
@@ -55,9 +59,11 @@ const UserListModal = (props: IUserListModalProps) => {
       return;
     }
 
+    props.setUserListType(EUserListType.FOLLOWERS);
+    dispatch(updateLoadingStatus(true));
     const res = await API.getFollowerListByAddress(userData?.address);
     setUserList(res.data);
-    props.setUserListType(EUserListType.FOLLOWERS);
+    dispatch(updateLoadingStatus(false));
   };
 
   useEffect(() => {

@@ -1,5 +1,21 @@
+@import '../global/colors'
+
 .global
   .show
     display: block
   .hidden
     display: none
+  .loadingMask
+    top: 0
+    left: 0
+    width: 100vw
+    height: 100vh
+    position: fixed
+    background-color: $grey
+    opacity: .5
+    z-index: 100
+    font-size: 5rem
+    display: flex
+    align-items: center
+    justify-content: center
+    color: $grey2

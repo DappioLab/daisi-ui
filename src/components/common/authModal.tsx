@@ -183,7 +183,7 @@ const AuthModal = () => {
         }}
       ></div>
       <div className={style.modalContainer}>
-        <div style={{ width: "fit-content", margin: "10rem auto" }}>
+        <div>
           <div>
             <MetamaskConnectBtn />
           </div>

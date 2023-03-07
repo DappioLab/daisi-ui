@@ -1,15 +1,19 @@
+@import '../global/colors'
+  
 .profileId
   width: 50%
   margin: auto
+  color: $font
   .userInfo
-    border: solid .1rem rgba(255, 255, 255, .2)
+    border: solid .1rem
     padding: 2rem 
     margin: 5rem auto
     display: flex
     align-items: flex-start
     justify-content: flex-start
+    border-radius: 2rem
   .avatar
-    background-color: white
+    background-color: $white
     width: 10rem
     height: 10rem
     border-radius: 2rem
@@ -20,7 +24,7 @@
       height: 100%
   .userInfoBlock
     margin-left: 5rem
-    color: white
+    // color: $white
   .userName
     font-size: 2.5rem
     font-weight: 700
@@ -50,8 +54,8 @@
     border-radius: 5rem
     padding: .8rem 1.2rem
     width: fit-content
-    background-color: #fff
+    background-color: $white
     cursor: pointer
-    color: #333333
+    color: $black
     font-weight: 600
 

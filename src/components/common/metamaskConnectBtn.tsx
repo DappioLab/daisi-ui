@@ -110,11 +110,21 @@ const MetamaskConnectBtn = () => {
   // };
 
   return (
-    <div onClick={connect}>
+    <div
+      style={{
+        backgroundColor: "white",
+        borderRadius: "1rem",
+      }}
+      onClick={connect}
+    >
       {address ? (
         address.slice(0, 4) + "..." + address.slice(-4)
       ) : (
-        <button>Connect metamask</button>
+        <img
+          // style={{ width: "5rem", height: "5rem", marginRight: "2rem" }}
+          src="https://raw.githubusercontent.com/MetaMask/brand-resources/c3c894bb8c460a2e9f47c07f6ef32e234190a7aa/SVG/metamask-fox-wordmark-horizontal.svg"
+          alt=""
+        />
       )}
     </div>
   );

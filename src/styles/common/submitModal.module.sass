@@ -1,3 +1,6 @@
+@import '../global/colors'
+
+  
 .submitModal
   position: relative
   .bg
@@ -6,7 +9,7 @@
     position: fixed
     top: 0
     left: 0
-    background-color: #fff
+    background-color: $white
     opacity: .1
     z-index: 1
   .modalContainer
@@ -17,11 +20,11 @@
     top: 50%
     left: 50%
     transform: translate(-50%, -50%)
-    background-color: #fff
+    background-color: $white
     overflow: scroll
     z-index: 1
-    background-color: rgb(15, 18, 23)
-    color: white
+    background-color: $black
+    color: $white
     border-radius: 2rem
   .titleBlock, .description
     padding: 2rem 3rem
@@ -47,7 +50,7 @@
     padding: .8rem 1.2rem
     border-radius: 1rem
     width: 100%
-    color: white
+    color: $white
     font-size: 1.4rem
     outline: none
     resize: none

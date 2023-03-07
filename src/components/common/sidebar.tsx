@@ -73,12 +73,12 @@ const Sidebar = () => {
       >
         Submit link
       </div>
-      <div
+      {/* <div
         className={`${style.label}`}
         onClick={() => showSubmitModal(ESubmitModalTypes.suggestNewSource)}
       >
         Suggest new source
-      </div>
+      </div> */}
     </div>
   );
 };
