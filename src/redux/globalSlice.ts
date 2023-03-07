@@ -10,6 +10,7 @@ export interface IGlobalInitialState {
   userData: IUser | null;
   showAuthModal: boolean;
   currentAddress: string | null;
+  screenWidth: number | null;
 }
 
 const initialState: IGlobalInitialState = {
@@ -32,6 +33,7 @@ const initialState: IGlobalInitialState = {
   isLoading: false,
   showAuthModal: false,
   currentAddress: null,
+  screenWidth: null,
 };
 
 export const globalSlice = createSlice({
@@ -56,6 +58,9 @@ export const globalSlice = createSlice({
     updateLoadingStatus: (state, action) => {
       state.isLoading = action.payload;
     },
+    updateScreenWidth: (state, action) => {
+      state.screenWidth = action.payload;
+    },
   },
 });
 
@@ -66,6 +71,7 @@ export const {
   updateAuthModal,
   updateCurrentAddress,
   updateLoadingStatus,
+  updateScreenWidth,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

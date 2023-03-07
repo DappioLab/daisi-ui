@@ -10,7 +10,8 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IFeedProps } from "./feed";
+import { IFeedProps } from "./gridFeed";
+// import { IFeedProps } from "./feed";
 
 export enum EFeedType {
   USER_POST = "USER POST",
@@ -22,7 +23,6 @@ export enum EFeedType {
 interface IHorizontalFeedProps extends IFeedProps {
   type: EFeedType;
   children: ReactNode;
-  // sourceData: IRssSourceData;
 }
 
 const HorizontalFeed = (props: IHorizontalFeedProps) => {
@@ -108,7 +108,11 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         )}
       </div>
       <div className={style.articleImage}>
-        <img src={props.article.itemImage} alt="icon" />
+        <img
+          src={`https://picsum.photos/200/300?${Math.random()}`}
+          alt="icon"
+        />
+        {/* <img src={props.article.itemImage} alt="icon" /> */}
       </div>
     </div>
   );

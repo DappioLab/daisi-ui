@@ -1,10 +1,11 @@
 import * as apiUrl from "../api-url";
 import axios from "../interceptors";
 
-export const getRssData = () => {
+export const getRssData = (data) => {
   return axios({
     method: "GET",
     url: `${apiUrl.RSS_DATA}/source_items`,
+    params: data,
   });
 };
 

@@ -1,8 +1,8 @@
-import style from "@/styles/homePage/feed.module.sass";
-import moment from "moment";
-import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
-import { Dispatch, SetStateAction, useState } from "react";
-import { useDispatch } from "react-redux";
+// import style from "@/styles/homePage/feed.module.sass";
+// import moment from "moment";
+// import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
+// import { Dispatch, SetStateAction, useState } from "react";
+// import { useDispatch } from "react-redux";
 
 export interface IFeed {
   //   profile?: string; // this field exists in GUM
@@ -23,14 +23,14 @@ export interface IFeed {
 // }
 
 export interface IFeedProps {
-  article: IParsedRssData;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
+  // article: IParsedRssData;
+  // setShowModal: Dispatch<SetStateAction<boolean>>;
   // getPost: (id: string) => Promise<void>;
 }
 
 const Feed = (props: IFeedProps) => {
-  const dispatch = useDispatch();
-  const [showLinkButton, setShowLinkButton] = useState(false);
+  // const dispatch = useDispatch();
+  // const [showLinkButton, setShowLinkButton] = useState(false);
 
   return (
     <div>hello world</div>

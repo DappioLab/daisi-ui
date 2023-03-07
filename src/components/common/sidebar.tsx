@@ -13,16 +13,15 @@ const Sidebar = () => {
       label: "Daily",
       route: "/",
     },
-    {
-      label: "Gum",
-      route: "/gum",
-    },
-    {
-      label: "CyberConnect",
-      route: "/cyber-connect",
-    },
+    // {
+    //   label: "Gum",
+    //   route: "/gum",
+    // },
+    // {
+    //   label: "CyberConnect",
+    //   route: "/cyber-connect",
+    // },
   ]);
-  // const { submitModalData } = useSelector((state: IRootState) => state.global);
   const dispatch = useDispatch();
 
   const showSubmitModal = (type: string) => {

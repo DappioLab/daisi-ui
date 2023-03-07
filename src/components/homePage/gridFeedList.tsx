@@ -1,9 +1,10 @@
-import style from "@/styles/homePage/horizontalFeedList.module.sass";
+import style from "@/styles/homePage/gridFeedList.module.sass";
 import HorizontalFeed, { EFeedType } from "./horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { IRootState } from "@/redux";
+import GridFeed from "./gridFeed";
 
 interface IFeedList {
   setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -12,7 +13,7 @@ interface IFeedList {
   updateList: () => void;
 }
 
-const HorizontalFeedList = (props: IFeedList) => {
+const GridFeedList = (props: IFeedList) => {
   const { feedList } = useSelector((state: IRootState) => state.daily);
   const { ref, inView } = useInView();
 
@@ -30,17 +31,17 @@ const HorizontalFeedList = (props: IFeedList) => {
   // }, [currentId]);
 
   return (
-    <div className={style.horizontalFeedList}>
+    <div className={style.feedList}>
       {feedList.map((item, index) => {
         return (
           <div key={`${index}`} ref={ref}>
-            <HorizontalFeed
+            <GridFeed
               article={item}
               setShowModal={props.setShowModal}
               type={EFeedType.RSS_ITEM}
             >
               {}
-            </HorizontalFeed>
+            </GridFeed>
           </div>
         );
       })}
@@ -48,4 +49,4 @@ const HorizontalFeedList = (props: IFeedList) => {
   );
 };
 
-export default HorizontalFeedList;
+export default GridFeedList;

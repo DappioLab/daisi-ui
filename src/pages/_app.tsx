@@ -8,7 +8,7 @@ import store, { IRootState } from "@/redux";
 import Nav from "@/components/common/nav";
 import { useRouter } from "next/router";
 import nProgress from "nprogress";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import React, { useMemo } from "react";
 import Global from "@/components/common/global";
+import { updateScreenWidth } from "@/redux/globalSlice";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -69,14 +70,15 @@ export default function App({ Component, pageProps }: AppProps) {
         <ConnectionProvider endpoint={endpoint}>
           <WalletProvider wallets={wallets} autoConnect>
             <WalletModalProvider>
-              <Nav />
-              <div className={style.content}>
-                <Sidebar />
-                <div className={style.page}>
-                  <Component {...pageProps} />
+              <Global>
+                <Nav />
+                <div className={style.content}>
+                  <Sidebar />
+                  <div className={style.page}>
+                    <Component {...pageProps} />
+                  </div>
                 </div>
-              </div>
-              <Global />
+              </Global>
             </WalletModalProvider>
           </WalletProvider>
         </ConnectionProvider>
