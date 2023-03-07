@@ -20,14 +20,16 @@ export enum ESubmitModalTypes {
   suggestNewSource = "Suggest new source",
 }
 
+export enum EPostType {
+  CYBER_CONNECT = "CYBER_CONNECT",
+  GUM = "GUM",
+}
+
 const SubmitModal = (props: ISubmitModalProps) => {
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
-  const { isLogin } = useSelector((state: IRootState) => state.global);
   const { provider } = useSelector((state: IRootState) => state.cyberConnect);
-  const { userProfile, following, followers, userAccounts } = useSelector(
-    (state: IRootState) => state.gum
-  );
+  const { userProfile } = useSelector((state: IRootState) => state.gum);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -80,11 +82,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
               type: "header",
               data: { text: CREATED_IN_DAISI_TAG, level: 0 },
             },
-            // {
-            //   id: "1",
-            //   type: "header",
-            //   data: { text: postLink, level: 3 },
-            // },
           ],
         },
         type: "blocks",
@@ -126,6 +123,44 @@ const SubmitModal = (props: ISubmitModalProps) => {
     }
   };
 
+  const createCCPost = async () => {
+    // form data
+    let data = {
+      itemTitle: form.title,
+      itemDescription: form.description,
+      itemLink: form.link,
+      itemImage: "https://picsum.photos/200/300",
+      created: new Date(),
+    };
+  };
+
+  const createPost = () => {
+    let type: EPostType | null = null;
+    if (provider && !solanaWallet.connected) {
+      type = EPostType.CYBER_CONNECT;
+    }
+
+    if (!provider && solanaWallet.connected) {
+      type = EPostType.GUM;
+    }
+
+    if (!type) {
+      alert("Connection error");
+      return;
+    }
+
+    switch (type) {
+      case EPostType.CYBER_CONNECT:
+        createCCPost();
+        break;
+      case EPostType.GUM:
+        createGumPost();
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className={style.submitModal}>
       <div
@@ -135,10 +170,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
         }}
       ></div>
       <div className={style.modalContainer}>
-        {!isLogin && <div>Please connect your wallet first!</div>}
-        {isLogin && solanaWallet.connected ? <div>Solana</div> : null}
-        {isLogin && provider ? <div>Cyber Connect</div> : null}
-
         <div className={style.titleBlock}>
           <div className={style.title}>{props.title}</div>
           <div
@@ -203,9 +234,15 @@ const SubmitModal = (props: ISubmitModalProps) => {
         </div>
 
         <div className={style.bottomBlock}>
-          <div className={style.operateBtn} onClick={() => createGumPost()}>
-            Submit
-          </div>
+          {!solanaWallet.connected && !provider ? (
+            <div className={style.operateBtn} style={{ pointerEvents: "none" }}>
+              Please connect wallet first to send the link.
+            </div>
+          ) : (
+            <div className={style.operateBtn} onClick={() => createPost()}>
+              Submit
+            </div>
+          )}
         </div>
       </div>
     </div>

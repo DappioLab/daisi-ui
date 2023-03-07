@@ -114,6 +114,8 @@ const MetamaskConnectBtn = () => {
       style={{
         backgroundColor: "white",
         borderRadius: "1rem",
+        cursor: "pointer",
+        border: "solid .1rem lightgrey",
       }}
       onClick={connect}
     >
