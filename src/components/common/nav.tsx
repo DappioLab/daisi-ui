@@ -57,7 +57,8 @@ const Nav = () => {
           <div
             className={style.tab}
             onClick={() => {
-              router.push(`/profile/${userData?.address}`);
+              // router.push(`/profile/${userData?.address}`);
+              router.push(`/profile?address=${userData?.address}`);
             }}
           >
             Profile

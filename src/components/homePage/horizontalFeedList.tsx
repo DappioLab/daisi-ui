@@ -62,8 +62,6 @@ const HorizontalFeedList = (props: IFeedList) => {
         });
       });
 
-      console.log(parsedData, "parsedData");
-
       dispatch(updateFeedList(parsedData));
     })();
   }, []);
@@ -77,8 +75,9 @@ const HorizontalFeedList = (props: IFeedList) => {
               article={item}
               setShowModal={props.setShowModal}
               type={EFeedType.RSS_ITEM}
-            />
-            t
+            >
+              {}
+            </HorizontalFeed>
           </div>
         );
       })}

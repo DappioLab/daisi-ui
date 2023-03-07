@@ -1,8 +1,0 @@
-[build]
-  command = "npm run build"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-[functions]
-  included_files = ["src/pages/profile/**"]

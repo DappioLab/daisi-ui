@@ -1,6 +1,13 @@
+import { IRootState } from "@/redux";
 import { updateSubmitModalData } from "@/redux/globalSlice";
 import style from "@/styles/common/submitModal.module.sass";
-import { useDispatch } from "react-redux";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useDispatch, useSelector } from "react-redux";
+import { ipfsClient, mainGateway } from "@/components/gumPage/storage";
+import { useGumSDK } from "@/hooks/useGumSDK";
+import { useMemo, useState } from "react";
+import { Connection } from "@solana/web3.js";
+import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 
 export interface ISubmitModalProps {
   title: string;
@@ -15,6 +22,33 @@ export enum ESubmitModalTypes {
 
 const SubmitModal = (props: ISubmitModalProps) => {
   const dispatch = useDispatch();
+  const solanaWallet = useWallet();
+  const { isLogin } = useSelector((state: IRootState) => state.global);
+  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+  const { userProfile, following, followers, userAccounts } = useSelector(
+    (state: IRootState) => state.gum
+  );
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    link: "",
+  });
+
+  const connection = useMemo(
+    () =>
+      new Connection(
+        "https://lingering-holy-wind.solana-devnet.discover.quiknode.pro/169c1aa008961ed4ec13c040acd5037e8ead18b1/",
+        "confirmed"
+      ),
+    []
+  );
+  const sdk = useGumSDK(
+    connection,
+    { preflightCommitment: "confirmed" },
+    "devnet",
+    GRAPHQL_ENDPOINTS.devnet
+  );
+  const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
   const closeModal = () => {
     const data: ISubmitModalProps = {
@@ -23,6 +57,73 @@ const SubmitModal = (props: ISubmitModalProps) => {
       showSubmitModal: false,
     };
     dispatch(updateSubmitModalData(data));
+  };
+
+  const createGumPost = async () => {
+    let postId = "";
+    let ipfsLink = "";
+
+    try {
+      let data: any = {
+        daisiContent: {
+          itemTitle: form.title,
+          itemDescription: form.description,
+          itemLink: form.link,
+          itemImage: "https://picsum.photos/200/300",
+          // "https://www.online-image-editor.com/styles/2019/images/power_girl_editor.png",
+          created: new Date(),
+        },
+        content: {
+          blocks: [
+            {
+              id: "0",
+              type: "header",
+              data: { text: CREATED_IN_DAISI_TAG, level: 0 },
+            },
+            // {
+            //   id: "1",
+            //   type: "header",
+            //   data: { text: postLink, level: 3 },
+            // },
+          ],
+        },
+        type: "blocks",
+        authorship: {
+          signature: "0",
+          publicKey: "0",
+        },
+        contentDigest: "0",
+        signatureEncoding: "base64",
+        digestEncoding: "hex",
+        parentDigest: "",
+      };
+      let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
+      console.log(uploadMetadata, "uploadMetadata");
+
+      ipfsLink = mainGateway + uploadMetadata.path;
+      if (solanaWallet.publicKey) {
+        if (userProfile) {
+          let postIx = await sdk?.post.create(
+            ipfsLink,
+            userProfile.profile,
+            userProfile.user,
+            solanaWallet.publicKey
+          );
+
+          if (postIx) {
+            let result = await postIx.instructionMethodBuilder.rpc();
+            console.log(result);
+            postId = postIx.postPDA.toString();
+          }
+        }
+        return { success: true, postId, postLink: ipfsLink };
+      } else {
+        alert("Wallet Not connected");
+      }
+    } catch (err) {
+      console.log(err);
+      return { success: false, postId, postLink: ipfsLink };
+    }
   };
 
   return (
@@ -34,6 +135,10 @@ const SubmitModal = (props: ISubmitModalProps) => {
         }}
       ></div>
       <div className={style.modalContainer}>
+        {!isLogin && <div>Please connect your wallet first!</div>}
+        {isLogin && solanaWallet.connected ? <div>Solana</div> : null}
+        {isLogin && provider ? <div>Cyber Connect</div> : null}
+
         <div className={style.titleBlock}>
           <div className={style.title}>{props.title}</div>
           <div
@@ -46,15 +151,61 @@ const SubmitModal = (props: ISubmitModalProps) => {
           </div>
         </div>
         <div className={style.description}>{props.description}</div>
-        <div className={style.inputBlock}>
-          <input
-            type="text"
-            placeholder="Paste your link here."
-            className={style.input}
-          />
+        <div className={style.formBlock}>
+          <div className={style.inputBlock}>
+            <div className={style.inputLabel}>Title</div>
+            <input
+              type="text"
+              placeholder="title"
+              className={style.input}
+              value={form.title}
+              onChange={(e) => {
+                setForm((old) => {
+                  old.title = e.target.value;
+                  return JSON.parse(JSON.stringify(old));
+                });
+              }}
+            />
+          </div>
+          <div className={style.inputBlock}>
+            <div className={style.inputLabel}>Description</div>
+            <textarea
+              placeholder="description"
+              className={style.input}
+              value={form.description}
+              onChange={(e) => {
+                setForm((old) => {
+                  old.description = e.target.value;
+                  return JSON.parse(JSON.stringify(old));
+                });
+              }}
+            ></textarea>
+          </div>
+          <div className={style.inputBlock}>
+            <div className={style.inputLabel}>Link</div>
+            <input
+              type="text"
+              placeholder="link"
+              className={style.input}
+              value={form.link}
+              onChange={(e) => {
+                setForm((old) => {
+                  old.link = e.target.value;
+                  return JSON.parse(JSON.stringify(old));
+                });
+              }}
+            />
+          </div>
+          {/* <div className={style.inputBlock}>
+            <div className={style.inputLabel}>Thumbnail Image</div>
+            <input type="file" />
+          </div> */}
         </div>
+
         <div className={style.bottomBlock}>
-          <div className={style.operateBtn}>Submit</div>
+          <div className={style.operateBtn} onClick={() => createGumPost()}>
+            Submit
+          </div>
         </div>
       </div>
     </div>

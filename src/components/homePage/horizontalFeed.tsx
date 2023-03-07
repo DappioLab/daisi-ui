@@ -8,17 +8,20 @@ import {
 import style from "@/styles/homePage/horizontalFeed.module.sass";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IFeedProps } from "./feed";
 
 export enum EFeedType {
   USER_POST = "USER POST",
   RSS_ITEM = "RSS ITEM",
+  CC_ITEM = "CC ITEM",
+  GUM_ITEM = "GUM ITEM",
 }
 
 interface IHorizontalFeedProps extends IFeedProps {
   type: EFeedType;
+  children: ReactNode;
   // sourceData: IRssSourceData;
 }
 
@@ -29,7 +32,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
   );
   const { feedList } = useSelector((state: IRootState) => state.daily);
   const dispatch = useDispatch();
-  const router = useRouter();
+
   const updateLike = async () => {
     if (!userData?.id || !isLogin) {
       alert("Please login");
@@ -86,20 +89,23 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         <div className={style.timeBlock}>
           {moment(props.article.created).format("MMMM DD,YYYY")}
         </div>
-        <br />
-        <br />
-        <div className={style.socialActionBlock} onClick={() => updateLike()}>
-          {userData && props.article.likes.includes(userData.id) ? (
-            <div style={{ fontSize: "1.6rem" }}>
-              <i className="fa fa-heart " aria-hidden="true"></i>
+        <div className={style.socialActionBlock}>{props.children}</div>
+        {props.type === EFeedType.RSS_ITEM && (
+          <div className={style.socialActionBlock} onClick={() => updateLike()}>
+            {userData && props.article.likes.includes(userData.id) ? (
+              <div style={{ fontSize: "1.6rem" }}>
+                <i className="fa fa-heart " aria-hidden="true"></i>
+              </div>
+            ) : (
+              <div style={{ fontSize: "1.6rem" }}>
+                <i className="fa fa-heart-o"></i>
+              </div>
+            )}
+            <div className={style.actionNumber}>
+              {props.article.likes.length}
             </div>
-          ) : (
-            <div style={{ fontSize: "1.6rem" }}>
-              <i className="fa fa-heart-o"></i>
-            </div>
-          )}
-          <div className={style.actionNumber}>{props.article.likes.length}</div>
-        </div>
+          </div>
+        )}
       </div>
       <div className={style.articleImage}>
         <img src={props.article.itemImage} alt="icon" />
