@@ -40,8 +40,7 @@ const Nav = () => {
           router.push("/");
         }}
       >
-        <div className={style.name}>DAISI</div>
-        <div className={style.slogan}>Limits of awareness</div>
+        <img className={style.logoBlock} src="/logo.svg" alt="" />
       </div>
       <div className={style.profile}>
         {!isLogin ? (
