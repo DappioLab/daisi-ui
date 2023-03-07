@@ -8,7 +8,7 @@ import CreateProfile from "./createProfile";
 import FollowBtn from "./followBtn";
 
 const Profile = () => {
-  const { address, accessToken, primaryProfile } = useSelector(
+  const { address, accessToken, profile } = useSelector(
     (state: IRootState) => state.cyberConnect
   );
   const [myProfiles, setMyProfiles] = useState<any>([]);
@@ -30,13 +30,13 @@ const Profile = () => {
     };
 
     fetchData();
-  }, [address, accessToken, primaryProfile]);
+  }, [address, accessToken, profile]);
 
   return (
     <div>
-      {primaryProfile ? (
+      {profile ? (
         <div>
-          <h1>{primaryProfile.handle.slice(0, -3)}</h1>
+          <h1>{profile.handle.slice(0, -3)}</h1>
           <h2>Wallet: {address}</h2>
           <h2> All my profiles:</h2>
           {myProfiles.map((p: any) => (

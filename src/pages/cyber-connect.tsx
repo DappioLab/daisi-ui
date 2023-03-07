@@ -1,6 +1,6 @@
 import PageTitle from "@/components/common/pageTitle";
 import OffChainFeedList from "@/components/cyberConnectPage/arweaveFeedList";
-import FeedList from "@/components/cyberConnectPage/feedList";
+import FeedList from "@/components/cyberConnectPage/EssenceList";
 import OffChainPost from "@/components/cyberConnectPage/offChainPost";
 import Post from "@/components/cyberConnectPage/post";
 import Profile from "@/components/cyberConnectPage/profile";
@@ -10,7 +10,7 @@ import style from "@/styles/cyberConnectPage/index.module.sass";
 import { useSelector } from "react-redux";
 
 const CyberConnect = () => {
-  const { address, accessToken, primaryProfile } = useSelector(
+  const { address, accessToken, profile } = useSelector(
     (state: IRootState) => state.cyberConnect
   );
   return (
@@ -19,7 +19,7 @@ const CyberConnect = () => {
 
       {accessToken && address ? (
         <div>
-          <Profile />
+          {/* <Profile /> */}
           {/* <Post /> */}
           <hr />
           <OffChainPost />
@@ -27,10 +27,7 @@ const CyberConnect = () => {
           <OffChainFeedList />
         </div>
       ) : (
-        <div>
-          <SigninBtn />
-          <hr />
-        </div>
+        <></>
       )}
 
       {/* <FeedList /> */}

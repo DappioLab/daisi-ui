@@ -14,7 +14,7 @@ export interface ICyberConnectInitialState {
   address: string | null;
   accessToken: string | null;
   provider: Web3Provider | null;
-  primaryProfile: IProfile | null;
+  profile: IProfile | null;
   cyberConnectClient: CyberConnect | null;
   ipfsClient: IPFSHTTPClient | null;
 }
@@ -23,7 +23,7 @@ const initialState: ICyberConnectInitialState = {
   address: null,
   accessToken: null,
   provider: null,
-  primaryProfile: null,
+  profile: null,
   cyberConnectClient: null,
   ipfsClient: null,
 };
@@ -41,8 +41,8 @@ const cyberConnectSlice = createSlice({
     setAccessToken(state, action) {
       state.accessToken = action.payload;
     },
-    setPrimaryProfile(state, action) {
-      state.primaryProfile = action.payload;
+    setProfile(state, action) {
+      state.profile = action.payload;
     },
     setCyberConnectClient(state, action) {
       state.cyberConnectClient = action.payload;
@@ -57,7 +57,7 @@ export const {
   setAddress,
   setProvider,
   setAccessToken,
-  setPrimaryProfile,
+  setProfile,
   setCyberConnectClient,
   setIpfsClient,
 } = cyberConnectSlice.actions;

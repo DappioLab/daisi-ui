@@ -6,18 +6,18 @@ import { IRootState } from "@/redux";
 import { useState } from "react";
 
 const OffChainPost = () => {
-  const { provider, primaryProfile } = useSelector(
+  const { provider, profile } = useSelector(
     (state: IRootState) => state.cyberConnect
   );
   const [post, setPost] = useState<Omit<Content, "id">>({
     title: "",
     body: "",
-    author: primaryProfile ? primaryProfile.handle : "",
+    author: profile ? profile.handle : "",
   });
 
   const handleOnClick = async () => {
     try {
-      if (!primaryProfile) {
+      if (!profile) {
         alert("Create a profile first, before post");
         return;
       }
@@ -30,12 +30,12 @@ const OffChainPost = () => {
       });
       const res = await cyberConnect.createPost({
         ...post,
-        author: primaryProfile.handle,
+        author: profile.handle,
       });
       setPost({
         title: "",
         body: "",
-        author: primaryProfile ? primaryProfile.handle : "",
+        author: profile ? profile.handle : "",
       });
     } catch (err) {
       console.log(err);
