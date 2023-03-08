@@ -36,15 +36,20 @@ export interface Post extends Content {
 }
 
 const PostList = ({ address }: { address: string }) => {
-  const { cyberConnectClient, address: myAddress } = useSelector(
-    (state: IRootState) => state.cyberConnect
-  );
+  const {
+    cyberConnectClient,
+    address: myAddress,
+    lastPostsUpdateTime,
+  } = useSelector((state: IRootState) => state.cyberConnect);
   const [postList, setPostList] = useState<Post[]>([]);
   const daisiHandle = handleCreator(address);
 
   const fetchData = async () => {
     try {
-      // TODO: Replace query with all post schema
+      if (!(address && myAddress)) {
+        return;
+      }
+
       const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
         address,
         myAddress,
@@ -77,6 +82,10 @@ const PostList = ({ address }: { address: string }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [myAddress, address, lastPostsUpdateTime]);
 
   return (
     <div>

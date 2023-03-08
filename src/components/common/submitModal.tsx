@@ -13,6 +13,8 @@ import { useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { useRouter } from "next/router";
+import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper/post";
+import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 
 export interface ISubmitModal {
   title: string;
@@ -36,7 +38,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
-  const { userData } = useSelector((state: IRootState) => state.global);
   const { provider } = useSelector((state: IRootState) => state.cyberConnect);
   const { userProfile } = useSelector((state: IRootState) => state.gum);
   const [form, setForm] = useState({
@@ -134,14 +135,40 @@ const SubmitModal = (props: ISubmitModalProps) => {
   };
 
   const createCCPost = async () => {
-    // form data
-    let data = {
-      itemTitle: form.title,
-      itemDescription: form.description,
-      itemLink: form.link,
-      itemImage: "https://picsum.photos/200/300",
-      created: new Date(),
-    };
+    try {
+      if (!(ccProfile && cyberConnectClient)) {
+        alert("Please connect wallet before summit post.");
+        return;
+      }
+
+      // form data
+      let data = {
+        itemTitle: form.title,
+        itemDescription: form.description,
+        itemLink: form.link,
+        itemImage: "https://picsum.photos/200/300",
+        created: new Date(),
+      };
+
+      const result = await createCyberConnectPost(
+        data.itemTitle,
+        data.itemDescription,
+        data.itemLink,
+        ccProfile.handle,
+        cyberConnectClient,
+        data.itemImage
+      );
+      dispatch(setLastPostsUpdateTime(new Date()));
+
+      return {
+        success: result.status == "SUCCESS" ? true : false,
+        postId: result.contentId,
+        postLink: result.metadataUrl,
+      };
+    } catch (err) {
+      console.log(err);
+      return { success: false, postId: "", postLink: "" };
+    }
   };
 
   const createPost = () => {

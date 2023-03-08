@@ -17,6 +17,7 @@ export interface ICyberConnectInitialState {
   profile: IProfile | null;
   cyberConnectClient: CyberConnect | null;
   ipfsClient: IPFSHTTPClient | null;
+  lastPostsUpdateTime: Date;
 }
 
 const initialState: ICyberConnectInitialState = {
@@ -26,6 +27,7 @@ const initialState: ICyberConnectInitialState = {
   profile: null,
   cyberConnectClient: null,
   ipfsClient: null,
+  lastPostsUpdateTime: new Date(),
 };
 
 const cyberConnectSlice = createSlice({
@@ -50,6 +52,9 @@ const cyberConnectSlice = createSlice({
     setIpfsClient(state, action) {
       state.ipfsClient = action.payload;
     },
+    setLastPostsUpdateTime(state, action) {
+      state.lastPostsUpdateTime = action.payload;
+    },
   },
 });
 
@@ -60,5 +65,6 @@ export const {
   setProfile,
   setCyberConnectClient,
   setIpfsClient,
+  setLastPostsUpdateTime,
 } = cyberConnectSlice.actions;
 export default cyberConnectSlice.reducer;
