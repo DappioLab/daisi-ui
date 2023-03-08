@@ -101,10 +101,8 @@ const ExplorePosts = () => {
           )
         );
       }
-      const address = router.asPath.split("address=")[1];
-      let userKeys = await sdk?.user.getUserAccountsByUser(
-        new PublicKey(address)
-      );
+      const address = router;
+      let userKeys = await sdk?.user.getUserAccountsByUser(wallet.publicKey);
       if (userKeys && userKeys.length > 0) {
         dispatch(
           updateUserAccounts(
@@ -121,12 +119,14 @@ const ExplorePosts = () => {
       if (wallet.publicKey) {
         // const allPostAccounts =
         //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+        const address = router.asPath.split("address=")[1];
 
         const allPostAccounts = [];
         // parts for reply
         // let replyMap = new Map<string, ReplyInterface[]>();
         const allPostLocal = await sdk.post.getPostAccountsByUser(
-          wallet.publicKey
+          new PublicKey(address)
+          // wallet.publicKey
         );
 
         let userPostAccounts = allPostLocal
