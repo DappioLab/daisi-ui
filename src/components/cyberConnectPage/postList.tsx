@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { like } from "./helper/like";
 import { useRouter } from "next/router";
+import { handleCreator } from "./helper/profile";
 
 export interface Content {
   contentID: string;
@@ -35,6 +36,7 @@ const PostList = ({ address }: { address: string }) => {
     (state: IRootState) => state.cyberConnect
   );
   const [postList, setPostList] = useState<Post[]>([]);
+  const daisiHandle = handleCreator(address);
 
   const fetchData = async () => {
     try {
@@ -44,14 +46,19 @@ const PostList = ({ address }: { address: string }) => {
       });
 
       // @ts-ignore
-      const feeds = res.address.wallet.profiles.edges
+      let posts = res.address.wallet.profiles.edges
         .map((e: any) => e.node)
         .reduce((prev: any, curr: any) => prev.concat(curr), [])
         .filter((n: any) => n.posts.edges.length > 0)
         .map((n: any) => n.posts.edges.map((e: any) => e.node))
         .reduce((prev: any, curr: any) => prev.concat(curr), []);
 
-      setPostList(feeds);
+      // filter Daisi created Handle only
+      posts = posts.filter(
+        (post: Post) => post.authorHandle.split(".")[0] == daisiHandle
+      );
+
+      setPostList(posts);
     } catch (err) {
       console.error(err);
     }
@@ -73,7 +80,7 @@ const PostList = ({ address }: { address: string }) => {
           <div>
             <h2>{post.title}</h2>{" "}
             <h2>
-              by {post.authorHandle.slice(0, -3)}
+              by {post.authorHandle.split(".")[0]}
               {" - "}
               {moment(post.createdAt).format("MMMM DD,YYYY")}
             </h2>
