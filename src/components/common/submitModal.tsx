@@ -174,7 +174,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
 
     setTimeout(() => {
       dispatch(updateShowSubmitModal(false));
-      router.push(`/profile/${userData.address}`);
       dispatch(updateLoadingStatus(false));
     }, 1500);
   };
