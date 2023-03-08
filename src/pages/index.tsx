@@ -69,7 +69,7 @@ const HomePage = () => {
     // dispatch(updateFeedList(parsedData));
 
     dispatch(updateFeedList(res));
-    dispatch(updateLoadingStatus(true));
+    dispatch(updateLoadingStatus(false));
   };
 
   useEffect(() => {

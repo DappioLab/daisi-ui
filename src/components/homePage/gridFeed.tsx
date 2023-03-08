@@ -1,8 +1,10 @@
-import { IParsedRssData } from "@/redux/dailySlice";
+import { IParsedRssData, updateFeedList } from "@/redux/dailySlice";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import style from "@/styles/homePage/gridFeed.module.sass";
 import moment from "moment";
+import { IRootState } from "@/redux";
+import API from "@/axios/api";
 
 export enum EFeedType {
   USER_POST = "USER POST",
@@ -25,6 +27,39 @@ export interface IFeedProps {
 const GridFeed = (props: IGridFeedProps) => {
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
+  const { userData, isLogin } = useSelector(
+    (state: IRootState) => state.global
+  );
+  const { feedList } = useSelector((state: IRootState) => state.daily);
+
+  const updateLike = async () => {
+    if (!userData?.id || !isLogin) {
+      alert("Please login");
+      return;
+    }
+
+    if (props.type === EFeedType.USER_POST) {
+      await API.updateUserPostLike(props.article.id, userData.id);
+      window.location.reload();
+    } else {
+      const updatedItem = await API.updateRssItemLike(
+        props.article.id,
+        userData.id
+      );
+
+      if (updatedItem) {
+        const updatedList = feedList.map((item) => {
+          if (item.id === updatedItem.data._id) {
+            const obj = JSON.parse(JSON.stringify(item));
+            obj.likes = updatedItem.data.likes;
+            return obj;
+          }
+          return item;
+        });
+        dispatch(updateFeedList(updatedList));
+      }
+    }
+  };
 
   return (
     <div
@@ -65,6 +100,26 @@ const GridFeed = (props: IGridFeedProps) => {
           alt="icon"
         />
       </div>
+      {props.type === EFeedType.RSS_ITEM && (
+        <div
+          className={style.socialActionBlock}
+          onClick={(e) => {
+            e.stopPropagation();
+            updateLike();
+          }}
+        >
+          {userData && props.article.likes.includes(userData.id) ? (
+            <div style={{ fontSize: "1.6rem" }}>
+              <i className="fa fa-heart " aria-hidden="true"></i>
+            </div>
+          ) : (
+            <div style={{ fontSize: "1.6rem" }}>
+              <i className="fa fa-heart-o"></i>
+            </div>
+          )}
+          <div className={style.actionNumber}>{props.article.likes.length}</div>
+        </div>
+      )}
     </div>
   );
 };
