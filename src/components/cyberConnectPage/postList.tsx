@@ -8,7 +8,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { like } from "./helper/like";
-import { useRouter } from "next/router";
 import { handleCreator } from "./helper/profile";
 
 export interface Content {
@@ -24,6 +23,11 @@ export interface Content {
   commentCount: number;
   likeCount: number;
   dislikeCount: number;
+  likedStatus: {
+    liked: boolean;
+    disliked: boolean;
+    proof: { arweaveTxHash: string | null };
+  };
 }
 
 // This only stored on Arweave, didn't launch an Onchain event
@@ -32,7 +36,7 @@ export interface Post extends Content {
 }
 
 const PostList = ({ address }: { address: string }) => {
-  const { cyberConnectClient, profile } = useSelector(
+  const { cyberConnectClient, address: myAddress } = useSelector(
     (state: IRootState) => state.cyberConnect
   );
   const [postList, setPostList] = useState<Post[]>([]);
@@ -43,6 +47,7 @@ const PostList = ({ address }: { address: string }) => {
       // TODO: Replace query with all post schema
       const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
         address,
+        myAddress,
       });
 
       // @ts-ignore
@@ -91,7 +96,7 @@ const PostList = ({ address }: { address: string }) => {
                 handleOnClick(post.contentID, true);
               }}
             >
-              Like
+              {post.likedStatus.liked ? "Liked" : "Like"}
             </button>
             {post.dislikeCount}
             <button
@@ -99,7 +104,7 @@ const PostList = ({ address }: { address: string }) => {
                 handleOnClick(post.contentID, false);
               }}
             >
-              Dislike
+              {post.likedStatus.disliked ? "Disliked" : "Dislike"}
             </button>
             <hr />
           </div>

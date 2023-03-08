@@ -63,7 +63,7 @@ export const POST_BY_ID_QUERY = gql`
 `;
 
 export const POST_BY_ADDRESS_QUERY = gql`
-  query getPostByAddress($address: AddressEVM!) {
+  query getPostByAddress($address: AddressEVM!, $myAddress: AddressEVM!) {
     address(address: $address) {
       wallet {
         profiles {
@@ -86,6 +86,13 @@ export const POST_BY_ADDRESS_QUERY = gql`
                       commentCount
                       likeCount
                       dislikeCount
+                      likedStatus(me: $myAddress) {
+                        liked
+                        disliked
+                        proof {
+                          arweaveTxHash
+                        }
+                      }
                     }
                   }
                 }
