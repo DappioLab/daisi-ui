@@ -18,6 +18,7 @@ import {
   updateReactions,
 } from "../../redux/gumSlice";
 import { IRootState } from "@/redux";
+import { useRouter } from "next/router";
 interface PostAccount {
   cl_pubkey: string;
   metadatauri: string;
@@ -48,6 +49,7 @@ export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
 const ExplorePosts = () => {
   const wallet = useWallet();
+  const router = useRouter();
   const dispatch = useDispatch();
   const { userProfile, following, followers, userAccounts } = useSelector(
     (state: IRootState) => state.gum
@@ -99,7 +101,10 @@ const ExplorePosts = () => {
           )
         );
       }
-      let userKeys = await sdk?.user.getUserAccountsByUser(wallet.publicKey);
+      const address = router.asPath.split("address=")[1];
+      let userKeys = await sdk?.user.getUserAccountsByUser(
+        new PublicKey(address)
+      );
       if (userKeys && userKeys.length > 0) {
         dispatch(
           updateUserAccounts(
