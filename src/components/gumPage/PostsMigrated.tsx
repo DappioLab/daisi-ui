@@ -67,6 +67,8 @@ const Post = (post: postState) => {
       created: daisiContent.created,
       likes: [],
       forwards: [],
+      sourceIcon: daisiContent.sourceIcon,
+      linkCreated: daisiContent.linkCreated,
     });
   }, [post]);
 
@@ -371,14 +373,14 @@ const Post = (post: postState) => {
   return (
     <div className={style.feed}>
       <div className={style.profile}>
-        {"@" + post.post.profile.toString().slice(0, 10)}
+        {/* {"@" + post.post.profile.toString().slice(0, 10)} */}
         {followButton}
       </div>
       {daisiContent && (
         <HorizontalFeed
           article={daisiContent}
           type={EFeedType.GUM_ITEM}
-          setShowModal={() => {}}
+          // setShowModal={() => {}}
         >
           <div className={style.btnBlock}>{reactionButton}</div>
         </HorizontalFeed>

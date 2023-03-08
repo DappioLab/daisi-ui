@@ -18,6 +18,8 @@ export interface IRssSourceItem {
   created: string;
   likes: string[];
   forwards: string[];
+  sourceIcon: string;
+  linkCreated: string;
 }
 
 export interface IParsedRssData extends IRssSourceItem {

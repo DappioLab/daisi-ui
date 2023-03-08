@@ -23,73 +23,103 @@ import { updateLoadingStatus } from "@/redux/globalSlice";
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
-  const { feedList } = useSelector((state: IRootState) => state.daily);
+  const { feedList, modalData } = useSelector(
+    (state: IRootState) => state.daily
+  );
   const { screenWidth } = useSelector((state: IRootState) => state.global);
   const [searchIndex, setSearchIndex] = useState(0);
+  const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
 
-  const getCurrentModalIndex = () => {
-    return 0;
-    // return feedList.findIndex((item) => item.id === currentId);
-  };
+  // const getCurrentModalIndex = (index: number) => {
+  //   setPo
+  // };
 
-  const getPost = async (id: string) => {
-    const postData = await request(endpoint, POST_BY_ID_STATIC_FIELDS_QUERY, {
-      id,
-    });
+  // const getPost = async (id: string) => {
+  //   const postData = await request(endpoint, POST_BY_ID_STATIC_FIELDS_QUERY, {
+  //     id,
+  //   });
 
-    dispatch(updateModalData(postData));
-    setShowModal(true);
-  };
+  //   dispatch(updateModalData(postData));
+  //   setShowModal(true);
+  // };
 
   const getAnonymousList = async () => {
     let nextNumber = searchIndex + 1;
     setSearchIndex(nextNumber);
-    const res = await API.getRssData({ index: nextNumber });
+    const res = await API.getRssData();
     return res.data;
   };
 
   const updateList = async () => {
     const res: IApiRssListResponse[] = await getAnonymousList();
+    console.log(res, "res");
 
-    let parsedData: any = [];
-    res.map((source) => {
-      source.items.map((item) => {
-        const obj = { ...item, source: { ...source } };
-        parsedData.push(obj);
-      });
-    });
+    // let parsedData: any = [];
 
-    dispatch(updateFeedList([...feedList, ...parsedData]));
+    // res.map((source) => {
+    //   source.items.map((item) => {
+    //     const obj = { ...item, source: { ...source } };
+    //     parsedData.push(obj);
+    //   });
+    // });
+    // console.log(parsedData, "parsedData");
+
+    // dispatch(updateFeedList(parsedData));
+
+    dispatch(updateFeedList(res));
   };
 
   useEffect(() => {
     updateList();
   }, []);
 
+  useEffect(() => {
+    const content = feedList.find((feed, index) => {
+      if (index === postModalIndex) {
+        return feed;
+      }
+    });
+
+    dispatch(updateModalData(content));
+  }, [postModalIndex]);
+
+  useEffect(() => {
+    if (modalData) {
+      setShowModal(true);
+    }
+  }, [modalData]);
+
+  useEffect(() => {
+    if (!showModal) {
+      setPostModalIndex(null);
+    }
+  }, [showModal]);
   return (
     <div className={`pageContent ${style.homePage}`}>
-      <PageTitle title="Daily" />
+      {/* <PageTitle title="Daily" /> */}
       {screenWidth < 960 ? (
         <GridFeedList
           setShowModal={setShowModal}
-          getPost={getPost}
-          getCurrentModalIndex={getCurrentModalIndex}
+          // getPost={getPost}
+          // getCurrentModalIndex={getCurrentModalIndex}
+          setPostModalIndex={setPostModalIndex}
           updateList={updateList}
         />
       ) : (
         <HorizontalFeedList
           setShowModal={setShowModal}
-          getPost={getPost}
-          getCurrentModalIndex={getCurrentModalIndex}
+          // getPost={getPost}
+          setPostModalIndex={setPostModalIndex}
           updateList={updateList}
         />
       )}
       {showModal ? (
         <FeedModal
           setShowModal={setShowModal}
-          getPost={getPost}
-          getCurrentModalIndex={getCurrentModalIndex}
+          postModalIndex={postModalIndex}
+          // getPost={getPost}
+          setPostModalIndex={setPostModalIndex}
         />
       ) : null}
     </div>

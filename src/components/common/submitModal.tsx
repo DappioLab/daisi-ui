@@ -1,5 +1,9 @@
 import { IRootState } from "@/redux";
-import { updateSubmitModalData } from "@/redux/globalSlice";
+import {
+  updateLoadingStatus,
+  updateShowSubmitModal,
+  updateSubmitModalData,
+} from "@/redux/globalSlice";
 import style from "@/styles/common/submitModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,17 +12,20 @@ import { useGumSDK } from "@/hooks/useGumSDK";
 import { useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
+import { useRouter } from "next/router";
 
-export interface ISubmitModalProps {
+export interface ISubmitModal {
   title: string;
   description: string;
-  showSubmitModal?: boolean;
+  link: "";
 }
 
-export enum ESubmitModalTypes {
-  submitLink = "Submit link",
-  suggestNewSource = "Suggest new source",
-}
+export interface ISubmitModalProps {}
+
+// export enum ESubmitModalTypes {
+//   submitLink = "Submit link",
+//   suggestNewSource = "Suggest new source",
+// }
 
 export enum EPostType {
   CYBER_CONNECT = "CYBER_CONNECT",
@@ -26,8 +33,10 @@ export enum EPostType {
 }
 
 const SubmitModal = (props: ISubmitModalProps) => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
+  const { userData } = useSelector((state: IRootState) => state.global);
   const { provider } = useSelector((state: IRootState) => state.cyberConnect);
   const { userProfile } = useSelector((state: IRootState) => state.gum);
   const [form, setForm] = useState({
@@ -53,12 +62,13 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
   const closeModal = () => {
-    const data: ISubmitModalProps = {
-      title: "",
-      description: "",
-      showSubmitModal: false,
-    };
-    dispatch(updateSubmitModalData(data));
+    // const data: ISubmitModalProps = {
+    //   title: "",
+    //   description: "",
+    //   showSubmitModal: false,
+    // };
+
+    dispatch(updateShowSubmitModal(false));
   };
 
   const createGumPost = async () => {
@@ -149,6 +159,8 @@ const SubmitModal = (props: ISubmitModalProps) => {
       return;
     }
 
+    dispatch(updateLoadingStatus(true));
+
     switch (type) {
       case EPostType.CYBER_CONNECT:
         createCCPost();
@@ -159,6 +171,12 @@ const SubmitModal = (props: ISubmitModalProps) => {
       default:
         break;
     }
+
+    setTimeout(() => {
+      dispatch(updateShowSubmitModal(false));
+      router.push(`/profile/${userData.address}`);
+      dispatch(updateLoadingStatus(false));
+    }, 1500);
   };
 
   return (
@@ -171,7 +189,8 @@ const SubmitModal = (props: ISubmitModalProps) => {
       ></div>
       <div className={style.modalContainer}>
         <div className={style.titleBlock}>
-          <div className={style.title}>{props.title}</div>
+          <div>Post</div>
+          {/* <div className={style.title}>{props.title}</div> */}
           <div
             className={style.closeBtn}
             onClick={() => {
@@ -181,7 +200,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
             x
           </div>
         </div>
-        <div className={style.description}>{props.description}</div>
+        {/* <div className={style.description}>{props.description}</div> */}
         <div className={style.formBlock}>
           <div className={style.inputBlock}>
             <div className={style.inputLabel}>Title</div>

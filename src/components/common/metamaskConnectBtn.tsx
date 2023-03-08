@@ -1,3 +1,4 @@
+import style from "@/styles/common/metamaskConnectBtn.module.sass";
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -110,15 +111,7 @@ const MetamaskConnectBtn = () => {
   // };
 
   return (
-    <div
-      style={{
-        backgroundColor: "white",
-        borderRadius: "1rem",
-        cursor: "pointer",
-        border: "solid .1rem lightgrey",
-      }}
-      onClick={connect}
-    >
+    <div onClick={connect} className={style.metamaskConnectBtn}>
       {address ? (
         address.slice(0, 4) + "..." + address.slice(-4)
       ) : (

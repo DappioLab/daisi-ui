@@ -18,7 +18,7 @@ interface IGridFeedProps extends IFeedProps {
 
 export interface IFeedProps {
   article: IParsedRssData;
-  setShowModal: Dispatch<SetStateAction<boolean>>;
+  // setShowModal: Dispatch<SetStateAction<boolean>>;
   // getPost: (id: string) => Promise<void>;
 }
 
@@ -38,7 +38,7 @@ const GridFeed = (props: IGridFeedProps) => {
       onMouseLeave={() => setShowLinkButton(false)}
     >
       <div className={style.articleIcon}>
-        <img src={props.article.source.sourceIcon} alt="icon" />
+        <img src={props.article.sourceIcon} alt="icon" />
       </div>
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">

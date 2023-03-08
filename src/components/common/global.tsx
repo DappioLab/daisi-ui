@@ -12,12 +12,16 @@ interface IGlobalProps {
 
 const Global = (props: IGlobalProps) => {
   const dispatch = useDispatch();
-  const { submitModalData, showAuthModal, isLoading, screenWidth } =
-    useSelector((state: IRootState) => state.global);
+  const {
+    submitModalData,
+    showAuthModal,
+    isLoading,
+    screenWidth,
+    showSubmitModal,
+  } = useSelector((state: IRootState) => state.global);
 
   const resize = () => {
     let width = window.innerWidth;
-    console.log(width, screenWidth, "#");
 
     if (width === screenWidth) {
       return;
@@ -35,10 +39,11 @@ const Global = (props: IGlobalProps) => {
 
   return (
     <div className={style.global}>
-      {submitModalData.showSubmitModal && (
+      {showSubmitModal && (
         <SubmitModal
-          title={submitModalData.title}
-          description={submitModalData.description}
+        // title={submitModalData.title}
+        // description={submitModalData.description}
+        // link={submitModalData.link}
         />
       )}
       <div className={showAuthModal ? style.show : style.hidden}>

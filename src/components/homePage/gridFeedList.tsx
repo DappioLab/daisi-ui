@@ -8,8 +8,9 @@ import GridFeed from "./gridFeed";
 
 interface IFeedList {
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getPost: (id: string) => Promise<void>;
-  getCurrentModalIndex: () => number;
+  // getPost: (id: string) => Promise<void>;
+  // getCurrentModalIndex: (index: number) => number;
+  setPostModalIndex: Dispatch<SetStateAction<number | null>>;
   updateList: () => void;
 }
 
@@ -34,10 +35,17 @@ const GridFeedList = (props: IFeedList) => {
     <div className={style.feedList}>
       {feedList.map((item, index) => {
         return (
-          <div key={`${index}`} ref={ref}>
+          <div
+            key={`${index}`}
+            ref={ref}
+            onClick={() => {
+              props.setPostModalIndex(index);
+              // props.setShowModal(true);
+            }}
+          >
             <GridFeed
               article={item}
-              setShowModal={props.setShowModal}
+              // setShowModal={props.setShowModal}
               type={EFeedType.RSS_ITEM}
             >
               {}

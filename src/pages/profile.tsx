@@ -60,7 +60,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
         <>
           <div className={style.userInfo}>
             <div className={style.avatar}>
-              <img src="/avatar.jpeg" alt="avatar" />
+              <img src="/logo.png" alt="avatar" />
             </div>
             <div className={style.userInfoBlock}>
               <div className={style.userName}>{fetchedUser.username}</div>

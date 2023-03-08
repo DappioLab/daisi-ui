@@ -187,7 +187,6 @@ const AuthModal = () => {
           <div>
             <MetamaskConnectBtn />
           </div>
-
           <br />
           <div>
             <SolanaConnectBtn />

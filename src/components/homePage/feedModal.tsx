@@ -3,11 +3,14 @@ import moment from "moment";
 import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { updateModalData } from "@/redux/dailySlice";
 
 interface IFeedModal {
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getPost: (id: string) => Promise<void>;
-  getCurrentModalIndex: () => number;
+  postModalIndex: number;
+  // getPost: (id: string) => Promise<void>;
+  // getCurrentModalIndex: (index: number) => number;
+  setPostModalIndex: Dispatch<SetStateAction<number | null>>;
 }
 
 const FeedModal = (props: IFeedModal) => {
@@ -17,26 +20,29 @@ const FeedModal = (props: IFeedModal) => {
   const dispatch = useDispatch();
   const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);
 
+  // useEffect(() => {
+  //   if (modalData) {
+  //     props.setShowModal(true);
+  //   }
+  // }, [modalData]);
+
   const getAdjoiningPost = (value: number) => {
-    const currentIndex = props.getCurrentModalIndex();
-    const updatedIndex = currentIndex + value;
-
-    if (updatedIndex <= 0) {
-      setDisabledPrevBtn(true);
-    } else {
-      setDisabledPrevBtn(false);
-    }
-
-    if (updatedIndex < 0) {
-      return;
-    }
-
-    // @ts-ignore
-    const targetPostId = feedList[updatedIndex].node.id;
-
-    const url = `/feed/${targetPostId}`;
-    history.replaceState({}, "", url);
-    props.getPost(targetPostId);
+    props.setPostModalIndex(props.postModalIndex + value);
+    // const currentIndex = props.getCurrentModalIndex();
+    // const updatedIndex = currentIndex + value;
+    // if (updatedIndex <= 0) {
+    //   setDisabledPrevBtn(true);
+    // } else {
+    //   setDisabledPrevBtn(false);
+    // }
+    // if (updatedIndex < 0) {
+    //   return;
+    // }
+    // // @ts-ignore
+    // const targetPostId = feedList[updatedIndex].node.id;
+    // const url = `/feed/${targetPostId}`;
+    // history.replaceState({}, "", url);
+    // props.getPost(targetPostId);
   };
 
   useEffect(() => {
@@ -48,24 +54,21 @@ const FeedModal = (props: IFeedModal) => {
       <div
         className={style.bg}
         onClick={() => {
-          const url = `/`;
-          history.replaceState({}, "", url);
+          // const url = `/`;
+          // history.replaceState({}, "", url);
+          dispatch(updateModalData(null));
           props.setShowModal(false);
         }}
       ></div>
       <div className={style.modalContainer}>
-        <a
-          href={`https://api.daily.dev/r/${modalData.post.id}`}
-          target="_blank"
-        >
+        <a href={modalData.itemLink} target="_blank">
           <div
             className={style.linkButton}
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            {/* @ts-ignore */}
-            Read more <i class="fa fa-external-link" aria-hidden="true"></i>
+            Read more <i className="fa fa-external-link" aria-hidden="true"></i>
           </div>
         </a>
         <div className={style.quickBtnBlock}>
@@ -73,17 +76,15 @@ const FeedModal = (props: IFeedModal) => {
             onClick={() => getAdjoiningPost(-1)}
             className={`${disabledPrevBtn && style.disabledBtn}`}
           >
-            {/* @ts-ignore */}
-            <i class="fa fa-arrow-left"></i>
+            <i className="fa fa-arrow-left"></i>
           </div>
           <br />
           <div onClick={() => getAdjoiningPost(1)}>
-            {/* @ts-ignore */}
-            <i class="fa fa-arrow-right"></i>
+            <i className="fa fa-arrow-right"></i>
           </div>
         </div>
-        <h1>{modalData.post.title}</h1>
-        <div className={style.tagBlock}>
+        <h1>{modalData.itemTitle}</h1>
+        {/* <div className={style.tagBlock}>
           {modalData.post.tags.map((tag: string) => {
             return (
               <div key={tag} className={style.tag}>
@@ -91,19 +92,20 @@ const FeedModal = (props: IFeedModal) => {
               </div>
             );
           })}
-        </div>
+        </div> */}
         <div className={style.timeBlock}>
-          {moment(modalData.post.createdAt).format("MMMM DD, YYYY")}
-          <span> -{modalData.post.readTime} read time</span>
+          {moment(parseInt(modalData.linkCreated)).format("MMMM DD, YYYY")}
+          {/* <span> -{modalData.post.readTime} read time</span> */}
         </div>
         <img
-          src={modalData.post.image}
+          src={`https://picsum.photos/200/300?${Math.random()}`}
+          // src={modalData.itemImage}
           alt="cover"
           className={style.coverImage}
         />
         <div className={style.interactNumBlock}>
-          <span> {modalData.post.numUpvotes} Upvotes</span>
-          <span>{modalData.post.numComments} Comments</span>
+          <span> {modalData.likes.length} Upvotes</span>
+          {/* <span>{modalData.post.numComments} Comments</span> */}
         </div>
       </div>
     </div>

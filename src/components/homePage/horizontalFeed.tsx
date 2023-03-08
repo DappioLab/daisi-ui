@@ -69,7 +69,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       onMouseLeave={() => setShowLinkButton(false)}
     >
       <div className={style.articleIcon}>
-        <img src={props.article.source.sourceIcon} alt="icon" />
+        <img src={props.article.sourceIcon} alt="icon" />
       </div>
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">

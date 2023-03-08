@@ -1,29 +1,34 @@
 import { IAuthData, IAuthModal } from "@/components/common/authModal";
-import { ISubmitModalProps } from "@/components/common/submitModal";
+import {
+  ISubmitModal,
+  ISubmitModalProps,
+} from "@/components/common/submitModal";
 import { IUser } from "@/pages/profile/[address]";
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface IGlobalInitialState {
-  submitModalData: ISubmitModalProps;
+  submitModalData: ISubmitModal;
   isLogin: boolean;
   isLoading: boolean;
   userData: IUser | null;
   showAuthModal: boolean;
+  showSubmitModal: boolean;
   currentAddress: string | null;
   screenWidth: number | null;
 }
 
 const initialState: IGlobalInitialState = {
+  showSubmitModal: false,
   submitModalData: {
-    showSubmitModal: false,
     title: "",
     description: "",
+    link: "",
   },
   userData: {
     id: "",
     username: "",
     description: "",
-    profilePicture: "/avatar.jpeg",
+    profilePicture: "/logo.png",
     address: "",
     createdAt: "",
     followers: [],
@@ -52,6 +57,9 @@ export const globalSlice = createSlice({
     updateAuthModal: (state, action) => {
       state.showAuthModal = action.payload;
     },
+    updateShowSubmitModal: (state, action) => {
+      state.showSubmitModal = action.payload;
+    },
     updateCurrentAddress: (state, action) => {
       state.currentAddress = action.payload;
     },
@@ -72,6 +80,7 @@ export const {
   updateCurrentAddress,
   updateLoadingStatus,
   updateScreenWidth,
+  updateShowSubmitModal,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

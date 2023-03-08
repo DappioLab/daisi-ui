@@ -7,20 +7,21 @@ import { IRootState } from "@/redux";
 
 interface IFeedList {
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  getPost: (id: string) => Promise<void>;
-  getCurrentModalIndex: () => number;
+  setPostModalIndex: Dispatch<SetStateAction<number | null>>;
+  // getPost: (id: string) => Promise<void>;
+  // getCurrentModalIndex: (index: number) => number;
   updateList: () => void;
 }
 
 const HorizontalFeedList = (props: IFeedList) => {
   const { feedList } = useSelector((state: IRootState) => state.daily);
-  const { ref, inView } = useInView();
+  // const { ref, inView } = useInView();
 
-  useEffect(() => {
-    if (inView) {
-      props.updateList();
-    }
-  }, [inView]);
+  // useEffect(() => {
+  //   if (inView) {
+  //     props.updateList();
+  //   }
+  // }, [inView]);
 
   // useEffect(() => {
   //   const currentIndex = props.getCurrentModalIndex();
@@ -33,10 +34,16 @@ const HorizontalFeedList = (props: IFeedList) => {
     <div className={style.horizontalFeedList}>
       {feedList.map((item, index) => {
         return (
-          <div key={`${index}`} ref={ref}>
+          <div
+            key={`${index}`}
+            onClick={() => {
+              props.setPostModalIndex(index);
+              // props.setShowModal(true);
+            }}
+          >
             <HorizontalFeed
               article={item}
-              setShowModal={props.setShowModal}
+              // setShowModal={props.setShowModal}
               type={EFeedType.RSS_ITEM}
             >
               {}
