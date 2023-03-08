@@ -200,3 +200,11 @@ export const GET_RELAY_ACTION_STATUS_QUERY = gql`
     }
   }
 `;
+
+export const GET_FOLLOW_STATUS_QUERY = gql`
+  query getFollowStatus($handle: String!, $myAddress: AddressEVM!) {
+    profileByHandle(handle: $handle) {
+      isFollowedByMe(me: $myAddress)
+    }
+  }
+`;

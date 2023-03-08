@@ -1,37 +1,61 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
+import { follow } from "./helper/follow";
+import { handleCreator } from "./helper/profile";
+import { useEffect, useState } from "react";
+import request from "graphql-request";
+import { CYBERCONNECT_ENDPOINT } from "./constants";
+import { GET_FOLLOW_STATUS_QUERY } from "@/graphql/cyberConnect/query";
 
-const FollowBtn = ({
-  handle,
-  isFollow,
-}: {
-  handle: string;
-  isFollow: boolean;
-}) => {
-  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+const FollowBtn = ({ address }: { address: string }) => {
+  const { address: myAddress, cyberConnectClient } = useSelector(
+    (state: IRootState) => state.cyberConnect
+  );
+  const [isFollowing, setFollowStatus] = useState(false);
+  const daisiHandle = handleCreator(address);
 
-  const handleOnClick = async () => {
+  const handleOnClick = async (isFollow: boolean) => {
+    await follow(daisiHandle, cyberConnectClient, isFollow);
+    await fetchData();
+  };
+
+  const fetchData = async () => {
     try {
-      const cyberConnect = new CyberConnect({
-        namespace: "CyberConnect",
-        env: "STAGING",
-        provider: provider,
-        signingMessageEntity: "CyberConnect",
-      });
-
-      if (isFollow) {
-        await cyberConnect.follow(handle);
-      } else {
-        await cyberConnect.unfollow(handle);
+      if (!(cyberConnectClient && address && myAddress)) {
+        return;
       }
+      const res = await request(
+        CYBERCONNECT_ENDPOINT,
+        GET_FOLLOW_STATUS_QUERY,
+        {
+          handle: daisiHandle,
+          myAddress,
+        }
+      );
+
+      //@ts-ignore
+      const isFollowByMe = res.profileByHandle.isFollowedByMe;
+      setFollowStatus(isFollowByMe);
     } catch (err) {
       console.log(err);
     }
   };
 
-  return (
-    <button onClick={handleOnClick}>{isFollow ? "Follow" : "Unfollow"}</button>
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [address, myAddress]);
+
+  return address != myAddress ? (
+    <button onClick={() => handleOnClick(!isFollowing)}>
+      {isFollowing ? "Following" : "Follow"}
+    </button>
+  ) : (
+    <></>
   );
 };
 
