@@ -91,7 +91,13 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         </div>
         <div className={style.socialActionBlock}>{props.children}</div>
         {props.type === EFeedType.RSS_ITEM && (
-          <div className={style.socialActionBlock} onClick={() => updateLike()}>
+          <div
+            className={style.socialActionBlock}
+            onClick={(e) => {
+              e.stopPropagation();
+              updateLike();
+            }}
+          >
             {userData && props.article.likes.includes(userData.id) ? (
               <div style={{ fontSize: "1.6rem" }}>
                 <i className="fa fa-heart " aria-hidden="true"></i>

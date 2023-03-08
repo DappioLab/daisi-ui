@@ -52,6 +52,7 @@ const HomePage = () => {
   };
 
   const updateList = async () => {
+    dispatch(updateLoadingStatus(true));
     const res: IApiRssListResponse[] = await getAnonymousList();
     console.log(res, "res");
 
@@ -68,6 +69,7 @@ const HomePage = () => {
     // dispatch(updateFeedList(parsedData));
 
     dispatch(updateFeedList(res));
+    dispatch(updateLoadingStatus(true));
   };
 
   useEffect(() => {
