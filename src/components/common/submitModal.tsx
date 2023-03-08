@@ -38,7 +38,11 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
-  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+  const {
+    provider,
+    profile: ccProfile,
+    cyberConnectClient,
+  } = useSelector((state: IRootState) => state.cyberConnect);
   const { userProfile } = useSelector((state: IRootState) => state.gum);
   const [form, setForm] = useState({
     title: "",
