@@ -1,10 +1,10 @@
 import PageTitle from "@/components/common/pageTitle";
 import PostList from "@/components/cyberConnectPage/postList";
-import FeedList from "@/components/cyberConnectPage/EssenceList";
-import OffChainPost from "@/components/cyberConnectPage/offChainPost";
-import Post from "@/components/cyberConnectPage/post";
-import Profile from "@/components/cyberConnectPage/profile";
-import SigninBtn from "@/components/cyberConnectPage/signinBtn";
+import FeedList from "@/components/cyberConnectPage/test/EssenceList";
+import OffChainPost from "@/components/cyberConnectPage/test/offChainPost";
+import Post from "@/components/cyberConnectPage/test/createEssensePost";
+import Profile from "@/components/cyberConnectPage/test/profile";
+import SigninBtn from "@/components/cyberConnectPage/test/signinBtn";
 import { IRootState } from "@/redux";
 import style from "@/styles/cyberConnectPage/index.module.sass";
 import { useSelector } from "react-redux";
@@ -16,17 +16,11 @@ const CyberConnect = () => {
   return (
     <div className={style.cyberConnect}>
       <PageTitle title="Cyber Connect" />
-
-      <div>
-        {/* <Profile /> */}
-        {/* <Post /> */}
-        <hr />
-        <OffChainPost />
-        <hr />
-        {/* <PostList /> */}
-      </div>
-
-      {/* <FeedList /> */}
+      {address && (
+        <div>
+          <PostList address={address} />
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import request from "graphql-request";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import CreateProfile from "./createProfile";
-import FollowBtn from "./followBtn";
+import FollowBtn from "../followBtn";
 
 const Profile = () => {
   const { address, accessToken, profile } = useSelector(
@@ -42,8 +42,8 @@ const Profile = () => {
           {myProfiles.map((p: any) => (
             <div>
               <h2>{p.handle.slice(0, -3)}</h2>
-              <FollowBtn handle={p.handle} isFollow={true} />
-              <FollowBtn handle={p.handle} isFollow={false} />
+              <FollowBtn address={address} />
+              <FollowBtn address={address} />
             </div>
           ))}
           <hr />
