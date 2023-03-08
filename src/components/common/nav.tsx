@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
-import { updateAuthModal, updateLoginStatus } from "@/redux/globalSlice";
+import {
+  updateAuthModal,
+  updateLoginStatus,
+  updateShowSubmitModal,
+} from "@/redux/globalSlice";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 const Nav = () => {
@@ -15,16 +19,8 @@ const Nav = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [routes, _] = useState([
     {
-      label: "Daily",
+      label: "Discover",
       route: "/",
-    },
-    {
-      label: "Gum",
-      route: "/gum",
-    },
-    {
-      label: "CyberConnect",
-      route: "/cyber-connect",
     },
   ]);
 
@@ -63,10 +59,6 @@ const Nav = () => {
             Profile
           </div>
         )}
-        {/* <i
-          className="fa fa-user"
-          aria-hidden="true"
-        ></i> */}
         {isLogin && userData ? (
           <div className={style.idBlock} onClick={() => showAuthModal()}>
             <span> {userData.address.substring(0, 6)}</span>
@@ -107,6 +99,28 @@ const Nav = () => {
               </div>
             );
           })}
+          <div
+            onClick={() => {
+              setShowMenu(false);
+              dispatch(updateShowSubmitModal(true));
+            }}
+            className={`${style.label} `}
+          >
+            Post
+          </div>
+          {isLogin && userData ? (
+            <div
+              className={style.idBlock}
+              onClick={() => {
+                setShowMenu(false);
+                showAuthModal();
+              }}
+            >
+              <span> {userData.address.substring(0, 6)}</span>
+              <span>...</span>
+              <span>{userData.address.slice(-6)}</span>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

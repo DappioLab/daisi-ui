@@ -17,6 +17,7 @@ const FeedModal = (props: IFeedModal) => {
   const { modalData, feedList } = useSelector(
     (state: IRootState) => state.daily
   );
+  const { screenWidth } = useSelector((state: IRootState) => state.global);
   const dispatch = useDispatch();
   const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);
 
@@ -54,35 +55,37 @@ const FeedModal = (props: IFeedModal) => {
       <div
         className={style.bg}
         onClick={() => {
-          // const url = `/`;
-          // history.replaceState({}, "", url);
           dispatch(updateModalData(null));
           props.setShowModal(false);
         }}
       ></div>
       <div className={style.modalContainer}>
-        <a href={modalData.itemLink} target="_blank">
-          <div
-            className={style.linkButton}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            Read more <i className="fa fa-external-link" aria-hidden="true"></i>
+        <div className={style.btnBlock}>
+          <div className={style.quickBtnBlock}>
+            <div
+              onClick={() => getAdjoiningPost(-1)}
+              className={`${disabledPrevBtn && style.disabledBtn}`}
+            >
+              <i className="fa fa-arrow-left"></i>
+            </div>
+            <br />
+            <div onClick={() => getAdjoiningPost(1)}>
+              <i className="fa fa-arrow-right"></i>
+            </div>
           </div>
-        </a>
-        <div className={style.quickBtnBlock}>
-          <div
-            onClick={() => getAdjoiningPost(-1)}
-            className={`${disabledPrevBtn && style.disabledBtn}`}
-          >
-            <i className="fa fa-arrow-left"></i>
-          </div>
-          <br />
-          <div onClick={() => getAdjoiningPost(1)}>
-            <i className="fa fa-arrow-right"></i>
-          </div>
+          <a href={modalData.itemLink} target="_blank">
+            <div
+              className={style.linkButton}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {screenWidth > 1024 ? <div>Read more</div> : null}
+              <i className="fa fa-external-link" aria-hidden="true"></i>
+            </div>
+          </a>
         </div>
+
         <h1>{modalData.itemTitle}</h1>
         {/* <div className={style.tagBlock}>
           {modalData.post.tags.map((tag: string) => {

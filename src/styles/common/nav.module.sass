@@ -23,21 +23,27 @@
     position: fixed
     top: 0
     left: 0
-    background-color: $white
-    opacity: .1
+    background-color: $font
+    opacity: .2
     z-index: 1
   .menuContainer
-    position: absolute
+    position: fixed
     right: 0
     top: 0
     background-color: $black
     color: $white
     height: 100%
-    padding: 3rem
+    padding: 8rem 0
     z-index: 2
     animation: menuAnimation .5s 
+    width: 18rem
+    z-index: 20
   .showMenu
     display: block
+    position: fixed
+    top: 0
+    left: 0
+    z-index: 100
   .menuBtn
     display: flex
     align-items: center
@@ -45,10 +51,10 @@
     flex-direction: column
     cursor: pointer
   .line
-    width: 1.5rem
-    height: .2rem
+    width: 2rem
+    height: .3rem
     margin-bottom: .5rem
-    background-color: $white
+    background-color: $black
   .closeMenuBtn
     position: absolute
     right: 1.5rem
@@ -58,11 +64,11 @@
       cursor: pointer
       color: $white
   .label
-    margin: 2rem 0
-    color: grey
+    padding: 1rem 3rem
     &:hover
-      color: $white
+      background-color: $grey
       cursor: pointer
+      color: $white
   .highlightRoute
     opacity: .9
     // color: $white
@@ -78,10 +84,17 @@
     //   font-size: 2.2rem
     //   color: $white
   .idBlock
+    position: absolute
+    bottom: 5rem
+    left: 50%
+    color: $white
+    z-index: 10
+    transform: translateX(-50%)
+    width: 14rem
+    font-size: 1.4rem
     border-radius: 2rem
     padding: .8rem 1.2rem
     border: solid .1rem 
-    margin-left: 3rem
     &:hover
       cursor: pointer
       opacity: .8
@@ -97,6 +110,16 @@
     .profile
       display: flex
       align-items: center
+    .idBlock
+      padding: .8rem 1.2rem
+      border: solid .1rem 
+      position: relative
+      width: fit-content
+      margin: 0
+      bottom: 0
+      color: $black
+      left: 0
+      margin-left: 3rem
 
 @keyframes menuAnimation
     0%
