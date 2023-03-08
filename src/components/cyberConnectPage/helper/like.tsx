@@ -1,14 +1,10 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
 
-const like = async ({
-  contendId,
-  cyberConnect,
-  isLike,
-}: {
-  contendId: string;
-  cyberConnect: CyberConnect;
-  isLike: boolean;
-}) => {
+export const like = async (
+  contendId: string,
+  cyberConnect: CyberConnect,
+  isLike: boolean
+) => {
   try {
     if (isLike) {
       const res = await cyberConnect.like(contendId);

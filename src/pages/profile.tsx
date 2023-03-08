@@ -15,7 +15,8 @@ import HorizontalFeed, {
 } from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
 import ExplorePosts from "@/components/gumPage/ExploreMigrated";
-import OffChainFeedList from "@/components/cyberConnectPage/arweaveFeedList";
+import PostList from "@/components/cyberConnectPage/postList";
+import FollowBtn from "@/components/cyberConnectPage/followBtn";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
   const { userData } = useSelector((state: IRootState) => state.global);
@@ -23,7 +24,9 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   // const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
   const [fetchedUser, setFetchedUser] = useState<IUser | null>(null);
-  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+  const { provider, address: metamaskAddress } = useSelector(
+    (state: IRootState) => state.cyberConnect
+  );
   const wallet = useWallet();
   const router = useRouter();
 
@@ -135,7 +138,12 @@ const ProfilePage = ({ user }: { user: IUser }) => {
           )}
           {provider && (
             <div>
-              <OffChainFeedList />
+              {metamaskAddress != router.asPath.split("address=")[1] && (
+                <div>
+                  <FollowBtn address={router.asPath.split("address=")[1]} />
+                </div>
+              )}
+              <PostList address={router.asPath.split("address=")[1]} />
             </div>
           )}
         </>

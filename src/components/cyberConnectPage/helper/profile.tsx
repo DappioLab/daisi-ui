@@ -5,19 +5,18 @@ import {
 import request from "graphql-request";
 import { CYBERCONNECT_ENDPOINT, X_API_KEY } from "../constants";
 import { IPFSHTTPClient } from "ipfs-http-client";
-// import { GET_RELAY_ACTION_STATUS_QUERY } from "@/graphql/cyberConnect/query";
+import {
+  GET_RELAY_ACTION_STATUS_QUERY,
+  PROFILE_BY_ADDRESS_QUERY,
+} from "@/graphql/cyberConnect/query";
+import { IProfile } from "@/redux/cyberConnectSlice";
 
-export const createProfile = async ({
-  handle,
-  address,
-  accessToken,
-  ipfsClient,
-}: {
-  handle: string;
-  address: string;
-  accessToken: string;
-  ipfsClient: IPFSHTTPClient;
-}) => {
+export const createProfile = async (
+  handle: string,
+  address: string,
+  accessToken: string,
+  ipfsClient: IPFSHTTPClient
+) => {
   try {
     if (!handle) {
       alert("handle can't be undefined!");
@@ -98,7 +97,6 @@ export const createProfile = async ({
 
     // TODO: Handle relay action status
     return {
-      status: "QUEUED",
       relayActionId,
     };
   } catch (error) {
@@ -107,23 +105,60 @@ export const createProfile = async ({
 };
 
 export const checkRelayActionStatus = async (relayActionId: string) => {
-  // const res = await request(
-  //   CYBERCONNECT_ENDPOINT,
-  //   GET_RELAY_ACTION_STATUS_QUERY,
-  //   { relayActionId }
-  // );
-  // //@ts-ignore
-  // if (res.reason) {
-  //   return {
-  //     status: "Failed",
-  //     //@ts-ignore
-  //     message: res.reason,
-  //   };
-  // } else {
-  //   return {
-  //     status: "SUCCESS",
-  //     //@ts-ignore
-  //     message: `https://testnet.bscscan.com/tx/${res.txHash}`,
-  //   };
-  // }
+  const res = await request(
+    CYBERCONNECT_ENDPOINT,
+    GET_RELAY_ACTION_STATUS_QUERY,
+    { relayActionId }
+  );
+  console.log("checkRelayActionStatus:", res);
+  //@ts-ignore
+  if (res.relayActionStatus.reason) {
+    return {
+      status: "QUEUED/FAILED",
+      //@ts-ignore
+      message: res.relayActionStatus.reason,
+    };
+  } else {
+    return {
+      status: "SUCCESS",
+      //@ts-ignore
+      message: `https://testnet.bscscan.com/tx/${res.relayActionStatus.txHash}`,
+    };
+  }
+};
+
+export const getProfileByAddress = async (address: string) => {
+  const daisiHandle = handleCreator(address);
+  try {
+    const res = await request(CYBERCONNECT_ENDPOINT, PROFILE_BY_ADDRESS_QUERY, {
+      address,
+    });
+
+    //@ts-ignore
+    if (res.address.wallet.profiles.edges.length == 0) {
+      return false;
+    }
+    //@ts-ignore
+    const profiles = res.address.wallet.profiles.edges.map(
+      (edge: any) => edge.node
+    );
+
+    const profile = profiles.find(
+      (profile: IProfile) => profile.handle.split(".")[0] == daisiHandle
+    );
+    return profile;
+  } catch (err) {}
+};
+
+export const handleCreator = (address: string, nonce?: number) => {
+  const handle = `daisi_${address.slice(0, 6)}_${address.slice(
+    -4
+  )}`.toLowerCase();
+
+  if (!nonce) {
+    return handle;
+  } else {
+    nonce = nonce % 100;
+    return `${handle}_${nonce}`;
+  }
 };

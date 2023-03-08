@@ -4,10 +4,10 @@ import {
   setProvider,
   setAddress,
   setAccessToken,
-  setPrimaryProfile,
+  setProfile,
 } from "@/redux/cyberConnectSlice";
 import request from "graphql-request";
-import { connectWallet, checkNetwork } from "./helper/wallet";
+import { connectWallet, checkNetwork } from "../helper/wallet";
 import {
   LOGIN_GET_MESSAGE_MUTATION,
   LOGIN_VERIFY_MUTATION,
@@ -79,7 +79,7 @@ const SigninBtn = () => {
 
       // @ts-ignore
       const primaryProfile = profile?.address?.wallet?.primaryProfile;
-      dispatch(setPrimaryProfile(primaryProfile));
+      dispatch(setProfile(primaryProfile));
     } catch (err) {}
   };
 

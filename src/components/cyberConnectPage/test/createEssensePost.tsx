@@ -1,7 +1,7 @@
 import { IRootState } from "@/redux";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { checkNetwork, connectWallet } from "./helper/wallet";
+import { checkNetwork, connectWallet } from "../helper/wallet";
 import { v4 as uuidv4 } from "uuid";
 import request from "graphql-request";
 import { cyberConnectEndpoint } from "@/graphql/cyberConnect/query";
@@ -18,7 +18,7 @@ interface IPostInput {
 }
 
 const Post = () => {
-  const { accessToken, primaryProfile } = useSelector(
+  const { accessToken, profile } = useSelector(
     (state: IRootState) => state.cyberConnect
   );
   const [postInput, setPostInput] = useState<IPostInput>({
@@ -53,7 +53,7 @@ const Post = () => {
       }
 
       /* Check if the has signed up */
-      if (!primaryProfile?.profileID) {
+      if (!profile?.profileID) {
         throw Error("You need to mint a profile.");
       }
 
@@ -75,8 +75,8 @@ const Post = () => {
         tags: [],
         image: postInput.nftImageURL,
         image_data: "",
-        name: `@${primaryProfile?.handle}'s post`,
-        description: `@${primaryProfile?.handle}'s post on CyberConnect Content app`,
+        name: `@${profile?.handle}'s post`,
+        description: `@${profile?.handle}'s post on CyberConnect Content app`,
         animation_url: "",
         external_url: "",
         attributes: [],
@@ -97,7 +97,7 @@ const Post = () => {
         variables: {
           input: {
             /* The profile id under which the Essence is registered */
-            profileID: primaryProfile?.profileID,
+            profileID: profile?.profileID,
             /* Name of the Essence */
             name: "Post",
             /* Symbol of the Essence */

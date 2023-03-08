@@ -5,24 +5,28 @@ import {
   setProvider,
   setAddress,
   setAccessToken,
-  setPrimaryProfile,
+  setProfile,
+  setIpfsClient,
+  setCyberConnectClient,
 } from "@/redux/cyberConnectSlice";
-import request from "graphql-request";
 import { Web3Provider, ExternalProvider } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
 
-import {
-  LOGIN_GET_MESSAGE_MUTATION,
-  LOGIN_VERIFY_MUTATION,
-} from "@/graphql/cyberConnect/mutation";
-import {
-  PROFILE_BY_ADDRESS_QUERY,
-  cyberConnectEndpoint,
-} from "@/graphql/cyberConnect/query";
 import { updateCurrentAddress, updateLoginStatus } from "@/redux/globalSlice";
 import { IAuthData } from "./authModal";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { signin } from "../cyberConnectPage/helper/signin";
+import {
+  createCyberConnectClient,
+  createIpfsClient,
+} from "../cyberConnectPage/helper/clientFactory";
+import {
+  getProfileByAddress,
+  createProfile,
+  handleCreator,
+  checkRelayActionStatus,
+} from "../cyberConnectPage/helper/profile";
 
 const MetamaskConnectBtn = () => {
   const solanaWallet = useWallet();
@@ -33,82 +37,49 @@ const MetamaskConnectBtn = () => {
     try {
       const provider = await connectWallet();
       await checkNetwork(provider);
-
-      /* Get the signer from the provider */
-      const signer = provider.getSigner();
-
-      /* Get the address of the connected wallet */
-      const address = await signer.getAddress();
-
       dispatch(setProvider(provider));
+
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
       dispatch(updateCurrentAddress(address));
       dispatch(setAddress(address));
+
+      const accessToken = await signin(address, provider);
+      dispatch(setAccessToken(accessToken));
+
+      const ipfsClient = createIpfsClient();
+      dispatch(setIpfsClient(ipfsClient));
+
+      const cyberConnectClient = createCyberConnectClient(provider);
+      dispatch(setCyberConnectClient(cyberConnectClient));
+
+      const daisiHandle = handleCreator(address);
+      const profile = await getProfileByAddress(address);
+
+      if (!profile) {
+        const { relayActionId } = await createProfile(
+          daisiHandle,
+          address,
+          accessToken,
+          ipfsClient
+        );
+
+        // TODO: Add auto detect relay action status and error handling if failed
+        console.log("relayActionId:", relayActionId);
+        const res = await checkRelayActionStatus(relayActionId);
+        console.log("create profile result:", res);
+      } else {
+        dispatch(setProfile(profile));
+        // TODO: Check handle is updated in Daisi DB
+        // 1. fetch from DB
+        // 2. Check
+        // 3. if not, update to DB
+      }
+
       solanaWallet.disconnect();
       dispatch(updateLoginStatus(true));
     } catch (err) {}
   };
-
-  // const handleOnClick = async () => {
-  //   try {
-  //     const provider = await connectWallet();
-  //     await checkNetwork(provider);
-  //     dispatch(setProvider(provider));
-
-  //     /* Get the signer from the provider */
-  //     const signer = provider.getSigner();
-
-  //     /* Get the address of the connected wallet */
-  //     const address = await signer.getAddress();
-  //     dispatch(setAddress(address));
-
-  //     /* Get the network from the provider */
-  //     const network = await provider.getNetwork();
-
-  //     /* Get the message from the server */
-  //     const messageResult = await request(
-  //       cyberConnectEndpoint,
-  //       LOGIN_GET_MESSAGE_MUTATION,
-  //       {
-  //         address,
-  //         domain: "daisi.social",
-  //       }
-  //     );
-  //     // @ts-ignore
-  //     const message = messageResult?.loginGetMessage?.message;
-
-  //     /* Get the signature for the message signed with the wallet */
-  //     const signature = await signer.signMessage(message);
-
-  //     /* Verify the signature on the server and get the access token */
-  //     const accessTokenResult = await request(
-  //       cyberConnectEndpoint,
-  //       LOGIN_VERIFY_MUTATION,
-  //       {
-  //         address,
-  //         domain: "daisi.social",
-  //         signature: signature,
-  //       }
-  //     );
-
-  //     // @ts-ignore
-  //     const accessToken = accessTokenResult?.loginVerify?.accessToken;
-
-  //     /* Set the access token in the state variable */
-  //     dispatch(setAccessToken("bearer " + accessToken));
-
-  //     const profile = await request(
-  //       cyberConnectEndpoint,
-  //       PROFILE_BY_ADDRESS_QUERY,
-  //       {
-  //         address,
-  //       }
-  //     );
-
-  //     // @ts-ignore
-  //     const primaryProfile = profile?.address?.wallet?.primaryProfile;
-  //     dispatch(setPrimaryProfile(primaryProfile));
-  //   } catch (err) {}
-  // };
 
   return (
     <div onClick={connect} className={style.metamaskConnectBtn}>
@@ -177,7 +148,7 @@ const checkNetwork = async (provider: Web3Provider) => {
         {
           chainId:
             "0x" + Number(process.env.NEXT_PUBLIC_CHAIN_ID)?.toString(16),
-          rpcUrls: ["https://goerli.infura.io/v3/"],
+          rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
         },
       ]);
 

@@ -1,39 +1,26 @@
 import PageTitle from "@/components/common/pageTitle";
-import OffChainFeedList from "@/components/cyberConnectPage/arweaveFeedList";
-import FeedList from "@/components/cyberConnectPage/feedList";
-import OffChainPost from "@/components/cyberConnectPage/offChainPost";
-import Post from "@/components/cyberConnectPage/post";
-import Profile from "@/components/cyberConnectPage/profile";
-import SigninBtn from "@/components/cyberConnectPage/signinBtn";
+import PostList from "@/components/cyberConnectPage/postList";
+import FeedList from "@/components/cyberConnectPage/test/EssenceList";
+import OffChainPost from "@/components/cyberConnectPage/test/offChainPost";
+import Post from "@/components/cyberConnectPage/test/createEssensePost";
+import Profile from "@/components/cyberConnectPage/test/profile";
+import SigninBtn from "@/components/cyberConnectPage/test/signinBtn";
 import { IRootState } from "@/redux";
 import style from "@/styles/cyberConnectPage/index.module.sass";
 import { useSelector } from "react-redux";
 
 const CyberConnect = () => {
-  const { address, accessToken, primaryProfile } = useSelector(
+  const { address, accessToken, profile } = useSelector(
     (state: IRootState) => state.cyberConnect
   );
   return (
     <div className={style.cyberConnect}>
       <PageTitle title="Cyber Connect" />
-
-      {accessToken && address ? (
+      {address && (
         <div>
-          <Profile />
-          {/* <Post /> */}
-          <hr />
-          <OffChainPost />
-          <hr />
-          <OffChainFeedList />
-        </div>
-      ) : (
-        <div>
-          <SigninBtn />
-          <hr />
+          <PostList address={address} />
         </div>
       )}
-
-      {/* <FeedList /> */}
     </div>
   );
 };

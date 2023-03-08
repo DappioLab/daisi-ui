@@ -63,7 +63,7 @@ export const POST_BY_ID_QUERY = gql`
 `;
 
 export const POST_BY_ADDRESS_QUERY = gql`
-  query getPostByAddress($address: AddressEVM!) {
+  query getPostByAddress($address: AddressEVM!, $myAddress: AddressEVM!) {
     address(address: $address) {
       wallet {
         profiles {
@@ -86,6 +86,13 @@ export const POST_BY_ADDRESS_QUERY = gql`
                       commentCount
                       likeCount
                       dislikeCount
+                      likedStatus(me: $myAddress) {
+                        liked
+                        disliked
+                        proof {
+                          arweaveTxHash
+                        }
+                      }
                     }
                   }
                 }
@@ -169,6 +176,42 @@ export const GET_ALL_POSTS_QUERY = gql`
           postCount
         }
       }
+    }
+  }
+`;
+
+export const GET_RELAY_ACTION_STATUS_QUERY = gql`
+  query RalayAction($relayActionId: ID!) {
+    relayActionStatus(relayActionId: $relayActionId) {
+      ... on RelayActionQueued {
+        reason
+        queuedAt
+      }
+      ... on RelayActionStatusResult {
+        txHash
+        txStatus
+        returnData {
+          ... on RegisterEssenceReturnData {
+            profileID
+            essenceID
+            name
+            symbol
+            essenceTokenURI
+          }
+        }
+      }
+      ... on RelayActionError {
+        reason
+        lastKnownTxHash
+      }
+    }
+  }
+`;
+
+export const GET_FOLLOW_STATUS_QUERY = gql`
+  query getFollowStatus($handle: String!, $myAddress: AddressEVM!) {
+    profileByHandle(handle: $handle) {
+      isFollowedByMe(me: $myAddress)
     }
   }
 `;
