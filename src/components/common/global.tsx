@@ -3,22 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 import AuthModal from "./authModal";
 import SubmitModal from "./submitModal";
 import style from "@/styles/common/global.module.sass";
-import { updateScreenWidth } from "@/redux/globalSlice";
+import {
+  updateLoginStatus,
+  updateScreenWidth,
+  updateUserData,
+} from "@/redux/globalSlice";
 import { ReactNode, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface IGlobalProps {
   children: ReactNode;
 }
 
 const Global = (props: IGlobalProps) => {
+  const solanaWallet = useWallet();
   const dispatch = useDispatch();
-  const {
-    submitModalData,
-    showAuthModal,
-    isLoading,
-    screenWidth,
-    showSubmitModal,
-  } = useSelector((state: IRootState) => state.global);
+  const { showAuthModal, isLoading, screenWidth, showSubmitModal } =
+    useSelector((state: IRootState) => state.global);
+  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
 
   const resize = () => {
     let width = window.innerWidth;
@@ -36,6 +38,13 @@ const Global = (props: IGlobalProps) => {
   useEffect(() => {
     resize();
   }, []);
+
+  useEffect(() => {
+    if (!provider && !solanaWallet.connected) {
+      dispatch(updateLoginStatus(false));
+      dispatch(updateUserData(null));
+    }
+  }, [provider, solanaWallet]);
 
   return (
     <div className={style.global}>
