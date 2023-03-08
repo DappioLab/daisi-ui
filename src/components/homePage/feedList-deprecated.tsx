@@ -13,7 +13,7 @@ interface IFeedList {
 const FeedList = (props: IFeedList) => {
   const [feedOptions, setFeedOptions] = useState({});
   const { feedList } = useSelector((state: IRootState) => state.daily);
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView({});
   const dispatch = useDispatch();
 
   const getAnonymousList = async () => {

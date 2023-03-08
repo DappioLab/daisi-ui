@@ -114,11 +114,16 @@ const ExplorePosts = () => {
   const fetchPostData = async () => {
     try {
       if (wallet.publicKey) {
-        const allPostAccounts =
-          (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+        // const allPostAccounts =
+        //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+
+        const allPostAccounts = [];
         // parts for reply
         // let replyMap = new Map<string, ReplyInterface[]>();
-        const allPostLocal = await sdk.post.getPostAccounts();
+        const allPostLocal = await sdk.post.getPostAccountsByUser(
+          wallet.publicKey
+        );
+
         let userPostAccounts = allPostLocal
           ? await Promise.all(
               allPostLocal.map(async (post) => {
