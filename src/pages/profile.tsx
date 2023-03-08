@@ -135,7 +135,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
           )}
           {provider && (
             <div>
-              <PostList />
+              <PostList address={router.asPath.split("address=")[1]} />
             </div>
           )}
         </>

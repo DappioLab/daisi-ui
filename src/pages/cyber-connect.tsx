@@ -23,7 +23,7 @@ const CyberConnect = () => {
         <hr />
         <OffChainPost />
         <hr />
-        <PostList />
+        {/* <PostList /> */}
       </div>
 
       {/* <FeedList /> */}

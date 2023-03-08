@@ -30,39 +30,42 @@ export interface Post extends Content {
   comments: Content[];
 }
 
-const PostList = () => {
-  const {
-    cyberConnectClient,
-    profile,
-    address: myAddress,
-  } = useSelector((state: IRootState) => state.cyberConnect);
+const PostList = ({ address }: { address: string }) => {
+  const { cyberConnectClient, profile } = useSelector(
+    (state: IRootState) => state.cyberConnect
+  );
   const [postList, setPostList] = useState<Post[]>([]);
-  const router = useRouter();
-  let address = router.query.address;
+
+  const fetchData = async () => {
+    try {
+      // TODO: Replace query with all post schema
+      const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
+        address,
+      });
+
+      // @ts-ignore
+      const feeds = res.address.wallet.profiles.edges
+        .map((e: any) => e.node)
+        .reduce((prev: any, curr: any) => prev.concat(curr), [])
+        .filter((n: any) => n.posts.edges.length > 0)
+        .map((n: any) => n.posts.edges.map((e: any) => e.node))
+        .reduce((prev: any, curr: any) => prev.concat(curr), []);
+
+      setPostList(feeds);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOnClick = async (contentID: string, isLike: boolean) => {
+    await like(contentID, cyberConnectClient, isLike);
+    await fetchData();
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // TODO: Replace query with all post schema
-        const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
-          address: address ?? myAddress ?? "",
-        });
-
-        // @ts-ignore
-        const feeds = res.address.wallet.profiles.edges
-          .map((e: any) => e.node)
-          .reduce((prev: any, curr: any) => prev.concat(curr), [])
-          .filter((n: any) => n.posts.edges.length > 0)
-          .map((n: any) => n.posts.edges.map((e: any) => e.node))
-          .reduce((prev: any, curr: any) => prev.concat(curr), []);
-
-        setPostList(feeds);
-      } catch (err) {
-        console.error(err);
-      }
-    };
     fetchData();
   }, []);
+
   return (
     <div>
       {postList.map((post) => {
@@ -78,7 +81,7 @@ const PostList = () => {
             {post.likeCount}
             <button
               onClick={() => {
-                like(post.contentID, cyberConnectClient, true);
+                handleOnClick(post.contentID, true);
               }}
             >
               Like
@@ -86,7 +89,7 @@ const PostList = () => {
             {post.dislikeCount}
             <button
               onClick={() => {
-                like(post.contentID, cyberConnectClient, true);
+                handleOnClick(post.contentID, false);
               }}
             >
               Dislike
