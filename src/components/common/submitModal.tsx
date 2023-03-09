@@ -313,6 +313,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
           <div className={style.inputBlock}>
             <div className={style.inputLabel}>Description</div>
             <textarea
+              style={{ height: "400px" }}
               placeholder="description"
               className={style.input}
               value={form.description}
@@ -325,9 +326,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
             ></textarea>
           </div>
           {showGeneratingLoading && (
-            <div className={style.loadingText}>
-              Summary is generating {dots}
-            </div>
+            <div className={style.loadingText}>Generating summary{dots}</div>
           )}
         </div>
 
