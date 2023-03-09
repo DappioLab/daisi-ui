@@ -47,7 +47,7 @@ const SolanaConnectBtn = () => {
       ) : (
         <div className={style.solanaConnectBtn}>
           <img className={style.icon} src="/phantom.png" alt="" />
-          <div>Select Wallet</div>
+          <div>Phantom</div>
 
           <div className={style.walletBtn}>
             <WalletMultiButtonDynamic />
