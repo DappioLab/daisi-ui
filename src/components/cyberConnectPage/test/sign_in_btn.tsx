@@ -7,7 +7,7 @@ import {
   setProfile,
 } from "@/redux/cyberConnectSlice";
 import request from "graphql-request";
-import { connectWallet, checkNetwork } from "../helper/wallet";
+import { connectWallet, checkNetwork } from "../helper";
 import {
   LOGIN_GET_MESSAGE_MUTATION,
   LOGIN_VERIFY_MUTATION,

@@ -6,7 +6,7 @@ import {
 } from "../../../graphql/cyberConnect/mutation";
 import { Web3Provider } from "@ethersproject/providers";
 
-export const signin = async (address: string, provider: Web3Provider) => {
+export const signIn = async (address: string, provider: Web3Provider) => {
   try {
     /* Get the signer from the provider */
     const signer = provider.getSigner();

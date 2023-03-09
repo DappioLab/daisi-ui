@@ -21,17 +21,15 @@ import {
 } from "@/redux/globalSlice";
 import { IAuthData } from "./authModal";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { signin } from "../cyberConnectPage/helper/signin";
 import {
+  signIn,
   createCyberConnectClient,
   createIpfsClient,
-} from "../cyberConnectPage/helper/clientFactory";
-import {
   getProfileByAddress,
   createProfile,
   handleCreator,
   checkRelayActionStatus,
-} from "../cyberConnectPage/helper/profile";
+} from "../cyberConnectPage/helper";
 
 const MetamaskConnectBtn = () => {
   const solanaWallet = useWallet();
@@ -51,7 +49,7 @@ const MetamaskConnectBtn = () => {
       const address = await signer.getAddress();
       dispatch(setAddress(address));
 
-      const accessToken = await signin(address, provider);
+      const accessToken = await signIn(address, provider);
       dispatch(setAccessToken(accessToken));
 
       const ipfsClient = createIpfsClient();

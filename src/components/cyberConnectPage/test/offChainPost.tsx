@@ -1,5 +1,4 @@
-import CyberConnect, { Env } from "@cyberlab/cyberconnect-v2";
-import { connectWallet } from "../helper/wallet";
+import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { useSelector } from "react-redux";
 import { Content } from "@cyberlab/cyberconnect-v2/src/types";
 import { IRootState } from "@/redux";

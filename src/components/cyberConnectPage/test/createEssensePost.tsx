@@ -1,7 +1,7 @@
 import { IRootState } from "@/redux";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { checkNetwork, connectWallet } from "../helper/wallet";
+import { checkNetwork, connectWallet } from "../helper";
 import { v4 as uuidv4 } from "uuid";
 import request from "graphql-request";
 import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";

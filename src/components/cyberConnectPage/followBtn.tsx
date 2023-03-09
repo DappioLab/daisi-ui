@@ -1,8 +1,7 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
-import { follow } from "./helper/follow";
-import { handleCreator } from "./helper/profile";
+import { follow, handleCreator } from "./helper";
 import { useEffect, useState } from "react";
 import request from "graphql-request";
 import { CYBER_CONNECT_ENDPOINT } from "./constants";

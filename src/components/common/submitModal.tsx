@@ -13,7 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { useRouter } from "next/router";
-import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper/post";
+import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 import API from "@/axios/api";
 

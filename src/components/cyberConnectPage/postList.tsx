@@ -2,8 +2,7 @@ import { IRootState } from "@/redux";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { like } from "./helper/like";
-import { fetchPosts } from "./helper/post";
+import { like, fetchPosts } from "./helper";
 
 export interface Content {
   contentID: string;
