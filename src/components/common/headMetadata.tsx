@@ -4,11 +4,11 @@ const HeadMetadata = () => {
   return (
     <Head>
       <title>Daisi</title>
-      <meta name="description" content="Efficient way to curate and discover" />
+      <meta name="description" content="Efficient Way to Curate and Discover" />
       <meta property="og:title" content="Daisi" />
       <meta
         property="og:description"
-        content="Efficient way to curate and discover"
+        content="Efficient Way to Curate and Discover"
       />
       <meta property="og:url" content="https://beta.daisi.social" />
       <meta
@@ -18,7 +18,7 @@ const HeadMetadata = () => {
       <meta property="twitter:title" content="Daisi" />
       <meta
         property="twitter:description"
-        content="Efficient way to curate and discover"
+        content="Efficient Way to Curate and Discover"
       />
       <meta property="twitter:site" content="@daisisocial" />
       <meta property="twitter:url" content="https://beta.daisi.social" />
