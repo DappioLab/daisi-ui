@@ -4,9 +4,10 @@ import {
 } from "@/graphql/cyberConnect/query";
 import { IRootState } from "@/redux";
 import { IParsedRssData, IRssSourceData } from "@/redux/dailySlice";
+import { updateUserProfilePageHandle } from "@/redux/globalSlice";
 import request from "graphql-request";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { EFeedType } from "../homePage/gridFeed";
 import HorizontalFeed from "../homePage/horizontalFeed";
 import { like } from "./helper/like";
@@ -45,6 +46,10 @@ const PostList = ({ address }: { address: string }) => {
   } = useSelector((state: IRootState) => state.cyberConnect);
   const [postList, setPostList] = useState<Post[]>([]);
   const daisiHandle = handleCreator(address);
+
+  const dispatch = useDispatch();
+
+  dispatch(updateUserProfilePageHandle(daisiHandle));
 
   const fetchData = async () => {
     try {

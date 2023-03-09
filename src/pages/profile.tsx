@@ -92,11 +92,26 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               </div>
               {userProfilePageHandle && (
                 <div className={style.userId}>
-                  <span>
-                    @handle - {userProfilePageHandle.toBase58().substring(0, 6)}
-                  </span>
-                  <span>...</span>
-                  <span>{userProfilePageHandle.toBase58().slice(-6)}</span>
+                  {wallet.connected && (
+                    <>
+                      <span>
+                        @handle -{" "}
+                        {userProfilePageHandle.toBase58().substring(0, 6)}
+                      </span>
+                      <span>...</span>
+                      <span>{userProfilePageHandle.toBase58().slice(-6)}</span>
+                    </>
+                  )}
+                  {provider && (
+                    <>
+                      <span>
+                        @handle -{" "}
+                        {userProfilePageHandle.toString().substring(0, 6)}
+                      </span>
+                      <span>...</span>
+                      <span>{userProfilePageHandle.toString().slice(-6)}</span>
+                    </>
+                  )}
                 </div>
               )}
               <div className={style.userBio}>

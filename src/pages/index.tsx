@@ -54,7 +54,6 @@ const HomePage = () => {
   const updateList = async () => {
     dispatch(updateLoadingStatus(true));
     const res: IApiRssListResponse[] = await getAnonymousList();
-    console.log(res, "res");
 
     // let parsedData: any = [];
 
@@ -84,7 +83,7 @@ const HomePage = () => {
     });
 
     dispatch(updateModalData(content));
-  }, [postModalIndex]);
+  }, [postModalIndex, feedList]);
 
   useEffect(() => {
     if (modalData) {
@@ -97,6 +96,7 @@ const HomePage = () => {
       setPostModalIndex(null);
     }
   }, [showModal]);
+
   return (
     <div className={`pageContent ${style.homePage}`}>
       {/* <PageTitle title="Daily" /> */}

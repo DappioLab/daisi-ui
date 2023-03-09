@@ -58,7 +58,11 @@ const Global = (props: IGlobalProps) => {
       <div className={showAuthModal ? style.show : style.hidden}>
         <AuthModal />
       </div>
-      {isLoading && <div className={style.loadingMask}>Loading</div>}
+      {isLoading && (
+        <div className={style.loadingMask}>
+          <img className={style.loadingIcon} src="/loading.png" alt="" />
+        </div>
+      )}
       <>{props.children}</>
     </div>
   );

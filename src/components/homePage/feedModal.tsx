@@ -3,7 +3,8 @@ import moment from "moment";
 import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateModalData } from "@/redux/dailySlice";
+import { updateFeedList, updateModalData } from "@/redux/dailySlice";
+import API from "@/axios/api";
 
 interface IFeedModal {
   setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -17,15 +18,32 @@ const FeedModal = (props: IFeedModal) => {
   const { modalData, feedList } = useSelector(
     (state: IRootState) => state.daily
   );
-  const { screenWidth } = useSelector((state: IRootState) => state.global);
+  const { screenWidth, userData, isLogin } = useSelector(
+    (state: IRootState) => state.global
+  );
   const dispatch = useDispatch();
   const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);
 
-  // useEffect(() => {
-  //   if (modalData) {
-  //     props.setShowModal(true);
-  //   }
-  // }, [modalData]);
+  const updateLike = async () => {
+    if (!userData?.id || !isLogin) {
+      alert("Please login");
+      return;
+    }
+
+    const updatedItem = await API.updateRssItemLike(modalData.id, userData.id);
+
+    if (updatedItem) {
+      const updatedList = feedList.map((item) => {
+        if (item.id === updatedItem.data._id) {
+          const obj = JSON.parse(JSON.stringify(item));
+          obj.likes = updatedItem.data.likes;
+          return obj;
+        }
+        return item;
+      });
+      dispatch(updateFeedList(updatedList));
+    }
+  };
 
   const getAdjoiningPost = (value: number) => {
     props.setPostModalIndex(props.postModalIndex + value);
@@ -106,8 +124,27 @@ const FeedModal = (props: IFeedModal) => {
           alt="cover"
           className={style.coverImage}
         />
+
         <div className={style.interactNumBlock}>
-          <span> {modalData.likes.length} Upvotes</span>
+          <div
+            className={style.socialActionBlock}
+            onClick={(e) => {
+              e.stopPropagation();
+              updateLike();
+            }}
+          >
+            {userData && modalData.likes.includes(userData.id) ? (
+              <div style={{ fontSize: "1.6rem" }}>
+                <i className="fa fa-heart " aria-hidden="true"></i>
+              </div>
+            ) : (
+              <div style={{ fontSize: "1.6rem" }}>
+                <i className="fa fa-heart-o"></i>
+              </div>
+            )}
+            <div className={style.actionNumber}>{modalData.likes.length}</div>
+          </div>
+          {/* <span> {modalData.likes.length} Upvotes</span> */}
           {/* <span>{modalData.post.numComments} Comments</span> */}
         </div>
       </div>
