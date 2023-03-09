@@ -1,6 +1,8 @@
 export const DOMAIN = "daisi.social";
 export const BETWEEN_FETCH_INTERVAL = 3; // unit: second(s)
-export const DAISI_DB_ENDPOINT = "https://localhost:8000/";
+export const DAISI_DB_ENDPOINT = process.env.NEXT_PUBLIC_SERVER_ENDPOINT
+  ? process.env.NEXT_PUBLIC_SERVER_ENDPOINT + "/"
+  : "https://localhost:8000/";
 export const ARWEAVE_ENDPOINT = "https://arweave.net/";
 export const CYBER_CONNECT_ENDPOINT = "https://api.cyberconnect.dev/testnet/";
 export const IPFS_GATEWAY = "https://daisi.infura-ipfs.io/";
