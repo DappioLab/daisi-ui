@@ -4,32 +4,29 @@ const HeadMetadata = () => {
   return (
     <Head>
       <title>Daisi</title>
-      <meta
-        name="description"
-        content="Your One Stop Solution Platform that aggregates yield across DeFi and NFT."
-      />
+      <meta name="description" content="Efficient way to curate and discover" />
       <meta property="og:title" content="Daisi" />
       <meta
         property="og:description"
-        content="Your One Stop Solution Platform that aggregates yield across DeFi and NFT."
+        content="Efficient way to curate and discover"
       />
       <meta property="og:url" content="https://beta.daisi.social" />
       <meta
         property="og:image"
-        content="https://beta.daisi.social/og_image.jpeg"
+        content="https://beta.daisi.social/og_image.png"
       />
       <meta property="twitter:title" content="Daisi" />
       <meta
         property="twitter:description"
-        content="Your One Stop Solution Platform that aggregates yield across DeFi and NFT."
+        content="Efficient way to curate and discover"
       />
-      <meta property="twitter:site" content="@Dappio_" />
+      <meta property="twitter:site" content="@daisisocial" />
       <meta property="twitter:url" content="https://beta.daisi.social" />
-      <meta property="twitter:creator" content="@Dappio_" />
+      <meta property="twitter:creator" content="@daisisocial" />
       <meta property="twitter:card" content="summary_large_image" />
       <meta
         property="twitter:image"
-        content="https://beta.daisi.social/og_image.jpeg"
+        content="https://beta.daisi.social/og_image.png"
       />
       <link rel="shortcut icon" href="https://beta.daisi.social/favicon.ico" />
       <link
