@@ -35,13 +35,6 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
     createdAt: "",
   });
 
-  const getUploadAvatarUrl = (url: string) => {
-    setForm((old) => {
-      old.profilePicture = url;
-      return old;
-    });
-  };
-
   const uploadImg = (file: any) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
@@ -84,7 +77,10 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
       props.setShowUserEditModal(false);
       props.getUser();
       dispatch(updateLoadingStatus(false));
-    } catch (err) {}
+    } catch (err) {
+      dispatch(updateLoadingStatus(false));
+      throw new Error(err);
+    }
   };
 
   useEffect(() => {
@@ -94,6 +90,13 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
   useEffect(() => {
     img && uploadImg(img);
   }, [img]);
+
+  useEffect(() => {
+    setForm((old) => {
+      old.id = userData.id;
+      return old;
+    });
+  }, [userData]);
 
   return (
     <div className={style.userProfileEdit}>

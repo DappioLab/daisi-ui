@@ -130,10 +130,6 @@ const AuthModal = () => {
     }
   };
 
-  const closeModal = () => {
-    dispatch(updateAuthModal(false));
-  };
-
   useEffect(() => {
     if (!currentAddress) {
       return;
@@ -149,6 +145,8 @@ const AuthModal = () => {
           description: "This is a user profile description.",
         });
       } else {
+        console.log("?");
+
         const data: IUser = {
           username: user.username,
           description: user.description,
@@ -167,7 +165,6 @@ const AuthModal = () => {
   // Create gum profile
   useEffect(() => {
     if (!solanaWallet.connected) {
-      dispatch(updateUserData(null));
       return;
     }
 
@@ -206,7 +203,7 @@ const AuthModal = () => {
       <div
         className={style.bg}
         onClick={() => {
-          closeModal();
+          dispatch(updateAuthModal(false));
         }}
       ></div>
       <div className={style.modalContainer}>

@@ -43,12 +43,13 @@ const MetamaskConnectBtn = () => {
       const provider = await connectWallet();
       await checkNetwork(provider);
 
+      solanaWallet.disconnect();
+
       dispatch(setProvider(provider));
       dispatch(updateUserProfilePageHandle(null));
-
+      dispatch(updateLoginStatus(true));
       const signer = provider.getSigner();
       const address = await signer.getAddress();
-      dispatch(updateCurrentAddress(address));
       dispatch(setAddress(address));
 
       const accessToken = await signin(address, provider);
@@ -62,6 +63,7 @@ const MetamaskConnectBtn = () => {
 
       const daisiHandle = handleCreator(address);
       const profile = await getProfileByAddress(address);
+      dispatch(updateCurrentAddress(address));
 
       if (!profile) {
         const { relayActionId } = await createProfile(
@@ -77,15 +79,9 @@ const MetamaskConnectBtn = () => {
         console.log("create profile result:", res);
       } else {
         dispatch(setProfile(profile));
-        // TODO: Check handle is updated in Daisi DB
-        // 1. fetch from DB
-        // 2. Check
-        // 3. if not, update to DB
       }
 
-      solanaWallet.disconnect();
       dispatch(updateAuthModal(false));
-      dispatch(updateLoginStatus(true));
     } catch (err) {}
   };
 

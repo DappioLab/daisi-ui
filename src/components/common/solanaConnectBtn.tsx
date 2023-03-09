@@ -30,13 +30,12 @@ const SolanaConnectBtn = () => {
   useEffect(() => {
     if (wallet.connected) {
       dispatch(updateUserProfilePageHandle(null));
-
-      const address = wallet.publicKey?.toBase58()!;
-
-      dispatch(updateCurrentAddress(address));
       dispatch(setProvider(null));
       dispatch(setAddress(null));
       dispatch(updateLoginStatus(true));
+
+      const address = wallet.publicKey?.toBase58()!;
+      dispatch(updateCurrentAddress(address));
       dispatch(updateAuthModal(false));
     }
   }, [wallet]);
