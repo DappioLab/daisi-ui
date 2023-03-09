@@ -1,11 +1,11 @@
 import Post, { postInterface } from "./Posts";
 import React, { useEffect, useState, useMemo } from "react";
 import API from "@/axios/api";
-import { useGumSDK } from "@/hooks/useGumSDK";
+import { connection, useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { useWallet, AnchorWallet } from "@solana/wallet-adapter-react";
-import { GRAPHQL_ENDPOINTS, SDK } from "../../gpl-core/src";
-import { ReactionType } from "../../gpl-core/src/reaction";
+import { GRAPHQL_ENDPOINTS, SDK } from "@/gpl-core/src";
+import { ReactionType } from "@/gpl-core/src/reaction";
 import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
 import { ipfsClient, mainGateway } from "./storage";
@@ -16,8 +16,9 @@ import {
   updateFollowers,
   updateFollowing,
   updateReactions,
-} from "../../redux/gumSlice";
+} from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
+
 interface PostAccount {
   cl_pubkey: string;
   metadatauri: string;
@@ -49,6 +50,7 @@ export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 const ExplorePosts = () => {
   const wallet = useWallet();
   const dispatch = useDispatch();
+  const sdk = useGumSDK();
   const { userProfile, following, followers, userAccounts } = useSelector(
     (state: IRootState) => state.gum
   );
@@ -63,21 +65,6 @@ const ExplorePosts = () => {
   // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
   //   new Map()
   // );
-  const connection = useMemo(
-    () =>
-      new Connection(
-        "https://lingering-holy-wind.solana-devnet.discover.quiknode.pro/169c1aa008961ed4ec13c040acd5037e8ead18b1/",
-        "confirmed"
-      ),
-    []
-  );
-
-  let sdk = useGumSDK(
-    connection,
-    { preflightCommitment: "confirmed" },
-    "devnet",
-    GRAPHQL_ENDPOINTS.devnet
-  );
 
   const fetchProfile = async () => {
     if (wallet.publicKey) {
@@ -561,7 +548,7 @@ const ExplorePosts = () => {
       {explore?.map((post: postInterface) => {
         return (
           <div key={post.cl_pubkey.toString()} className="">
-            <Post post={post} sdk={sdk} setData={setExplore} />
+            <Post post={post} setData={setExplore} />
           </div>
         );
       })}
