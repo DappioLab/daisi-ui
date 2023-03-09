@@ -211,11 +211,11 @@ const AuthModal = () => {
           <div
             style={{
               marginBottom: "3rem ",
-              fontSize: "3rem",
+              fontSize: "2rem",
               textAlign: "center",
             }}
           >
-            Sign in
+            Sign In
           </div>
           <div>
             <MetamaskConnectBtn />
