@@ -9,12 +9,13 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useDispatch, useSelector } from "react-redux";
 import { ipfsClient, mainGateway } from "@/components/gumPage/storage";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { useRouter } from "next/router";
 import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper/post";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
+import API from "@/axios/api";
 
 export interface ISubmitModal {
   title: string;
@@ -38,6 +39,9 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
+  const [showGeneratingLoading, setShowGeneratingLoading] = useState(false);
+  const [loadingDots, setLoadingDots] = useState(0);
+  const [dots, detDots] = useState("");
   const {
     provider,
     profile: ccProfile,
@@ -209,6 +213,48 @@ const SubmitModal = (props: ISubmitModalProps) => {
     }, 1500);
   };
 
+  const genDot = (num: number) => {
+    if (num > 3) {
+      setLoadingDots(0);
+    } else {
+      setLoadingDots(num);
+    }
+  };
+
+  useEffect(() => {
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      if (i > 3) {
+        i = 0;
+      }
+      genDot(i);
+    }, 500);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    let str = "";
+    for (let i = 0; i < loadingDots; i++) {
+      str = str + ".";
+    }
+    detDots(str);
+  }, [loadingDots]);
+
+  useEffect(() => {
+    (async () => {
+      if (form.link) {
+        setShowGeneratingLoading(true);
+        const res = await API.getGeneratedContent(form.link);
+        setForm((old) => {
+          old.description = res.data;
+          return JSON.parse(JSON.stringify(old));
+        });
+        setShowGeneratingLoading(false);
+      }
+    })();
+  }, [form.link]);
+
   return (
     <div className={style.submitModal}>
       <div
@@ -248,20 +294,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
             />
           </div>
           <div className={style.inputBlock}>
-            <div className={style.inputLabel}>Description</div>
-            <textarea
-              placeholder="description"
-              className={style.input}
-              value={form.description}
-              onChange={(e) => {
-                setForm((old) => {
-                  old.description = e.target.value;
-                  return JSON.parse(JSON.stringify(old));
-                });
-              }}
-            ></textarea>
-          </div>
-          <div className={style.inputBlock}>
             <div className={style.inputLabel}>Link</div>
             <input
               type="text"
@@ -276,10 +308,25 @@ const SubmitModal = (props: ISubmitModalProps) => {
               }}
             />
           </div>
-          {/* <div className={style.inputBlock}>
-            <div className={style.inputLabel}>Thumbnail Image</div>
-            <input type="file" />
-          </div> */}
+          <div className={style.inputBlock}>
+            <div className={style.inputLabel}>Description</div>
+            <textarea
+              placeholder="description"
+              className={style.input}
+              value={form.description}
+              onChange={(e) => {
+                setForm((old) => {
+                  old.description = e.target.value;
+                  return JSON.parse(JSON.stringify(old));
+                });
+              }}
+            ></textarea>
+          </div>
+          {showGeneratingLoading && (
+            <div className={style.loadingText}>
+              Summary is generating {dots}
+            </div>
+          )}
         </div>
 
         <div className={style.bottomBlock}>
