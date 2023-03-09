@@ -1,5 +1,5 @@
 import { PROFILE_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
-import { cyberConnectEndpoint } from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 import { IRootState } from "@/redux";
 import request from "graphql-request";
 import React, { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       const profile = await request(
-        cyberConnectEndpoint,
+        CYBER_CONNECT_ENDPOINT,
         PROFILE_BY_ADDRESS_QUERY,
         {
           address,

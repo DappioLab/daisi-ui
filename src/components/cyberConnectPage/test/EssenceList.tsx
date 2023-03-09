@@ -1,8 +1,6 @@
 import request from "graphql-request";
-import {
-  cyberConnectEndpoint,
-  PROFILES_WITH_POSTS_QUERY,
-} from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
+import { PROFILES_WITH_POSTS_QUERY } from "@/graphql/cyberConnect/query";
 import { useEffect, useState } from "react";
 import Feed, { IFeed } from "./essence";
 
@@ -12,7 +10,7 @@ const FeedList = () => {
   useEffect(() => {
     const getData = async () => {
       const res = await request(
-        cyberConnectEndpoint,
+        CYBER_CONNECT_ENDPOINT,
         PROFILES_WITH_POSTS_QUERY
       );
       // @ts-ignore

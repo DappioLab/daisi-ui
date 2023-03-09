@@ -1,7 +1,6 @@
 import { gql } from "graphql-request";
 
-export const cyberConnectEndpoint = "https://api.cyberconnect.dev/testnet/";
-
+// CYBER_CONNECT_ENDPOINT = "https://api.cyberconnect.dev/testnet/";
 const ESSENCE_FRAGMENT = `
   fragment Essence on Essence {
     essenceID

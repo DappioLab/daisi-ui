@@ -12,11 +12,8 @@ import {
   LOGIN_GET_MESSAGE_MUTATION,
   LOGIN_VERIFY_MUTATION,
 } from "@/graphql/cyberConnect/mutation";
-import {
-  PROFILE_BY_ADDRESS_QUERY,
-  cyberConnectEndpoint,
-} from "@/graphql/cyberConnect/query";
-
+import { PROFILE_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 const SigninBtn = () => {
   const { address } = useSelector((state: IRootState) => state.cyberConnect);
   const dispatch = useDispatch();
@@ -39,7 +36,7 @@ const SigninBtn = () => {
 
       /* Get the message from the server */
       const messageResult = await request(
-        cyberConnectEndpoint,
+        CYBER_CONNECT_ENDPOINT,
         LOGIN_GET_MESSAGE_MUTATION,
         {
           address,
@@ -54,7 +51,7 @@ const SigninBtn = () => {
 
       /* Verify the signature on the server and get the access token */
       const accessTokenResult = await request(
-        cyberConnectEndpoint,
+        CYBER_CONNECT_ENDPOINT,
         LOGIN_VERIFY_MUTATION,
         {
           address,
@@ -70,7 +67,7 @@ const SigninBtn = () => {
       dispatch(setAccessToken("bearer " + accessToken));
 
       const profile = await request(
-        cyberConnectEndpoint,
+        CYBER_CONNECT_ENDPOINT,
         PROFILE_BY_ADDRESS_QUERY,
         {
           address,
