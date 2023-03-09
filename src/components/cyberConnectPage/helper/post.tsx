@@ -1,8 +1,11 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { ARWEAVE_ENDPOINT, CYBER_CONNECT_ENDPOINT } from "../constants";
-import { handleCreator } from "./profile";
+import { isDaisiHandle } from "./profile";
 import request from "graphql-request";
-import { POST_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
+import {
+  GET_FOLLOWINGS_POST_BY_ADDRESS_QUERY,
+  POST_BY_ADDRESS_QUERY,
+} from "@/graphql/cyberConnect/query";
 import { Post } from "../postList";
 
 export const createPost = async (
@@ -57,9 +60,11 @@ export const createPost = async (
   }
 };
 
-export const fetchPosts = async (address: string, myAddress: string) => {
-  const daisiHandle = handleCreator(address);
-
+export const fetchPosts = async (
+  address: string,
+  myAddress: string,
+  daisiOnly: boolean = true
+) => {
   try {
     const res = await request(CYBER_CONNECT_ENDPOINT, POST_BY_ADDRESS_QUERY, {
       address,
@@ -75,9 +80,46 @@ export const fetchPosts = async (address: string, myAddress: string) => {
     let posts = parsePostsByProfile(profiles);
 
     // filter Daisi created Handle only
-    posts = posts.filter(
-      (post: Post) => post.authorHandle.split(".")[0] == daisiHandle
+    if (daisiOnly) {
+      posts = posts.filter((post: Post) => isDaisiHandle(post.authorHandle));
+    }
+    return posts;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const fetchFollowingsPosts = async (
+  address: string,
+  daisiOnly: boolean = true
+) => {
+  let posts: Post[] = [];
+
+  try {
+    const res = await request(
+      CYBER_CONNECT_ENDPOINT,
+      GET_FOLLOWINGS_POST_BY_ADDRESS_QUERY,
+      {
+        address,
+      }
     );
+    console.log("get following post res:", res);
+    // @ts-ignore
+    if (res.address.followingCount == 0) return posts;
+
+    // @ts-ignore
+    let profiles = res.address.followings.edges
+      .map((e: any) => e.node.profile) // get all profile objects
+      .reduce((prev: any, curr: any) => prev.concat(curr), []) // flatten
+      .filter((n: any) => n.posts.edges.length > 0); // get profiles who have at least 1 post
+
+    console.log("profiles:", profiles);
+    posts = parsePostsByProfile(profiles);
+
+    // filter Daisi created Handle only
+    if (daisiOnly) {
+      posts = posts.filter((post: Post) => isDaisiHandle(post.authorHandle));
+    }
 
     return posts;
   } catch (err) {

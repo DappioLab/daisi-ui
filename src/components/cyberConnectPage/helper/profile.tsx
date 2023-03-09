@@ -154,6 +154,7 @@ export const getProfileByAddress = async (address: string) => {
   } catch (err) {}
 };
 
+export const MIN_DAISI_HANDLE_LENGTH = 17;
 export const handleCreator = (address: string, nonce?: number) => {
   const handle = `daisi_${address.slice(0, 6)}_${address.slice(
     -4
@@ -165,4 +166,12 @@ export const handleCreator = (address: string, nonce?: number) => {
     nonce = nonce % 100;
     return `${handle}_${nonce}`;
   }
+};
+
+export const isDaisiHandle = (handle: string) => {
+  handle = handle.split(".")[0];
+  if (handle.length < MIN_DAISI_HANDLE_LENGTH) return false;
+  const pattern: RegExp = /^daisi_0x\w{4}_\w{4}$/;
+
+  return pattern.test(handle.substring(0, MIN_DAISI_HANDLE_LENGTH));
 };

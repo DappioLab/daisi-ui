@@ -214,3 +214,51 @@ export const GET_FOLLOW_STATUS_QUERY = gql`
     }
   }
 `;
+
+export const GET_FOLLOWINGS_POST_BY_ADDRESS_QUERY = gql`
+  query getFollowingsPostByAddress($address: AddressEVM!) {
+    address(address: $address) {
+      followingCount
+      followings {
+        edges {
+          node {
+            address {
+              address
+            }
+            profile {
+              handle
+              posts {
+                edges {
+                  node {
+                    contentID
+                    ... on Post {
+                      contentID
+                      title
+                      body
+                      digest
+                      authorHandle
+                      authorAddress
+                      arweaveTxHash
+                      createdAt
+                      updatedAt
+                      commentCount
+                      likeCount
+                      dislikeCount
+                      likedStatus(me: $address) {
+                        liked
+                        disliked
+                        proof {
+                          arweaveTxHash
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
