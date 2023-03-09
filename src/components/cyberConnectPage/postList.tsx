@@ -67,7 +67,7 @@ const PostList = ({ address }: { address: string }) => {
     <div>
       {postList.map((post) => {
         return (
-          <div>
+          <div key={post.contentID}>
             <h2>{post.title}</h2>{" "}
             <h2>
               by {post.authorHandle.split(".")[0]}
