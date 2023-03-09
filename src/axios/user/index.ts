@@ -1,4 +1,5 @@
 import { IAuthData } from "@/components/common/authModal";
+import { IUser } from "@/pages/profile/[address]";
 import * as apiUrl from "../api-url";
 import axios from "../interceptors";
 
@@ -6,6 +7,14 @@ export const createUser = (data: IAuthData) => {
   return axios({
     method: "POST",
     url: `${apiUrl.USER}`,
+    data,
+  });
+};
+
+export const updateUser = (data: IUser) => {
+  return axios({
+    method: "PUT",
+    url: `${apiUrl.USER}/update/${data.id}`,
     data,
   });
 };

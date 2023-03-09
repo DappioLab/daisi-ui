@@ -15,8 +15,10 @@ import HorizontalFeed, {
 } from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
 import ExplorePosts from "@/components/gumPage/ExploreMigrated";
-import PostList from "@/components/cyberConnectPage/postList";
+import PostList from "@/components/cyberConnectPage/postListMigrated";
 import FollowBtn from "@/components/cyberConnectPage/followBtn";
+import { postInterface } from "@/utils/gum";
+import UserProfileEdit from "@/components/common/userProfileEdit";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
   const { userData } = useSelector((state: IRootState) => state.global);
@@ -30,14 +32,16 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const wallet = useWallet();
   const router = useRouter();
 
-  const updateUserFollowData = async () => {
-    if (!userData?.id) {
-      return;
-    }
+  const [showUserEditModal, setShowUserEditModal] = useState(false);
 
-    await API.updateUserFollowData({ id: userData.id, targetId: user.id });
-    router.push(router.asPath);
-  };
+  // const updateUserFollowData = async () => {
+  //   if (!userData?.id) {
+  //     return;
+  //   }
+
+  //   await API.updateUserFollowData({ id: userData.id, targetId: user.id });
+  //   router.push(router.asPath);
+  // };
 
   const getUser = async () => {
     const address = router.asPath.split("address=")[1];
@@ -63,10 +67,18 @@ const ProfilePage = ({ user }: { user: IUser }) => {
         <>
           <div className={style.userInfo}>
             <div className={style.avatar}>
-              <img src="/logo.png" alt="avatar" />
+              <img src={fetchedUser.profilePicture} alt="avatar" />
             </div>
             <div className={style.userInfoBlock}>
-              <div className={style.userName}>{fetchedUser.username}</div>
+              <div className={style.userNameRow}>
+                <div>{fetchedUser.username}</div>
+                <button
+                  className={style.editBtn}
+                  onClick={() => setShowUserEditModal(true)}
+                >
+                  Edit
+                </button>
+              </div>
               <div className={style.userId}>
                 <span>@{fetchedUser.address.substring(0, 6)}</span>
                 <span>...</span>
@@ -76,7 +88,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 {!fetchedUser.description ? "-" : fetchedUser.description}
               </div>
               <br />
-              <div className={style.followDataBlock}>
+              {/* <div className={style.followDataBlock}>
                 <div
                   onClick={() => {
                     setUserListType(EUserListType.FOLLOWINGS);
@@ -93,11 +105,21 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 >
                   {fetchedUser.followers.length} Followers
                 </div>
-              </div>
+              </div> */}
               <div className={style.userJoinedDate}>
                 Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
               </div>
-              {userData?.id && userData.id !== fetchedUser.id ? (
+              {/* Metamask follow btn */}
+              {provider && (
+                <div>
+                  {metamaskAddress != router.asPath.split("address=")[1] && (
+                    <div>
+                      <FollowBtn address={router.asPath.split("address=")[1]} />
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* {userData?.id && userData.id !== fetchedUser.id ? (
                 <div className={style.followBtnBlock}>
                   <div
                     className={style.followBtn}
@@ -108,7 +130,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       : "Follow"}
                   </div>
                 </div>
-              ) : null}
+              ) : null} */}
               {showUserList && (
                 <UserListModal
                   setShowUserList={setShowUserList}
@@ -118,37 +140,25 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               )}
             </div>
           </div>
-          {/* <div>
-            {userPosts.map((item, index) => {
-              return (
-                <div key={`${index}`}>
-                  <HorizontalFeed
-                    article={item}
-                    setShowModal={() => {}}
-                    type={EFeedType.GUM_ITEM}
-                  />
-                </div>
-              );
-            })}
-          </div> */}
           {wallet.connected && (
             <div>
               <ExplorePosts />
             </div>
           )}
           {provider && (
-            <div>
-              {metamaskAddress != router.asPath.split("address=")[1] && (
-                <div>
-                  <FollowBtn address={router.asPath.split("address=")[1]} />
-                </div>
-              )}
-              <PostList address={router.asPath.split("address=")[1]} />
-            </div>
+            <PostList address={router.asPath.split("address=")[1]} />
           )}
         </>
       ) : (
         <div>User Not Exist</div>
+      )}
+
+      {showUserEditModal && (
+        <UserProfileEdit
+          user={JSON.parse(JSON.stringify(fetchedUser))}
+          setShowUserEditModal={setShowUserEditModal}
+          getUser={getUser}
+        />
       )}
     </div>
   );

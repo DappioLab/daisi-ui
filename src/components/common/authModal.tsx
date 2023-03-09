@@ -20,6 +20,8 @@ export interface IAuthModal {
 
 export interface IAuthData {
   address: string;
+  description: string;
+  profilePicture: string;
 }
 
 const AuthModal = () => {
@@ -131,7 +133,11 @@ const AuthModal = () => {
       const user: IUser = (await API.getUserByAddress(currentAddress)).data;
 
       if (!user) {
-        await API.createUser({ address: currentAddress });
+        await API.createUser({
+          address: currentAddress,
+          profilePicture: "/logo.png",
+          description: "This is a user profile description.",
+        });
       } else {
         const data: IUser = {
           username: user.username,
