@@ -8,5 +8,5 @@ export {
   getProfileByAddress,
   handleCreator,
 } from "./profile";
-export { signIn } from "./sign_in";
+export { signIn } from "./signIn";
 export { connectWallet, checkNetwork } from "./wallet";
