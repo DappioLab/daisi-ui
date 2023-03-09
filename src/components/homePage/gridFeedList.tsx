@@ -46,7 +46,9 @@ const GridFeedList = (props: IFeedList) => {
             <GridFeed
               article={item}
               // setShowModal={props.setShowModal}
-              type={EFeedType.RSS_ITEM}
+              type={
+                item.id.length > 24 ? EFeedType.CC_ITEM : EFeedType.RSS_ITEM
+              }
             >
               {}
             </GridFeed>

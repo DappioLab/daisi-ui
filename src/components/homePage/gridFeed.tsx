@@ -5,6 +5,7 @@ import style from "@/styles/homePage/gridFeed.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
 import API from "@/axios/api";
+import { like } from "../cyberConnectPage/helper";
 
 export enum EFeedType {
   USER_POST = "USER POST",
@@ -27,8 +28,14 @@ export interface IFeedProps {
 const GridFeed = (props: IGridFeedProps) => {
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
-  const { userData, isLogin } = useSelector(
-    (state: IRootState) => state.global
+  const { userData, isLogin, cyberConnectClient } = useSelector(
+    (state: IRootState) => {
+      return {
+        userData: state.global.userData,
+        isLogin: state.global.isLogin,
+        cyberConnectClient: state.cyberConnect.cyberConnectClient,
+      };
+    }
   );
   const { feedList } = useSelector((state: IRootState) => state.daily);
 
@@ -38,26 +45,43 @@ const GridFeed = (props: IGridFeedProps) => {
       return;
     }
 
-    if (props.type === EFeedType.USER_POST) {
-      await API.updateUserPostLike(props.article.id, userData.id);
-      window.location.reload();
-    } else {
-      const updatedItem = await API.updateRssItemLike(
-        props.article.id,
-        userData.id
-      );
+    switch (props.type) {
+      case EFeedType.RSS_ITEM:
+        const updatedItem = await API.updateRssItemLike(
+          props.article.id,
+          userData.id
+        );
 
-      if (updatedItem) {
-        const updatedList = feedList.map((item) => {
-          if (item.id === updatedItem.data._id) {
-            const obj = JSON.parse(JSON.stringify(item));
-            obj.likes = updatedItem.data.likes;
-            return obj;
-          }
-          return item;
-        });
-        dispatch(updateFeedList(updatedList));
-      }
+        if (updatedItem) {
+          const updatedList = feedList.map((item) => {
+            if (item.id === updatedItem.data._id) {
+              const obj = JSON.parse(JSON.stringify(item));
+              obj.likes = updatedItem.data.likes;
+              return obj;
+            }
+            return item;
+          });
+          dispatch(updateFeedList(updatedList));
+        }
+        break;
+
+      case EFeedType.CC_ITEM:
+        const isLiked = props.article.likes.includes(userData.id);
+        await like(props.article.id, cyberConnectClient, !isLiked);
+        window.location.reload();
+        break;
+
+      case EFeedType.GUM_ITEM:
+        break;
+
+      case EFeedType.USER_POST:
+        // Deprecate
+        await API.updateUserPostLike(props.article.id, userData.id);
+        window.location.reload();
+        break;
+
+      default:
+        throw "ERROR: unknown feed type";
     }
   };
 
