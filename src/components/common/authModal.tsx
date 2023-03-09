@@ -2,7 +2,11 @@ import API from "@/axios/api";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { IUser } from "@/pages/profile/[address]";
 import { IRootState } from "@/redux";
-import { updateAuthModal, updateUserData } from "@/redux/globalSlice";
+import {
+  updateAuthModal,
+  updateLoadingStatus,
+  updateUserData,
+} from "@/redux/globalSlice";
 import style from "@/styles/common/authModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
@@ -163,6 +167,7 @@ const AuthModal = () => {
   // Create gum profile
   useEffect(() => {
     if (!solanaWallet.connected) {
+      dispatch(updateUserData(null));
       return;
     }
 
@@ -171,8 +176,6 @@ const AuthModal = () => {
       if (!res) {
         return;
       }
-
-      console.log(JSON.parse(JSON.stringify(res)), "####");
 
       if (res.length <= 0) {
         createUserAccount();

@@ -1,9 +1,11 @@
+import style from "@/styles/common/solanaConnectBtn.module.sass";
 import { IRootState } from "@/redux";
 import { setAddress, setProvider } from "@/redux/cyberConnectSlice";
 import {
   updateAuthModal,
   updateCurrentAddress,
   updateLoginStatus,
+  updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
 import { useWallet } from "@solana/wallet-adapter-react";
 import dynamic from "next/dynamic";
@@ -27,16 +29,34 @@ const SolanaConnectBtn = () => {
 
   useEffect(() => {
     if (wallet.connected) {
+      dispatch(updateUserProfilePageHandle(null));
+
       const address = wallet.publicKey?.toBase58()!;
 
       dispatch(updateCurrentAddress(address));
       dispatch(setProvider(null));
       dispatch(setAddress(null));
       dispatch(updateLoginStatus(true));
+      dispatch(updateAuthModal(false));
     }
   }, [wallet]);
 
-  return <WalletMultiButtonDynamic />;
+  return (
+    <>
+      {wallet.connected ? (
+        <WalletMultiButtonDynamic />
+      ) : (
+        <div className={style.solanaConnectBtn}>
+          <img className={style.icon} src="/phantom.png" alt="" />
+          <div>Select Wallet</div>
+
+          <div className={style.walletBtn}>
+            <WalletMultiButtonDynamic />
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default SolanaConnectBtn;

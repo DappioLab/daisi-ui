@@ -188,9 +188,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
             <PostList address={router.asPath.split("address=")[1]} />
           )}
         </>
-      ) : (
-        <div>User Not Exist</div>
-      )}
+      ) : null}
       {showUserEditModal && (
         <UserProfileEdit
           user={JSON.parse(JSON.stringify(fetchedUser))}

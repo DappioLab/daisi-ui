@@ -7,6 +7,7 @@ import {
   updateAuthModal,
   updateLoginStatus,
   updateShowSubmitModal,
+  updateUserData,
 } from "@/redux/globalSlice";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -14,6 +15,7 @@ const Nav = () => {
   const { userData, isLogin } = useSelector(
     (state: IRootState) => state.global
   );
+  const solanaWallet = useWallet();
   const router = useRouter();
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
@@ -120,7 +122,17 @@ const Nav = () => {
               <span>...</span>
               <span>{userData.address.slice(-6)}</span>
             </div>
-          ) : null}
+          ) : (
+            <div
+              className={style.idBlock}
+              onClick={() => {
+                setShowMenu(false);
+                showAuthModal();
+              }}
+            >
+              Sign in
+            </div>
+          )}
         </div>
       </div>
     </div>

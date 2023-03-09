@@ -71,7 +71,14 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       onMouseLeave={() => setShowLinkButton(false)}
     >
       <div className={style.articleIcon}>
-        <img src={props.article.sourceIcon} alt="icon" />
+        {props.type === EFeedType.CC_ITEM ? (
+          <img
+            src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
+            alt="icon"
+          />
+        ) : (
+          <img src={props.article.sourceIcon} alt="icon" />
+        )}
       </div>
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">

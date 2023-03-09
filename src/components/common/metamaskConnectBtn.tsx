@@ -13,7 +13,12 @@ import { Web3Provider, ExternalProvider } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
 
-import { updateCurrentAddress, updateLoginStatus } from "@/redux/globalSlice";
+import {
+  updateAuthModal,
+  updateCurrentAddress,
+  updateLoginStatus,
+  updateUserProfilePageHandle,
+} from "@/redux/globalSlice";
 import { IAuthData } from "./authModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { signin } from "../cyberConnectPage/helper/signin";
@@ -37,7 +42,9 @@ const MetamaskConnectBtn = () => {
     try {
       const provider = await connectWallet();
       await checkNetwork(provider);
+
       dispatch(setProvider(provider));
+      dispatch(updateUserProfilePageHandle(null));
 
       const signer = provider.getSigner();
       const address = await signer.getAddress();
@@ -77,6 +84,7 @@ const MetamaskConnectBtn = () => {
       }
 
       solanaWallet.disconnect();
+      dispatch(updateAuthModal(false));
       dispatch(updateLoginStatus(true));
     } catch (err) {}
   };
@@ -84,14 +92,23 @@ const MetamaskConnectBtn = () => {
   return (
     <div onClick={connect} className={style.metamaskConnectBtn}>
       {address ? (
-        address.slice(0, 4) + "..." + address.slice(-4)
+        <>
+          <img
+            style={{ width: "3rem", height: "3rem" }}
+            src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg"
+            alt=""
+          />
+          <span>{address.slice(0, 4) + "..." + address.slice(-4)}</span>
+        </>
       ) : (
-        <div>Metamask</div>
-        // <img
-        //   // style={{ width: "5rem", height: "5rem", marginRight: "2rem" }}
-        //   src="https://raw.githubusercontent.com/MetaMask/brand-resources/c3c894bb8c460a2e9f47c07f6ef32e234190a7aa/SVG/metamask-fox-wordmark-horizontal.svg"
-        //   alt=""
-        // />
+        <>
+          <img
+            style={{ width: "3rem", height: "3rem" }}
+            src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg"
+            alt=""
+          />
+          <span>Metamask</span>
+        </>
       )}
     </div>
   );

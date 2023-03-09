@@ -39,12 +39,12 @@ const Global = (props: IGlobalProps) => {
     resize();
   }, []);
 
-  useEffect(() => {
-    if (!provider && !solanaWallet.connected) {
-      dispatch(updateLoginStatus(false));
-      dispatch(updateUserData(null));
-    }
-  }, [provider, solanaWallet]);
+  // useEffect(() => {
+  //   if (!provider && !solanaWallet.connected) {
+  //     dispatch(updateLoginStatus(false));
+  //     dispatch(updateUserData(null));
+  //   }
+  // }, [provider, solanaWallet]);
 
   return (
     <div className={style.global}>

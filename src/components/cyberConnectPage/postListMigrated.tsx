@@ -8,7 +8,7 @@ import { updateUserProfilePageHandle } from "@/redux/globalSlice";
 import request from "graphql-request";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { EFeedType } from "../homePage/gridFeed";
+import GridFeed, { EFeedType } from "../homePage/gridFeed";
 import HorizontalFeed from "../homePage/horizontalFeed";
 import { like } from "./helper/like";
 import { handleCreator } from "./helper/profile";
@@ -44,6 +44,9 @@ const PostList = ({ address }: { address: string }) => {
     address: myAddress,
     lastPostsUpdateTime,
   } = useSelector((state: IRootState) => state.cyberConnect);
+  const { screenWidth } = useSelector((state: IRootState) => state.global);
+
+  screenWidth;
   const [postList, setPostList] = useState<Post[]>([]);
   const daisiHandle = handleCreator(address);
 
@@ -120,27 +123,51 @@ const PostList = ({ address }: { address: string }) => {
 
         return (
           <div>
-            <HorizontalFeed article={article} type={EFeedType.CC_ITEM}>
-              {post.likedStatus.liked ? (
-                <div
-                  style={{ fontSize: "1.6rem" }}
-                  onClick={() => {
-                    handleOnClick(post.contentID, false);
-                  }}
-                >
-                  <i className="fa fa-heart" aria-hidden="true"></i>
-                </div>
-              ) : (
-                <div
-                  style={{ fontSize: "1.6rem" }}
-                  onClick={() => {
-                    handleOnClick(post.contentID, true);
-                  }}
-                >
-                  <i className="fa fa-heart-o"></i>
-                </div>
-              )}
-            </HorizontalFeed>
+            {screenWidth > 900 ? (
+              <HorizontalFeed article={article} type={EFeedType.CC_ITEM}>
+                {post.likedStatus.liked ? (
+                  <div
+                    style={{ fontSize: "1.6rem" }}
+                    onClick={() => {
+                      handleOnClick(post.contentID, false);
+                    }}
+                  >
+                    <i className="fa fa-heart" aria-hidden="true"></i>
+                  </div>
+                ) : (
+                  <div
+                    style={{ fontSize: "1.6rem" }}
+                    onClick={() => {
+                      handleOnClick(post.contentID, true);
+                    }}
+                  >
+                    <i className="fa fa-heart-o"></i>
+                  </div>
+                )}
+              </HorizontalFeed>
+            ) : (
+              <GridFeed article={article} type={EFeedType.CC_ITEM}>
+                {post.likedStatus.liked ? (
+                  <div
+                    style={{ fontSize: "1.6rem" }}
+                    onClick={() => {
+                      handleOnClick(post.contentID, false);
+                    }}
+                  >
+                    <i className="fa fa-heart" aria-hidden="true"></i>
+                  </div>
+                ) : (
+                  <div
+                    style={{ fontSize: "1.6rem" }}
+                    onClick={() => {
+                      handleOnClick(post.contentID, true);
+                    }}
+                  >
+                    <i className="fa fa-heart-o"></i>
+                  </div>
+                )}
+              </GridFeed>
+            )}
           </div>
         );
       })}

@@ -73,8 +73,18 @@ const GridFeed = (props: IGridFeedProps) => {
       onMouseLeave={() => setShowLinkButton(false)}
     >
       <div className={style.articleIcon}>
-        <img src={props.article.sourceIcon} alt="icon" />
+        {props.type === EFeedType.CC_ITEM ? (
+          <img
+            src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
+            alt="icon"
+          />
+        ) : (
+          <img src={props.article.sourceIcon} alt="icon" />
+        )}
       </div>
+      {/* <div className={style.articleIcon}>
+        <img src={props.article.sourceIcon} alt="icon" />
+      </div> */}
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">
           <div
@@ -94,12 +104,12 @@ const GridFeed = (props: IGridFeedProps) => {
         {moment(props.article.created).format("MMMM DD,YYYY")}
       </div>
       <div className={style.articleImage}>
-        {/* <img src={props.article.itemImage} alt="icon" /> */}
         <img
           src={`https://picsum.photos/200/300?${Math.random()}`}
           alt="icon"
         />
       </div>
+      <div className={style.socialActionBlock}>{props.children}</div>
       {props.type === EFeedType.RSS_ITEM && (
         <div
           className={style.socialActionBlock}

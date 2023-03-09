@@ -1,6 +1,7 @@
 @import '../global/colors'
-
-.metamaskConnectBtn
+  
+.solanaConnectBtn
+  position: relative
   width: 16rem
   height: 5rem
   border: none
@@ -15,7 +16,19 @@
   line-height: 48px
   padding: 0 1.2rem
   border-radius: 4px
-  background-color: $grey2
+  background-color: rgb(80, 62, 191)
   justify-content: space-between
+  overflow: hidden
   &:hover
     opacity: .9
+  .walletBtn
+    position: absolute
+    top: 0
+    left: 0
+    width: 16rem
+    opacity: 0
+  .icon
+    // position: absolute
+    width: 3rem
+    height: 3rem
+    

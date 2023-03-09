@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../../redux/index";
 import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
 import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
+import GridFeed from "../homePage/gridFeed";
 export interface postInterface {
   metadatauri: string;
   cl_pubkey: PublicKey;
@@ -44,7 +45,7 @@ const Post = (post: postState) => {
   const { userProfile, following, followers, reactions } = useSelector(
     (state: IRootState) => state.gum
   );
-  const { userData, userProfilePageData } = useSelector(
+  const { userData, userProfilePageData, screenWidth } = useSelector(
     (state: IRootState) => state.global
   );
   const sdk = post.sdk;
@@ -396,22 +397,19 @@ const Post = (post: postState) => {
   // }
   return (
     <div className={style.feed}>
-      {/* <div className={style.profile}> */}
-      {/* {"@" + post.post.profile.toString().slice(0, 10)} */}
-      {/* {followButton} */}
-      {/* </div> */}
       {daisiContent && (
-        <HorizontalFeed
-          article={daisiContent}
-          type={EFeedType.GUM_ITEM}
-          // setShowModal={() => {}}
-        >
-          <div className={style.btnBlock}>{reactionButton}</div>
-        </HorizontalFeed>
+        <>
+          {screenWidth > 900 ? (
+            <HorizontalFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
+              <div className={style.btnBlock}>{reactionButton}</div>
+            </HorizontalFeed>
+          ) : (
+            <GridFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
+              <div className={style.btnBlock}>{reactionButton}</div>
+            </GridFeed>
+          )}
+        </>
       )}
-      {/* <div className={style.reaction}>
-        {"reactions: " + (postReaction ? postReaction.length : 0)}
-      </div> */}
     </div>
   );
 };
