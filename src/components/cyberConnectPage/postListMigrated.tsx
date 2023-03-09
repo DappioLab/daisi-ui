@@ -1,7 +1,4 @@
-import {
-  POST_BY_ADDRESS_QUERY,
-  cyberConnectEndpoint,
-} from "@/graphql/cyberConnect/query";
+import { POST_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
 import { IRootState } from "@/redux";
 import { IParsedRssData, IRssSourceData } from "@/redux/dailySlice";
 import { updateUserProfilePageHandle } from "@/redux/globalSlice";
@@ -12,6 +9,7 @@ import GridFeed, { EFeedType } from "../homePage/gridFeed";
 import HorizontalFeed from "../homePage/horizontalFeed";
 import { like } from "./helper/like";
 import { handleCreator } from "./helper/profile";
+import { CYBER_CONNECT_ENDPOINT } from "./constants";
 
 export interface Content {
   contentID: string;
@@ -60,7 +58,7 @@ const PostList = ({ address }: { address: string }) => {
         return;
       }
 
-      const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
+      const res = await request(CYBER_CONNECT_ENDPOINT, POST_BY_ADDRESS_QUERY, {
         address,
         myAddress,
       });
