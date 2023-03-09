@@ -1,5 +1,5 @@
 import request from "graphql-request";
-import { CYBERCONNECT_ENDPOINT, DOMAIN } from "../constants";
+import { CYBER_CONNECT_ENDPOINT, DOMAIN } from "../constants";
 import {
   LOGIN_GET_MESSAGE_MUTATION,
   LOGIN_VERIFY_MUTATION,
@@ -12,7 +12,7 @@ export const signin = async (address: string, provider: Web3Provider) => {
     const signer = provider.getSigner();
     /* Get the message from the server */
     const messageResult = await request(
-      CYBERCONNECT_ENDPOINT,
+      CYBER_CONNECT_ENDPOINT,
       LOGIN_GET_MESSAGE_MUTATION,
       {
         address,
@@ -27,7 +27,7 @@ export const signin = async (address: string, provider: Web3Provider) => {
 
     /* Verify the signature on the server and get the access token */
     const accessTokenResult = await request(
-      CYBERCONNECT_ENDPOINT,
+      CYBER_CONNECT_ENDPOINT,
       LOGIN_VERIFY_MUTATION,
       {
         address,

@@ -5,7 +5,7 @@ import { follow } from "./helper/follow";
 import { handleCreator } from "./helper/profile";
 import { useEffect, useState } from "react";
 import request from "graphql-request";
-import { CYBERCONNECT_ENDPOINT } from "./constants";
+import { CYBER_CONNECT_ENDPOINT } from "./constants";
 import { GET_FOLLOW_STATUS_QUERY } from "@/graphql/cyberConnect/query";
 import style from "@/styles/cyberConnectPage/followButton.module.sass";
 
@@ -27,7 +27,7 @@ const FollowBtn = ({ address }: { address: string }) => {
         return;
       }
       const res = await request(
-        CYBERCONNECT_ENDPOINT,
+        CYBER_CONNECT_ENDPOINT,
         GET_FOLLOW_STATUS_QUERY,
         {
           handle: daisiHandle,

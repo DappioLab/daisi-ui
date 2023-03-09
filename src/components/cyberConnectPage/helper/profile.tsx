@@ -3,7 +3,7 @@ import {
   RELAY,
 } from "@/graphql/cyberConnect/mutation";
 import request from "graphql-request";
-import { CYBERCONNECT_ENDPOINT, X_API_KEY } from "../constants";
+import { CYBER_CONNECT_ENDPOINT, X_API_KEY } from "../constants";
 import { IPFSHTTPClient } from "ipfs-http-client";
 import {
   GET_RELAY_ACTION_STATUS_QUERY,
@@ -55,7 +55,7 @@ export const createProfile = async (
 
     // TODO: Upload metadata to IPFS
     const createProfileTypedDataResult = await request({
-      url: CYBERCONNECT_ENDPOINT,
+      url: CYBER_CONNECT_ENDPOINT,
       document: CREATE_PROFILE_TYPED_DATA,
       variables: {
         input: {
@@ -77,7 +77,7 @@ export const createProfile = async (
       createProfileTypedDataResult?.createCreateProfileTypedData?.typedDataID;
 
     const relayResult = await request({
-      url: CYBERCONNECT_ENDPOINT,
+      url: CYBER_CONNECT_ENDPOINT,
       document: RELAY,
       variables: {
         input: {
@@ -106,7 +106,7 @@ export const createProfile = async (
 
 export const checkRelayActionStatus = async (relayActionId: string) => {
   const res = await request(
-    CYBERCONNECT_ENDPOINT,
+    CYBER_CONNECT_ENDPOINT,
     GET_RELAY_ACTION_STATUS_QUERY,
     { relayActionId }
   );
@@ -130,9 +130,13 @@ export const checkRelayActionStatus = async (relayActionId: string) => {
 export const getProfileByAddress = async (address: string) => {
   const daisiHandle = handleCreator(address);
   try {
-    const res = await request(CYBERCONNECT_ENDPOINT, PROFILE_BY_ADDRESS_QUERY, {
-      address,
-    });
+    const res = await request(
+      CYBER_CONNECT_ENDPOINT,
+      PROFILE_BY_ADDRESS_QUERY,
+      {
+        address,
+      }
+    );
 
     //@ts-ignore
     if (res.address.wallet.profiles.edges.length == 0) {

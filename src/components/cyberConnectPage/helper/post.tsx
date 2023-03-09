@@ -1,5 +1,5 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
-import { ARWEAVE_ENDPOINT, CYBERCONNECT_ENDPOINT } from "../constants";
+import { ARWEAVE_ENDPOINT, CYBER_CONNECT_ENDPOINT } from "../constants";
 import { handleCreator } from "./profile";
 import request from "graphql-request";
 import { POST_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
@@ -61,7 +61,7 @@ export const fetchPosts = async (address: string, myAddress: string) => {
   const daisiHandle = handleCreator(address);
 
   try {
-    const res = await request(CYBERCONNECT_ENDPOINT, POST_BY_ADDRESS_QUERY, {
+    const res = await request(CYBER_CONNECT_ENDPOINT, POST_BY_ADDRESS_QUERY, {
       address,
       myAddress,
     });
