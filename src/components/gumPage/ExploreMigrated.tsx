@@ -19,6 +19,7 @@ import {
 } from "../../redux/gumSlice";
 import { IRootState } from "@/redux";
 import { useRouter } from "next/router";
+import { updateUserProfilePageHandle } from "@/redux/globalSlice";
 interface PostAccount {
   cl_pubkey: string;
   metadatauri: string;
@@ -86,6 +87,7 @@ const ExplorePosts = () => {
       let profileKeys = await sdk?.profile.getProfileAccountsByUser(
         wallet.publicKey
       );
+
       if (!userProfile && profileKeys && profileKeys.length > 0) {
         dispatch(
           updateUserProfile(
@@ -232,8 +234,12 @@ const ExplorePosts = () => {
             };
           });
 
+        if (data.length > 0) {
+          dispatch(updateUserProfilePageHandle(data[0].profile));
+        }
         // @ts-ignore
         setExplore(data);
+        fetchReaction();
         // parts for reply
         // [...userPostAccounts, ...allPostsMetadata]
         //   .filter((data) => {
@@ -352,7 +358,6 @@ const ExplorePosts = () => {
         parentDigest: "",
       };
       let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
-      console.log(uploadMetadata, "uploadMetadata");
 
       ipfsLink = mainGateway + uploadMetadata.path;
       if (wallet.publicKey) {
@@ -366,7 +371,6 @@ const ExplorePosts = () => {
 
           if (postIx) {
             let result = await postIx.instructionMethodBuilder.rpc();
-            console.log(result);
             postId = postIx.postPDA.toString();
           }
         }
@@ -406,7 +410,6 @@ const ExplorePosts = () => {
             wallet.publicKey
           )
         ).instructionMethodBuilder.rpc();
-        console.log(addProfileTx);
         return { success: true };
       }
     } catch (err) {
@@ -541,6 +544,12 @@ const ExplorePosts = () => {
     </form>
   );
 
+  useEffect(() => {
+    (async () => {
+      await fetchPostData();
+    })();
+  }, [router.asPath]);
+
   return (
     <div>
       {/* <div>
@@ -562,7 +571,12 @@ const ExplorePosts = () => {
       {explore?.map((post: postInterface) => {
         return (
           <div key={post.cl_pubkey.toString()} className="">
-            <Post post={post} sdk={sdk} setData={setExplore} />
+            <Post
+              post={post}
+              sdk={sdk}
+              setData={setExplore}
+              fetchPostData={fetchPostData}
+            />
           </div>
         );
       })}

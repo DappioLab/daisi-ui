@@ -34,6 +34,7 @@ interface postState {
   post: postInterface;
   sdk: SDK;
   setData: Dispatch<SetStateAction<postInterface[]>>;
+  fetchPostData: () => Promise<void>;
 }
 
 const Post = (post: postState) => {
@@ -43,7 +44,9 @@ const Post = (post: postState) => {
   const { userProfile, following, followers, reactions } = useSelector(
     (state: IRootState) => state.gum
   );
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData, userProfilePageData } = useSelector(
+    (state: IRootState) => state.global
+  );
   const sdk = post.sdk;
   const [daisiContent, setDaisiContent] = useState<IParsedRssData | null>();
 
@@ -67,7 +70,7 @@ const Post = (post: postState) => {
       created: daisiContent.created,
       likes: [],
       forwards: [],
-      sourceIcon: daisiContent.sourceIcon,
+      sourceIcon: userProfilePageData.profilePicture,
       linkCreated: daisiContent.linkCreated,
     });
   }, [post]);
@@ -177,14 +180,29 @@ const Post = (post: postState) => {
   };
   const handleLike = async (e: any) => {
     try {
+      console.log("like trigger");
+
       let result = await createGunLike(post.post.cl_pubkey.toString());
+      console.log("k");
+
       if (result.success) {
-        let likeOnDb = await API.updateRssItemLike(
-          post.post.cl_pubkey.toString(),
-          userData.id
-        );
-        console.log(likeOnDb);
+        console.log("done");
+
+        setTimeout(() => {
+          post.fetchPostData();
+        }, 3000);
+
+        //   let likeOnDb = await API.updateRssItemLike(
+        //     post.post.cl_pubkey.toString(),
+        //     userData.id
+        //   );
+        //   console.log(likeOnDb);
       }
+
+      // setTimeout(() => {
+      //   console.log("in");
+
+      // }, 10000);
     } catch (err) {
       console.log(err);
     }
@@ -309,7 +327,9 @@ const Post = (post: postState) => {
   if (userProfile) {
     let likeButton = (
       <div className={style.btn} onClick={handleLike}>
-        Like
+        <div style={{ fontSize: "1.6rem" }}>
+          <i className="fa fa-heart-o"></i>
+        </div>
       </div>
     );
     let disLikeButton = (
@@ -331,7 +351,9 @@ const Post = (post: postState) => {
             deleteLike(like.cl_pubkey);
           }}
         >
-          revoke Like
+          <div style={{ fontSize: "1.6rem" }}>
+            <i className="fa fa-heart" aria-hidden="true"></i>
+          </div>{" "}
         </div>
       );
     }
@@ -343,14 +365,16 @@ const Post = (post: postState) => {
             deleteDislike(disLike.cl_pubkey);
           }}
         >
-          revoke Dislike
+          <div style={{ fontSize: "1.6rem" }}>
+            <i className="fa fa-heart" aria-hidden="true"></i>
+          </div>
         </div>
       );
     }
     reactionButton = (
       <>
         {likeButton}
-        {disLikeButton}
+        {/* {disLikeButton} */}
       </>
     );
   }
@@ -372,10 +396,10 @@ const Post = (post: postState) => {
   // }
   return (
     <div className={style.feed}>
-      <div className={style.profile}>
-        {/* {"@" + post.post.profile.toString().slice(0, 10)} */}
-        {followButton}
-      </div>
+      {/* <div className={style.profile}> */}
+      {/* {"@" + post.post.profile.toString().slice(0, 10)} */}
+      {/* {followButton} */}
+      {/* </div> */}
       {daisiContent && (
         <HorizontalFeed
           article={daisiContent}

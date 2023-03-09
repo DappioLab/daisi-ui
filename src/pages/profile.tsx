@@ -6,7 +6,7 @@ import { IRootState } from "@/redux";
 import { IApiRssListResponse, IParsedRssData } from "@/redux/dailySlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IUser } from "./profile/[address]";
 import style from "@/styles/profile/id.module.sass";
 import moment from "moment";
@@ -19,9 +19,14 @@ import PostList from "@/components/cyberConnectPage/postListMigrated";
 import FollowBtn from "@/components/cyberConnectPage/followBtn";
 import { postInterface } from "@/utils/gum";
 import UserProfileEdit from "@/components/common/userProfileEdit";
+import FollowButton from "@/components/gumPage/FollowButton";
+import { PublicKey } from "@solana/web3.js";
+import { updateUserProfilePageData } from "@/redux/globalSlice";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData, userProfilePageHandle } = useSelector(
+    (state: IRootState) => state.global
+  );
   const [showUserList, setShowUserList] = useState(false);
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   // const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
@@ -31,7 +36,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   );
   const wallet = useWallet();
   const router = useRouter();
-
+  const dispatch = useDispatch();
   const [showUserEditModal, setShowUserEditModal] = useState(false);
 
   // const updateUserFollowData = async () => {
@@ -51,15 +56,16 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     }
 
     const user = await API.getUserByAddress(address);
+
     setFetchedUser(user.data);
+    dispatch(updateUserProfilePageData(user.data));
   };
 
   useEffect(() => {
-    console.log(router);
     (async () => {
       await getUser();
     })();
-  }, []);
+  }, [router.asPath]);
 
   return (
     <div className={style.profileId}>
@@ -76,15 +82,25 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                   className={style.editBtn}
                   onClick={() => setShowUserEditModal(true)}
                 >
-                  Edit
+                  <i className="fa fa-pencil" aria-hidden="true"></i>
                 </button>
               </div>
               <div className={style.userId}>
-                <span>@{fetchedUser.address.substring(0, 6)}</span>
+                <span>@address - {fetchedUser.address.substring(0, 6)}</span>
                 <span>...</span>
                 <span>{fetchedUser.address.slice(-6)}</span>
               </div>
+              {userProfilePageHandle && (
+                <div className={style.userId}>
+                  <span>
+                    @handle - {userProfilePageHandle.toBase58().substring(0, 6)}
+                  </span>
+                  <span>...</span>
+                  <span>{userProfilePageHandle.toBase58().slice(-6)}</span>
+                </div>
+              )}
               <div className={style.userBio}>
+                <div>Bio</div>
                 {!fetchedUser.description ? "-" : fetchedUser.description}
               </div>
               <br />
@@ -109,16 +125,24 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               <div className={style.userJoinedDate}>
                 Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
               </div>
+              {/* Solana follow btn */}
+              {wallet.connected &&
+              userProfilePageHandle &&
+              userData &&
+              userData.address !== router.asPath.split("address=")[1] &&
+              !router.asPath
+                .split("address=")[1]
+                .substring(0, 2)
+                .includes("0x") ? (
+                <FollowButton toProfile={userProfilePageHandle.toBase58()} />
+              ) : null}
               {/* Metamask follow btn */}
-              {provider && (
+              {provider &&
+              metamaskAddress != router.asPath.split("address=")[1] ? (
                 <div>
-                  {metamaskAddress != router.asPath.split("address=")[1] && (
-                    <div>
-                      <FollowBtn address={router.asPath.split("address=")[1]} />
-                    </div>
-                  )}
+                  <FollowBtn address={router.asPath.split("address=")[1]} />
                 </div>
-              )}
+              ) : null}
               {/* {userData?.id && userData.id !== fetchedUser.id ? (
                 <div className={style.followBtnBlock}>
                   <div
@@ -152,7 +176,6 @@ const ProfilePage = ({ user }: { user: IUser }) => {
       ) : (
         <div>User Not Exist</div>
       )}
-
       {showUserEditModal && (
         <UserProfileEdit
           user={JSON.parse(JSON.stringify(fetchedUser))}

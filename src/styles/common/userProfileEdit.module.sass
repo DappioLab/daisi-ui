@@ -25,13 +25,18 @@
     background-color: $black
     color: $font
     border-radius: 2rem
+  .avatarRow
+    display: flex
+    justify-content: center
+    align-items: flex-end
+    margin-bottom: 1rem
+    position: relative
   .avatar
-    width: 10rem
-    height: 10rem
+    width: 12rem
+    height: 12rem
     border-radius: 2rem
     overflow: hidden
     flex-shrink: 0
-    margin: auto
     img
       width: 100%
       height: 100%
@@ -64,3 +69,47 @@
     outline: none
     resize: none
     border: none
+  .closeBtn
+    position: absolute
+    right: 2rem
+    top: 1rem
+    font-size: 2rem
+    cursor: pointer
+  .uploadBtnBlock
+    z-index: 100
+    position: absolute
+    right: 0
+    bottom: -1rem
+    // position: absolute
+    // right: 0
+    // bottom: 0
+  .uploadBtn
+    padding: .5rem 1rem
+    background-color: $font
+    color: $grey2
+    width: fit-content
+    border-radius: .5rem
+    cursor: pointer
+    label
+      width: 100%
+      height: 100%
+      cursor: pointer
+    &:hover
+      opacity: .8
+  .uploadInput
+    display: none
+    width: 100%
+  .confirmBtn
+    width: 70%
+    padding: 2rem 
+    margin: auto
+    margin-top: 3rem
+    background-color: $grey2
+    display: flex
+    align-items: center
+    justify-content: center
+    font-size: 2rem
+    border-radius: 5rem
+    cursor: pointer
+    &:hover
+      opacity: .9

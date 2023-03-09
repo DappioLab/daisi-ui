@@ -1,3 +1,4 @@
+import style from "@/styles/gumPage/followButton.module.sass";
 import { PublicKey } from "@solana/web3.js";
 import { IRootState } from "@/redux/index";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,7 +70,11 @@ const FollowButton = (prop: followButtonProp) => {
       return conn.follow.equals(toProfile);
     })
   ) {
-    followButton = <button onClick={handleFollow}>Follow</button>;
+    followButton = (
+      <button className={style.followButton} onClick={handleFollow}>
+        Follow
+      </button>
+    );
   } else if (
     userProfile &&
     userProfile.profile.toString() != toProfile.toString() &&
@@ -77,7 +82,11 @@ const FollowButton = (prop: followButtonProp) => {
       return conn.follow.equals(toProfile);
     })
   ) {
-    followButton = <button onClick={handleUnfollow}>Unfollow</button>;
+    followButton = (
+      <button className={style.followButton} onClick={handleUnfollow}>
+        Following
+      </button>
+    );
   }
   return <> {followButton}</>;
 };

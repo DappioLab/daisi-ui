@@ -46,6 +46,22 @@ const AuthModal = () => {
     GRAPHQL_ENDPOINTS.devnet
   );
 
+  const createUserAccount = async () => {
+    try {
+      if (!solanaWallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      console.log("creating user");
+      let user = await sdk?.user.create(solanaWallet.publicKey);
+
+      let result = await user?.instructionMethodBuilder.rpc();
+
+      await fetchProfile();
+      console.log(result);
+    } catch (err) {}
+    // await fetchProfile();
+  };
+
   const handleCreateProfile = async () => {
     try {
       if (!solanaWallet.publicKey) {
@@ -62,20 +78,9 @@ const AuthModal = () => {
           )
         )?.instructionMethodBuilder.rpc();
         console.log(result);
-        // await fetchProfile();
-      } else {
-        console.log("creating user");
-
-        let user = await sdk?.user.create(solanaWallet.publicKey);
-
-        let result = await user?.instructionMethodBuilder.rpc();
-
-        console.log(result);
-        // await fetchProfile();
+        await fetchProfile();
       }
-
-      const res = await fetchProfile();
-      dispatch(updateUserAccounts(res));
+      await fetchProfile();
     } catch (err) {
       console.log(err);
     }
@@ -86,6 +91,7 @@ const AuthModal = () => {
       let profileKeys = await sdk?.profile.getProfileAccountsByUser(
         solanaWallet.publicKey
       );
+
       if (!userProfile && profileKeys && profileKeys.length > 0) {
         dispatch(
           updateUserProfile(
@@ -166,19 +172,31 @@ const AuthModal = () => {
         return;
       }
 
-      if (res.length > 0) {
-        updateUserAccounts(res);
-      } else {
-        handleCreateProfile();
+      console.log(JSON.parse(JSON.stringify(res)), "####");
+
+      if (res.length <= 0) {
+        createUserAccount();
       }
     })();
   }, [solanaWallet]);
 
   useEffect(() => {
-    if (userAccounts.length < 0) {
+    if (!solanaWallet.connected) {
+      return;
+    }
+
+    if (userAccounts.length > 0 && userProfile === null) {
       handleCreateProfile();
     }
-  }, [userAccounts]);
+  }, [userAccounts, userProfile]);
+
+  // useEffect(() => {
+  //   // if (userAccounts.length === 0) {
+  //   //   createUserAccount();
+  //   // } else {
+  //   handleCreateProfile();
+  //   // }
+  // }, [solanaWallet, userAccounts]);
 
   return (
     <div className={style.authModal}>

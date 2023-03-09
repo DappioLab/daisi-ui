@@ -1,4 +1,4 @@
-import style from "@/styles/profile/userProfileEdit.module.sass";
+import style from "@/styles/common/userProfileEdit.module.sass";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IUser } from "@/pages/profile/[address]";
 import {
@@ -99,9 +99,34 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
     <div className={style.userProfileEdit}>
       <div className={style.bg}></div>
       <div className={style.modalContainer}>
-        <div onClick={() => props.setShowUserEditModal(false)}>x</div>
-        <div className={style.avatar}>
-          <img src={form.profilePicture} alt="avatar" />
+        <div
+          className={style.closeBtn}
+          onClick={() => props.setShowUserEditModal(false)}
+        >
+          x
+        </div>
+        <div className={style.avatarRow}>
+          <div className={style.avatar}>
+            <img src={form.profilePicture} alt="avatar" />
+          </div>
+          <div className={style.uploadBtnBlock}>
+            {/* {imgUploadProgress > 0 ? (
+              <div>Uploading {imgUploadProgress} %</div>
+            ) : ( */}
+            <>
+              <div className={style.uploadBtn}>
+                <label htmlFor="file-upload">Upload</label>
+              </div>
+              <input
+                className={style.uploadInput}
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImg(e.target.files![0])}
+              />
+            </>
+            {/* )} */}
+          </div>
         </div>
         <div className={style.inputBlock}>
           <div className={style.inputLabel}>Username</div>
@@ -134,18 +159,9 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
           />
         </div>
 
-        {imgUploadProgress > 0 ? (
-          <div>Uploading {imgUploadProgress} %</div>
-        ) : (
-          <input
-            type="file"
-            className="bg-transparent border border-slate-500 rounded p-2"
-            accept="image/*"
-            onChange={(e) => setImg(e.target.files![0])}
-          />
-        )}
-
-        <button onClick={() => confirmUpdate()}>Confirm</button>
+        <div className={style.confirmBtn} onClick={() => confirmUpdate()}>
+          Confirm
+        </div>
       </div>
     </div>
   );

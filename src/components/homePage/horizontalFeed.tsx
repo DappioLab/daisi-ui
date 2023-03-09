@@ -42,7 +42,9 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
     if (props.type === EFeedType.USER_POST) {
       await API.updateUserPostLike(props.article.id, userData.id);
       window.location.reload();
-    } else {
+    }
+
+    if (props.type === EFeedType.RSS_ITEM) {
       const updatedItem = await API.updateRssItemLike(
         props.article.id,
         userData.id

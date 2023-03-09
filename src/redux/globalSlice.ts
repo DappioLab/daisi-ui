@@ -5,6 +5,7 @@ import {
 } from "@/components/common/submitModal";
 import { IUser } from "@/pages/profile/[address]";
 import { createSlice } from "@reduxjs/toolkit";
+import { PublicKey } from "@solana/web3.js";
 
 export interface IGlobalInitialState {
   submitModalData: ISubmitModal;
@@ -15,6 +16,8 @@ export interface IGlobalInitialState {
   showSubmitModal: boolean;
   currentAddress: string | null;
   screenWidth: number | null;
+  userProfilePageHandle: PublicKey | null;
+  userProfilePageData: IUser;
 }
 
 const initialState: IGlobalInitialState = {
@@ -39,6 +42,8 @@ const initialState: IGlobalInitialState = {
   showAuthModal: false,
   currentAddress: null,
   screenWidth: null,
+  userProfilePageHandle: null,
+  userProfilePageData: null,
 };
 
 export const globalSlice = createSlice({
@@ -69,6 +74,12 @@ export const globalSlice = createSlice({
     updateScreenWidth: (state, action) => {
       state.screenWidth = action.payload;
     },
+    updateUserProfilePageHandle: (state, action) => {
+      state.userProfilePageHandle = action.payload;
+    },
+    updateUserProfilePageData: (state, action) => {
+      state.userProfilePageData = action.payload;
+    },
   },
 });
 
@@ -81,6 +92,8 @@ export const {
   updateLoadingStatus,
   updateScreenWidth,
   updateShowSubmitModal,
+  updateUserProfilePageHandle,
+  updateUserProfilePageData,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

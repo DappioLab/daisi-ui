@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import request from "graphql-request";
 import { CYBERCONNECT_ENDPOINT } from "./constants";
 import { GET_FOLLOW_STATUS_QUERY } from "@/graphql/cyberConnect/query";
+import style from "@/styles/cyberConnectPage/followButton.module.sass";
 
 const FollowBtn = ({ address }: { address: string }) => {
   const { address: myAddress, cyberConnectClient } = useSelector(
@@ -51,7 +52,10 @@ const FollowBtn = ({ address }: { address: string }) => {
   }, [address, myAddress]);
 
   return address != myAddress ? (
-    <button onClick={() => handleOnClick(!isFollowing)}>
+    <button
+      className={style.followButton}
+      onClick={() => handleOnClick(!isFollowing)}
+    >
       {isFollowing ? "Following" : "Follow"}
     </button>
   ) : (
