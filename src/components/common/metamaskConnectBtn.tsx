@@ -44,9 +44,8 @@ const MetamaskConnectBtn = () => {
       await checkNetwork(provider);
 
       solanaWallet.disconnect();
-
-      dispatch(setProvider(provider));
       dispatch(updateUserProfilePageHandle(null));
+      dispatch(setProvider(provider));
       dispatch(updateLoginStatus(true));
       const signer = provider.getSigner();
       const address = await signer.getAddress();

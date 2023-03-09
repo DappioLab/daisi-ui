@@ -92,7 +92,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               </div>
               {userProfilePageHandle && (
                 <div className={style.userId}>
-                  {wallet.connected && (
+                  {wallet.connected && !provider ? (
                     <>
                       <span>
                         @handle -{" "}
@@ -101,7 +101,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       <span>...</span>
                       <span>{userProfilePageHandle.toBase58().slice(-6)}</span>
                     </>
-                  )}
+                  ) : null}
                   {provider && (
                     <>
                       <span>

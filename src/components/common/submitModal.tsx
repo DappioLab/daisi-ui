@@ -39,6 +39,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
+  const { userData } = useSelector((state: IRootState) => state.global);
   const [showGeneratingLoading, setShowGeneratingLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState(0);
   const [dots, detDots] = useState("");
@@ -210,6 +211,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
     setTimeout(() => {
       dispatch(updateShowSubmitModal(false));
       dispatch(updateLoadingStatus(false));
+      router.push(`/profile?address=${userData.address}`);
     }, 1500);
   };
 
