@@ -34,7 +34,7 @@ const PostList = ({ address }: { address: string }) => {
     cyberConnectClient,
     address: myAddress,
     lastPostsUpdateTime,
-  } = useSelector((state: IRootState) => state.cyberConnect);
+  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
   const [postList, setPostList] = useState<Post[]>([]);
 
   const fetchData = async () => {

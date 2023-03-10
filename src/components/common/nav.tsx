@@ -13,7 +13,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 
 const Nav = () => {
   const { userData, isLogin } = useSelector(
-    (state: IRootState) => state.global
+    (state: IRootState) => state.persistedReducer.global
   );
   const solanaWallet = useWallet();
   const router = useRouter();

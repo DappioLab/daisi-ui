@@ -15,7 +15,9 @@ interface IFeedList {
 }
 
 const GridFeedList = (props: IFeedList) => {
-  const { feedList } = useSelector((state: IRootState) => state.daily);
+  const { feedList } = useSelector(
+    (state: IRootState) => state.persistedReducer.daily
+  );
   const { ref, inView } = useInView();
 
   useEffect(() => {

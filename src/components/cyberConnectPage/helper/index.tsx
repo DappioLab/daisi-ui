@@ -4,6 +4,7 @@ export { like } from "./like";
 export {
   createPost,
   fetchPosts,
+  fetchPostById,
   fetchFollowingsPosts,
   parsePostsByProfile,
 } from "./post";

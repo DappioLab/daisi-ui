@@ -25,7 +25,9 @@ export interface IUser {
 }
 
 const Feed = ({ user }: { user: IUser }) => {
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const [showUserList, setShowUserList] = useState(false);
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);

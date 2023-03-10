@@ -19,7 +19,7 @@ interface IPostInput {
 
 const Post = () => {
   const { accessToken, profile } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [postInput, setPostInput] = useState<IPostInput>({
     nftImageURL: "",

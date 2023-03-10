@@ -11,7 +11,8 @@ import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IFeedProps } from "./gridFeed";
-import { like } from "../cyberConnectPage/helper";
+import { fetchPostById, like } from "../cyberConnectPage/helper";
+import { setPostList } from "@/redux/cyberConnectSlice";
 // import { IFeedProps } from "./feed";
 
 export enum EFeedType {
@@ -28,16 +29,18 @@ interface IHorizontalFeedProps extends IFeedProps {
 
 const HorizontalFeed = (props: IHorizontalFeedProps) => {
   const [showLinkButton, setShowLinkButton] = useState(false);
-  const { userData, isLogin, cyberConnectClient } = useSelector(
-    (state: IRootState) => {
+  const { userData, isLogin, feedList, address, postList, cyberConnectClient } =
+    useSelector((state: IRootState) => {
       return {
-        userData: state.global.userData,
-        isLogin: state.global.isLogin,
-        cyberConnectClient: state.cyberConnect.cyberConnectClient,
+        userData: state.persistedReducer.global.userData,
+        isLogin: state.persistedReducer.global.isLogin,
+        feedList: state.persistedReducer.daily.feedList,
+        address: state.persistedReducer.cyberConnect.address,
+        postList: state.persistedReducer.cyberConnect.postList,
+        cyberConnectClient:
+          state.persistedReducer.cyberConnect.cyberConnectClient,
       };
-    }
-  );
-  const { feedList } = useSelector((state: IRootState) => state.daily);
+    });
   const dispatch = useDispatch();
 
   const updateLike = async () => {
@@ -67,9 +70,54 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         break;
 
       case EFeedType.CC_ITEM:
-        const isLiked = props.article.likes.includes(userData.id);
-        await like(props.article.id, cyberConnectClient, !isLiked);
-        window.location.reload();
+        try {
+          if (!address) {
+            alert("address is missing!");
+            return;
+          }
+          if (!props.article.id) {
+            alert("postId is missing!");
+            return;
+          }
+          const isLiked = props.article.likes.includes(userData.id);
+          await like(props.article.id, cyberConnectClient, !isLiked);
+
+          const updatedPost = await fetchPostById(props.article.id, address);
+          console.log(updatedPost, "updatedPost");
+          if (updatedPost) {
+            const post: any = {
+              sourceIcon: "",
+              sourceId: updatedPost.contentID,
+              itemTitle: updatedPost.title,
+              itemDescription: updatedPost.body.split("\n\n")[0],
+              itemImage: "",
+              itemLink: updatedPost.body.split("\n\n").reverse()[0],
+              likes: updatedPost.likedStatus.liked
+                ? new Array(updatedPost.likeCount).fill(userData.id)
+                : new Array(updatedPost.likeCount).fill("123"),
+              forwards: [],
+              linkCreated: new Date(updatedPost.createdAt).getTime().toString(),
+              id: updatedPost.contentID,
+            };
+
+            const updatedList = feedList.map((feed) => {
+              if (feed.id === updatedPost.contentID) {
+                return post;
+              }
+              return feed;
+            });
+            const updatedCCPosts = postList.map((p) => {
+              if (p.id === updatedPost.contentID) {
+                return post;
+              }
+              return p;
+            });
+            dispatch(setPostList(updatedCCPosts));
+            dispatch(updateFeedList(updatedList));
+          }
+        } catch (err) {
+          console.log(err);
+        }
         break;
 
       case EFeedType.GUM_ITEM:

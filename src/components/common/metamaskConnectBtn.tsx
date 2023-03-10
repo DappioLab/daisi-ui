@@ -33,30 +33,31 @@ import {
 
 const MetamaskConnectBtn = () => {
   const solanaWallet = useWallet();
-  const { address } = useSelector((state: IRootState) => state.cyberConnect);
+  const { address } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const dispatch = useDispatch();
 
   const connect = async () => {
     try {
+      await solanaWallet.disconnect();
       const provider = await connectWallet();
       await checkNetwork(provider);
 
-      solanaWallet.disconnect();
-      dispatch(updateUserProfilePageHandle(null));
-      dispatch(setProvider(provider));
-      dispatch(updateLoginStatus(true));
       const signer = provider.getSigner();
       const address = await signer.getAddress();
-      dispatch(setAddress(address));
-
       const accessToken = await signIn(address, provider);
       dispatch(setAccessToken(accessToken));
+      dispatch(setProvider(provider));
+      dispatch(setAddress(address));
 
       const ipfsClient = createIpfsClient();
-      dispatch(setIpfsClient(ipfsClient));
-
       const cyberConnectClient = createCyberConnectClient(provider);
+      dispatch(setIpfsClient(ipfsClient));
       dispatch(setCyberConnectClient(cyberConnectClient));
+
+      dispatch(updateUserProfilePageHandle(null));
+      dispatch(updateLoginStatus(true));
 
       const daisiHandle = handleCreator(address);
       const profile = await getProfileByAddress(address);

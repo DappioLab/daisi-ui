@@ -53,7 +53,7 @@ const ExplorePosts = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { userProfile, following, followers, userAccounts } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
   const [explore, setExplore] = useState<postInterface[]>([]);
   const [postLink, setPostLink] = useState("");

@@ -41,7 +41,7 @@ const PROFILE_FRAGMENT = `
 `;
 
 export const POST_BY_ID_QUERY = gql`
-  query getPostByID($id: String!) {
+  query getPostByID($id: String!, $address: AddressEVM!) {
     content(id: $id) {
       ... on Post {
         contentID
@@ -56,6 +56,13 @@ export const POST_BY_ID_QUERY = gql`
         commentCount
         likeCount
         dislikeCount
+        likedStatus(me: $address) {
+          liked
+          disliked
+          proof {
+            arweaveTxHash
+          }
+        }
       }
     }
   }
@@ -143,7 +150,7 @@ export const PROFILE_BY_ADDRESS_QUERY = gql`
 `;
 
 export const GET_ALL_POSTS_QUERY = gql`
-  query getAllPosts {
+  query getAllPosts($address: AddressEVM!) {
     profiles {
       edges {
         node {
@@ -157,17 +164,24 @@ export const GET_ALL_POSTS_QUERY = gql`
                 contentID
                 ... on Post {
                   contentID
-                  authorHandle
-                  authorAddress
                   title
                   body
                   digest
+                  authorHandle
+                  authorAddress
                   arweaveTxHash
                   createdAt
                   updatedAt
                   commentCount
                   likeCount
                   dislikeCount
+                  likedStatus(me: $address) {
+                    liked
+                    disliked
+                    proof {
+                      arweaveTxHash
+                    }
+                  }
                 }
               }
             }

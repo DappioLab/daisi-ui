@@ -26,14 +26,14 @@ import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const { feedList, modalData } = useSelector(
-    (state: IRootState) => state.daily
+    (state: IRootState) => state.persistedReducer.daily
   );
   const { screenWidth, userData, address } = useSelector(
     (state: IRootState) => {
       return {
-        screenWidth: state.global.screenWidth,
-        userData: state.global.userData,
-        address: state.cyberConnect.address,
+        screenWidth: state.persistedReducer.global.screenWidth,
+        userData: state.persistedReducer.global.userData,
+        address: state.persistedReducer.cyberConnect.address,
       };
     }
   );

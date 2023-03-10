@@ -16,7 +16,7 @@ import { SDK } from "./../../gpl-core/src";
 import { ReactionType } from "../../gpl-core/src/reaction";
 import { ipfsClient, mainGateway } from "./storage";
 import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "../../redux/index";
+import { IRootState } from "@/redux";
 import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
 import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import GridFeed from "../homePage/gridFeed";
@@ -43,10 +43,10 @@ const Post = (post: postState) => {
   // const [reply, setReply] = useState("");
   // const [open, setOpen] = useState(false);
   const { userProfile, following, followers, reactions } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
   const { userData, userProfilePageData, screenWidth } = useSelector(
-    (state: IRootState) => state.global
+    (state: IRootState) => state.persistedReducer.global
   );
   const sdk = post.sdk;
   const [daisiContent, setDaisiContent] = useState<IParsedRssData | null>();
@@ -314,6 +314,7 @@ const Post = (post: postState) => {
     );
   }
   let deleteButton = null;
+  console.log(userProfile.profile);
   if (userProfile && userProfile.profile.equals(post.post.profile)) {
     deleteButton = (
       <div>

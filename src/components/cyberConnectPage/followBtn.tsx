@@ -10,7 +10,7 @@ import style from "@/styles/cyberConnectPage/followButton.module.sass";
 
 const FollowBtn = ({ address }: { address: string }) => {
   const { address: myAddress, cyberConnectClient } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [isFollowing, setFollowStatus] = useState(false);
   const daisiHandle = handleCreator(address);

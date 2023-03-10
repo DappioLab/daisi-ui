@@ -10,6 +10,7 @@ import HorizontalFeed from "../homePage/horizontalFeed";
 import { like } from "./helper/like";
 import { handleCreator } from "./helper/profile";
 import { CYBER_CONNECT_ENDPOINT } from "./constants";
+import { setPostList } from "@/redux/cyberConnectSlice";
 
 export interface Content {
   contentID: string;
@@ -41,11 +42,14 @@ const PostList = ({ address }: { address: string }) => {
     cyberConnectClient,
     address: myAddress,
     lastPostsUpdateTime,
-  } = useSelector((state: IRootState) => state.cyberConnect);
-  const { screenWidth } = useSelector((state: IRootState) => state.global);
+    postList,
+  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
+  const { screenWidth, userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
 
   screenWidth;
-  const [postList, setPostList] = useState<Post[]>([]);
+  // const [postList, setPostList] = useState<Post[]>([]);
   const daisiHandle = handleCreator(address);
 
   const dispatch = useDispatch();
@@ -64,7 +68,7 @@ const PostList = ({ address }: { address: string }) => {
       });
 
       // @ts-ignore
-      let posts = res.address.wallet.profiles.edges
+      let posts: Post[] = res.address.wallet.profiles.edges
         .map((e: any) => e.node)
         .reduce((prev: any, curr: any) => prev.concat(curr), [])
         .filter((n: any) => n.posts.edges.length > 0)
@@ -78,16 +82,37 @@ const PostList = ({ address }: { address: string }) => {
 
       console.log(posts, "posts");
 
-      setPostList(posts);
+      const formattedPosts = posts.map((post) => {
+        const formattedPost = {
+          id: post.contentID,
+          itemTitle: post.title,
+          itemDescription: post.body.split("\n\n")[0],
+          itemLink: post.body.split("\n\n").reverse()[0],
+          itemImage: "",
+          created: post.createdAt as unknown as string,
+          likes: post.likedStatus.liked
+            ? new Array(post.likeCount).fill(userData.id)
+            : new Array(post.likeCount).fill("1"),
+          forwards: [],
+          sourceIcon: "",
+          linkCreated: post.createdAt as unknown as string,
+          source: {} as IRssSourceData,
+        } as IParsedRssData;
+
+        return formattedPost;
+      });
+
+      dispatch(setPostList(formattedPosts));
+      console.log(formattedPosts);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleOnClick = async (contentID: string, isLike: boolean) => {
-    await like(contentID, cyberConnectClient, isLike);
-    await fetchData();
-  };
+  // const handleOnClick = async (contentID: string, isLike: boolean) => {
+  //   await like(contentID, cyberConnectClient, isLike);
+  //   await fetchData();
+  // };
 
   useEffect(() => {
     fetchData();
@@ -99,31 +124,29 @@ const PostList = ({ address }: { address: string }) => {
 
   return (
     <div>
-      {postList.map((post) => {
-        let likes = [];
-        for (let i = 0; i < post.likeCount; i++) {
-          likes.push(i);
-        }
+      {postList &&
+        postList.map((post) => {
+          // const article = {
+          //   id: post.contentID,
+          //   itemTitle: post.title,
+          //   itemDescription: post.body.split("\n\n")[0],
+          //   itemLink: post.body.split("\n\n").reverse()[0],
+          //   itemImage: "",
+          //   created: post.createdAt as unknown as string,
+          //   likes: post.likedStatus.liked
+          //     ? new Array(post.likeCount).fill(userData.id)
+          //     : new Array(post.likeCount).fill("1"),
+          //   forwards: [],
+          //   sourceIcon: "",
+          //   linkCreated: post.createdAt as unknown as string,
+          //   source: {} as IRssSourceData,
+          // } as IParsedRssData;
 
-        const article = {
-          id: "",
-          itemTitle: post.title,
-          itemDescription: post.body,
-          itemLink: "",
-          itemImage: "",
-          created: post.createdAt as unknown as string,
-          likes: likes,
-          forwards: [],
-          sourceIcon: "",
-          linkCreated: post.createdAt as unknown as string,
-          source: {} as IRssSourceData,
-        } as IParsedRssData;
-
-        return (
-          <div>
-            {screenWidth > 900 ? (
-              <HorizontalFeed article={article} type={EFeedType.CC_ITEM}>
-                {post.likedStatus.liked ? (
+          return (
+            <div>
+              {screenWidth > 900 ? (
+                <HorizontalFeed article={post} type={EFeedType.CC_ITEM}>
+                  {/* {post.likedStatus.liked ? (
                   <div
                     style={{ fontSize: "1.6rem" }}
                     onClick={() => {
@@ -141,11 +164,11 @@ const PostList = ({ address }: { address: string }) => {
                   >
                     <i className="fa fa-heart-o"></i>
                   </div>
-                )}
-              </HorizontalFeed>
-            ) : (
-              <GridFeed article={article} type={EFeedType.CC_ITEM}>
-                {post.likedStatus.liked ? (
+                )} */}
+                </HorizontalFeed>
+              ) : (
+                <GridFeed article={post} type={EFeedType.CC_ITEM}>
+                  {/* {post.likedStatus.liked ? (
                   <div
                     style={{ fontSize: "1.6rem" }}
                     onClick={() => {
@@ -163,12 +186,12 @@ const PostList = ({ address }: { address: string }) => {
                   >
                     <i className="fa fa-heart-o"></i>
                   </div>
-                )}
-              </GridFeed>
-            )}
-          </div>
-        );
-      })}
+                )} */}
+                </GridFeed>
+              )}
+            </div>
+          );
+        })}
     </div>
   );
 };

@@ -15,7 +15,9 @@ import {
 import { PROFILE_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
 import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 const SigninBtn = () => {
-  const { address } = useSelector((state: IRootState) => state.cyberConnect);
+  const { address } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const dispatch = useDispatch();
 
   const handleOnClick = async () => {

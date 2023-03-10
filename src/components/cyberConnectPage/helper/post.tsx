@@ -5,6 +5,7 @@ import request from "graphql-request";
 import {
   GET_FOLLOWINGS_POST_BY_ADDRESS_QUERY,
   POST_BY_ADDRESS_QUERY,
+  POST_BY_ID_QUERY,
 } from "@/graphql/cyberConnect/query";
 import { Post } from "../postList";
 
@@ -60,11 +61,29 @@ export const createPost = async (
   }
 };
 
+export const fetchPostById = async (
+  id: string,
+  address: string
+): Promise<Post> => {
+  try {
+    if (!(id && address)) return;
+    const res = await request(CYBER_CONNECT_ENDPOINT, POST_BY_ID_QUERY, {
+      id,
+      address,
+    });
+
+    //@ts-ignore
+    return res.content;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const fetchPosts = async (
   address: string,
   myAddress: string,
   daisiOnly: boolean = true
-) => {
+): Promise<Post[]> => {
   try {
     const res = await request(CYBER_CONNECT_ENDPOINT, POST_BY_ADDRESS_QUERY, {
       address,
@@ -92,7 +111,7 @@ export const fetchPosts = async (
 export const fetchFollowingsPosts = async (
   address: string,
   daisiOnly: boolean = true
-) => {
+): Promise<Post[]> => {
   let posts: Post[] = [];
 
   try {
@@ -127,7 +146,7 @@ export const fetchFollowingsPosts = async (
   }
 };
 
-export const parsePostsByProfile = (profile: any) => {
+export const parsePostsByProfile = (profile: any): Post[] => {
   return profile
     .map((n: any) => n.posts.edges.map((e: any) => e.node)) // get posts object
     .reduce((prev: any, curr: any) => prev.concat(curr), []); // flatten

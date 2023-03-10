@@ -9,7 +9,7 @@ import FollowBtn from "../followBtn";
 
 const Profile = () => {
   const { address, accessToken, profile } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [myProfiles, setMyProfiles] = useState<any>([]);
 

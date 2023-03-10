@@ -29,9 +29,11 @@ export interface IAuthData {
 }
 
 const AuthModal = () => {
-  const { currentAddress } = useSelector((state: IRootState) => state.global);
+  const { currentAddress } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const { userProfile, userAccounts } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
   const dispatch = useDispatch();
   const solanaWallet = useWallet();

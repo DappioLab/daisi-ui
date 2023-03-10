@@ -18,7 +18,9 @@ export enum EUserListType {
 }
 
 const UserListModal = (props: IUserListModalProps) => {
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const [userList, setUserList] = useState<IUser[]>([]);
   const dispatch = useDispatch();
 

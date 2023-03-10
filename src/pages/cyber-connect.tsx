@@ -5,7 +5,9 @@ import style from "@/styles/cyberConnectPage/index.module.sass";
 import { useSelector } from "react-redux";
 
 const CyberConnect = () => {
-  const { address } = useSelector((state: IRootState) => state.cyberConnect);
+  const { address } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   return (
     <div className={style.cyberConnect}>
       <PageTitle title="Cyber Connect" />

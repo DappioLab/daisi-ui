@@ -12,7 +12,7 @@ const CreateProfile = () => {
   const [handle, setHandle] = useState("");
   const [avatar, setAvatar] = useState("");
   const { accessToken, address } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
 
   const handleOnClick = async () => {

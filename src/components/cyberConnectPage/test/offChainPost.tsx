@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const OffChainPost = () => {
   const { provider, profile } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [post, setPost] = useState<Omit<Content, "id">>({
     title: "",

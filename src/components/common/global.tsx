@@ -19,8 +19,10 @@ const Global = (props: IGlobalProps) => {
   const solanaWallet = useWallet();
   const dispatch = useDispatch();
   const { showAuthModal, isLoading, screenWidth, showSubmitModal } =
-    useSelector((state: IRootState) => state.global);
-  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+    useSelector((state: IRootState) => state.persistedReducer.global);
+  const { provider } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
 
   const resize = () => {
     let width = window.innerWidth;
