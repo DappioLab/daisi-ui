@@ -84,7 +84,8 @@ const Post = (post: postState) => {
   let postReaction = reactions.get(post.post.cl_pubkey.toString());
   if (postReaction) {
     reactionsFromUser = postReaction.filter((reaction) => {
-      if (userProfile) return reaction.from.equals(userProfile.profile);
+      if (userProfile)
+        return reaction.from.toString() == userProfile.profile.toString();
     });
   }
   const createGunFollow = async (profile: string) => {
@@ -314,8 +315,10 @@ const Post = (post: postState) => {
     );
   }
   let deleteButton = null;
-  console.log(userProfile.profile);
-  if (userProfile && userProfile.profile.equals(post.post.profile)) {
+  if (
+    userProfile &&
+    userProfile.profile.toString() == post.post.profile.toString()
+  ) {
     deleteButton = (
       <div>
         <button className={""} onClick={handleDelete}>
