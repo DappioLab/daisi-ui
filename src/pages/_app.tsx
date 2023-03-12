@@ -31,6 +31,7 @@ import React, { useMemo } from "react";
 import Global from "@/components/common/global";
 import { updateScreenWidth } from "@/redux/globalSlice";
 import HeadMetadata from "@/components/common/headMetadata";
+import TagManager from "react-gtm-module";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -42,6 +43,10 @@ export default function App({ Component, pageProps }: AppProps) {
     router.events.on("routeChangeComplete", () => nProgress.done());
     router.events.on("routeChangeError", () => nProgress.done());
   }, [router.pathname]);
+
+  useEffect(() => {
+    TagManager.initialize({ gtmId: "G-7C4N7ZGKQJ" });
+  }, []);
 
   const network = WalletAdapterNetwork.Devnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
