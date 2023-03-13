@@ -16,15 +16,18 @@ import HorizontalFeed, {
 import { useWallet } from "@solana/wallet-adapter-react";
 import ExplorePosts from "@/components/gumPage/ExploreMigrated";
 import PostList from "@/components/cyberConnectPage/postListMigrated";
-import FollowBtn from "@/components/cyberConnectPage/followBtn";
+import CyberConnectFollowBtn from "@/components/cyberConnectPage/followBtn";
 import { postInterface } from "@/utils/gum";
 import UserProfileEdit from "@/components/common/userProfileEdit";
-import FollowButton from "@/components/gumPage/FollowButton";
+import GumFollowButton from "@/components/gumPage/FollowButton";
 import { PublicKey } from "@solana/web3.js";
-import { updateUserProfilePageData } from "@/redux/globalSlice";
+import {
+  updateAuthModal,
+  updateUserProfilePageData,
+} from "@/redux/globalSlice";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
-  const { userData, userProfilePageHandle } = useSelector(
+  const { userData, userProfilePageHandle, isLogin } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
   const [showUserList, setShowUserList] = useState(false);
@@ -50,6 +53,10 @@ const ProfilePage = ({ user }: { user: IUser }) => {
 
     setFetchedUser(user.data);
     dispatch(updateUserProfilePageData(user.data));
+  };
+
+  const showLoginPrompt = () => {
+    dispatch(updateAuthModal(true));
   };
 
   useEffect(() => {
@@ -83,12 +90,14 @@ const ProfilePage = ({ user }: { user: IUser }) => {
             <div className={style.userInfoBlock}>
               <div className={style.userNameRow}>
                 <div>{fetchedUser.username}</div>
-                <button
-                  className={style.editBtn}
-                  onClick={() => setShowUserEditModal(true)}
-                >
-                  <i className="fa fa-pencil" aria-hidden="true"></i>
-                </button>
+                {isLogin && (
+                  <div
+                    className={style.editBtn}
+                    onClick={() => setShowUserEditModal(true)}
+                  >
+                    <i className="fa fa-pencil" aria-hidden="true"></i>
+                  </div>
+                )}
               </div>
               <div className={style.userId}>
                 <span>@address - {fetchedUser.address.substring(0, 6)}</span>
@@ -124,6 +133,35 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 {!fetchedUser.description ? "-" : fetchedUser.description}
               </div>
               <br />
+
+              <div className={style.followBtnBlock}>
+                <div>
+                  <span>Supported by </span>
+                  {isCheckingSolanaAddress ? (
+                    <span>Gum</span>
+                  ) : (
+                    <span>Cyber Connect</span>
+                  )}
+                </div>
+                {!isLogin ? (
+                  <div
+                    className={style.followBtn}
+                    onClick={() => showLoginPrompt()}
+                  >
+                    Follow{" "}
+                  </div>
+                ) : (
+                  <>
+                    {isCheckingSolanaAddress ? (
+                      <GumFollowButton
+                        toProfile={userProfilePageHandle.toBase58()}
+                      />
+                    ) : (
+                      <CyberConnectFollowBtn address={checkingAddress} />
+                    )}
+                  </>
+                )}
+              </div>
               <div className={style.followDataBlock}>
                 <div
                   onClick={() => {
@@ -145,28 +183,21 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               <div className={style.userJoinedDate}>
                 Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
               </div>
-              <div>
-                Support by{" "}
-                {isCheckingSolanaAddress ? (
-                  <span>Gum</span>
-                ) : (
-                  <span>Cyber Connect</span>
-                )}
-              </div>
+
               {/* Solana follow btn */}
-              {wallet.connected &&
+              {/* {wallet.connected &&
               userProfilePageHandle &&
               userData &&
               userData.address !== checkingAddress &&
               isCheckingSolanaAddress ? (
                 <FollowButton toProfile={userProfilePageHandle.toBase58()} />
-              ) : null}
+              ) : null} */}
               {/* Metamask follow btn */}
-              {provider && metamaskAddress != checkingAddress ? (
+              {/* {provider && metamaskAddress != checkingAddress ? (
                 <div>
                   <FollowBtn address={checkingAddress} />
                 </div>
-              ) : null}
+              ) : null} */}
               {showUserList && (
                 <UserListModal
                   setShowUserList={setShowUserList}

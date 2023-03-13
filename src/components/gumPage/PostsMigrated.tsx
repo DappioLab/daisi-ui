@@ -20,6 +20,7 @@ import { IRootState } from "@/redux";
 import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
 import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import GridFeed from "../homePage/gridFeed";
+import { updateAuthModal } from "@/redux/globalSlice";
 export interface postInterface {
   metadatauri: string;
   cl_pubkey: PublicKey;
@@ -40,6 +41,7 @@ interface postState {
 
 const Post = (post: postState) => {
   const wallet = useWallet();
+  const dispatch = useDispatch();
   // const [reply, setReply] = useState("");
   // const [open, setOpen] = useState(false);
   const { userProfile, following, followers, reactions } = useSelector(
@@ -399,17 +401,44 @@ const Post = (post: postState) => {
   //     </div>
   //   );
   // }
+
+  const showLoginPrompt = () => {
+    dispatch(updateAuthModal(true));
+  };
+
   return (
     <div className={style.feed}>
       {daisiContent && (
         <>
           {screenWidth > 900 ? (
             <HorizontalFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
-              <div className={style.btnBlock}>{reactionButton}</div>
+              <div className={style.btnBlock}>
+                {reactionButton ? (
+                  reactionButton
+                ) : (
+                  <div
+                    style={{ fontSize: "1.6rem" }}
+                    onClick={() => showLoginPrompt()}
+                  >
+                    <i className="fa fa-heart-o"></i>
+                  </div>
+                )}
+              </div>
             </HorizontalFeed>
           ) : (
             <GridFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
-              <div className={style.btnBlock}>{reactionButton}</div>
+              <div className={style.btnBlock}>
+                {reactionButton ? (
+                  reactionButton
+                ) : (
+                  <div
+                    style={{ fontSize: "1.6rem" }}
+                    onClick={() => showLoginPrompt()}
+                  >
+                    <i className="fa fa-heart-o"></i>
+                  </div>
+                )}
+              </div>
             </GridFeed>
           )}
         </>
