@@ -40,9 +40,11 @@ const Post = (post: postState) => {
   // const [reply, setReply] = useState("");
   // const [open, setOpen] = useState(false);
   const { userProfile, following, followers, reactions } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const sdk = useGumSDK();
   let reactionsFromUser: ReactionInterface[] = [];
   let postReaction = reactions.get(post.post.cl_pubkey.toString());

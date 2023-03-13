@@ -53,7 +53,7 @@ const checkNetwork = async (provider: Web3Provider) => {
         {
           chainId:
             "0x" + Number(process.env.NEXT_PUBLIC_CHAIN_ID)?.toString(16),
-          rpcUrls: ["https://goerli.infura.io/v3/"],
+          rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
         },
       ]);
 

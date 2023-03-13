@@ -1,10 +1,10 @@
 import { IRootState } from "@/redux";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { checkNetwork, connectWallet } from "../helper/wallet";
+import { checkNetwork, connectWallet } from "../helper";
 import { v4 as uuidv4 } from "uuid";
 import request from "graphql-request";
-import { cyberConnectEndpoint } from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 import {
   CREATE_REGISTER_ESSENCE_TYPED_DATA,
   RELAY,
@@ -19,7 +19,7 @@ interface IPostInput {
 
 const Post = () => {
   const { accessToken, profile } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [postInput, setPostInput] = useState<IPostInput>({
     nftImageURL: "",
@@ -92,7 +92,7 @@ const Post = () => {
 
       /* Create typed data in a readable format */
       const typedDataResult = await request({
-        url: cyberConnectEndpoint,
+        url: CYBER_CONNECT_ENDPOINT,
         document: CREATE_REGISTER_ESSENCE_TYPED_DATA,
         variables: {
           input: {
@@ -130,7 +130,7 @@ const Post = () => {
 
       /* Call the relay to broadcast the transaction */
       const relayResult = await request({
-        url: cyberConnectEndpoint,
+        url: CYBER_CONNECT_ENDPOINT,
         document: RELAY,
         variables: {
           input: {

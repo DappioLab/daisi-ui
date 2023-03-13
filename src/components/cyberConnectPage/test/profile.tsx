@@ -1,5 +1,5 @@
 import { PROFILE_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
-import { cyberConnectEndpoint } from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 import { IRootState } from "@/redux";
 import request from "graphql-request";
 import React, { useEffect, useState } from "react";
@@ -9,14 +9,14 @@ import FollowBtn from "../followBtn";
 
 const Profile = () => {
   const { address, accessToken, profile } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [myProfiles, setMyProfiles] = useState<any>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const profile = await request(
-        cyberConnectEndpoint,
+        CYBER_CONNECT_ENDPOINT,
         PROFILE_BY_ADDRESS_QUERY,
         {
           address,

@@ -10,7 +10,7 @@ interface likeButtonProp {
 }
 const LikeButton = (prop: likeButtonProp) => {
   const { userProfile, reactions } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
   let toPost = new PublicKey(prop.toPost);
   let reactionsFromUser: ReactionInterface[] = [];

@@ -21,44 +21,43 @@ import {
 } from "@/redux/globalSlice";
 import { IAuthData } from "./authModal";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { signin } from "../cyberConnectPage/helper/signin";
 import {
+  signIn,
   createCyberConnectClient,
   createIpfsClient,
-} from "../cyberConnectPage/helper/clientFactory";
-import {
   getProfileByAddress,
   createProfile,
   handleCreator,
   checkRelayActionStatus,
-} from "../cyberConnectPage/helper/profile";
+} from "../cyberConnectPage/helper";
 
 const MetamaskConnectBtn = () => {
   const solanaWallet = useWallet();
-  const { address } = useSelector((state: IRootState) => state.cyberConnect);
+  const { address } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const dispatch = useDispatch();
 
   const connect = async () => {
     try {
+      await solanaWallet.disconnect();
       const provider = await connectWallet();
       await checkNetwork(provider);
 
-      solanaWallet.disconnect();
-      dispatch(updateUserProfilePageHandle(null));
-      dispatch(setProvider(provider));
-      dispatch(updateLoginStatus(true));
       const signer = provider.getSigner();
       const address = await signer.getAddress();
+      const accessToken = await signIn(address, provider);
+      dispatch(setAccessToken(accessToken));
+      dispatch(setProvider(provider));
       dispatch(setAddress(address));
 
-      const accessToken = await signin(address, provider);
-      dispatch(setAccessToken(accessToken));
-
       const ipfsClient = createIpfsClient();
-      dispatch(setIpfsClient(ipfsClient));
-
       const cyberConnectClient = createCyberConnectClient(provider);
+      dispatch(setIpfsClient(ipfsClient));
       dispatch(setCyberConnectClient(cyberConnectClient));
+
+      dispatch(updateUserProfilePageHandle(null));
+      dispatch(updateLoginStatus(true));
 
       const daisiHandle = handleCreator(address);
       const profile = await getProfileByAddress(address);

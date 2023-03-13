@@ -1,7 +1,6 @@
 import { gql } from "graphql-request";
 
-export const cyberConnectEndpoint = "https://api.cyberconnect.dev/testnet/";
-
+// CYBER_CONNECT_ENDPOINT = "https://api.cyberconnect.dev/testnet/";
 const ESSENCE_FRAGMENT = `
   fragment Essence on Essence {
     essenceID
@@ -42,7 +41,7 @@ const PROFILE_FRAGMENT = `
 `;
 
 export const POST_BY_ID_QUERY = gql`
-  query getPostByID($id: String!) {
+  query getPostByID($id: String!, $address: AddressEVM!) {
     content(id: $id) {
       ... on Post {
         contentID
@@ -57,6 +56,13 @@ export const POST_BY_ID_QUERY = gql`
         commentCount
         likeCount
         dislikeCount
+        likedStatus(me: $address) {
+          liked
+          disliked
+          proof {
+            arweaveTxHash
+          }
+        }
       }
     }
   }
@@ -144,7 +150,7 @@ export const PROFILE_BY_ADDRESS_QUERY = gql`
 `;
 
 export const GET_ALL_POSTS_QUERY = gql`
-  query getAllPosts {
+  query getAllPosts($address: AddressEVM!) {
     profiles {
       edges {
         node {
@@ -158,17 +164,24 @@ export const GET_ALL_POSTS_QUERY = gql`
                 contentID
                 ... on Post {
                   contentID
-                  authorHandle
-                  authorAddress
                   title
                   body
                   digest
+                  authorHandle
+                  authorAddress
                   arweaveTxHash
                   createdAt
                   updatedAt
                   commentCount
                   likeCount
                   dislikeCount
+                  likedStatus(me: $address) {
+                    liked
+                    disliked
+                    proof {
+                      arweaveTxHash
+                    }
+                  }
                 }
               }
             }
@@ -212,6 +225,54 @@ export const GET_FOLLOW_STATUS_QUERY = gql`
   query getFollowStatus($handle: String!, $myAddress: AddressEVM!) {
     profileByHandle(handle: $handle) {
       isFollowedByMe(me: $myAddress)
+    }
+  }
+`;
+
+export const GET_FOLLOWINGS_POST_BY_ADDRESS_QUERY = gql`
+  query getFollowingsPostByAddress($address: AddressEVM!) {
+    address(address: $address) {
+      followingCount
+      followings {
+        edges {
+          node {
+            address {
+              address
+            }
+            profile {
+              handle
+              posts {
+                edges {
+                  node {
+                    contentID
+                    ... on Post {
+                      contentID
+                      title
+                      body
+                      digest
+                      authorHandle
+                      authorAddress
+                      arweaveTxHash
+                      createdAt
+                      updatedAt
+                      commentCount
+                      likeCount
+                      dislikeCount
+                      likedStatus(me: $address) {
+                        liked
+                        disliked
+                        proof {
+                          arweaveTxHash
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;

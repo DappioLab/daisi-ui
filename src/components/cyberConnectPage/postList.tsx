@@ -1,14 +1,8 @@
-import {
-  POST_BY_ADDRESS_QUERY,
-  cyberConnectEndpoint,
-} from "@/graphql/cyberConnect/query";
 import { IRootState } from "@/redux";
-import request from "graphql-request";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { like } from "./helper/like";
-import { handleCreator } from "./helper/profile";
+import { like, fetchPosts } from "./helper";
 
 export interface Content {
   contentID: string;
@@ -40,9 +34,8 @@ const PostList = ({ address }: { address: string }) => {
     cyberConnectClient,
     address: myAddress,
     lastPostsUpdateTime,
-  } = useSelector((state: IRootState) => state.cyberConnect);
+  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
   const [postList, setPostList] = useState<Post[]>([]);
-  const daisiHandle = handleCreator(address);
 
   const fetchData = async () => {
     try {
@@ -50,24 +43,7 @@ const PostList = ({ address }: { address: string }) => {
         return;
       }
 
-      const res = await request(cyberConnectEndpoint, POST_BY_ADDRESS_QUERY, {
-        address,
-        myAddress,
-      });
-
-      // @ts-ignore
-      let posts = res.address.wallet.profiles.edges
-        .map((e: any) => e.node)
-        .reduce((prev: any, curr: any) => prev.concat(curr), [])
-        .filter((n: any) => n.posts.edges.length > 0)
-        .map((n: any) => n.posts.edges.map((e: any) => e.node))
-        .reduce((prev: any, curr: any) => prev.concat(curr), []);
-
-      // filter Daisi created Handle only
-      posts = posts.filter(
-        (post: Post) => post.authorHandle.split(".")[0] == daisiHandle
-      );
-
+      const posts = await fetchPosts(address, myAddress);
       setPostList(posts);
     } catch (err) {
       console.error(err);
@@ -91,7 +67,7 @@ const PostList = ({ address }: { address: string }) => {
     <div>
       {postList.map((post) => {
         return (
-          <div>
+          <div key={post.contentID}>
             <h2>{post.title}</h2>{" "}
             <h2>
               by {post.authorHandle.split(".")[0]}

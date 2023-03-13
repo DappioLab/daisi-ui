@@ -5,6 +5,8 @@ import style from "@/styles/homePage/gridFeed.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
 import API from "@/axios/api";
+import { like, fetchPostById } from "../cyberConnectPage/helper";
+import { setPostList } from "@/redux/cyberConnectSlice";
 
 export enum EFeedType {
   USER_POST = "USER POST",
@@ -27,10 +29,18 @@ export interface IFeedProps {
 const GridFeed = (props: IGridFeedProps) => {
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
-  const { userData, isLogin } = useSelector(
-    (state: IRootState) => state.global
-  );
-  const { feedList } = useSelector((state: IRootState) => state.daily);
+  const { userData, isLogin, feedList, address, postList, cyberConnectClient } =
+    useSelector((state: IRootState) => {
+      return {
+        userData: state.persistedReducer.global.userData,
+        isLogin: state.persistedReducer.global.isLogin,
+        feedList: state.persistedReducer.daily.feedList,
+        address: state.persistedReducer.cyberConnect.address,
+        postList: state.persistedReducer.cyberConnect.postList,
+        cyberConnectClient:
+          state.persistedReducer.cyberConnect.cyberConnectClient,
+      };
+    });
 
   const updateLike = async () => {
     if (!userData?.id || !isLogin) {
@@ -38,26 +48,88 @@ const GridFeed = (props: IGridFeedProps) => {
       return;
     }
 
-    if (props.type === EFeedType.USER_POST) {
-      await API.updateUserPostLike(props.article.id, userData.id);
-      window.location.reload();
-    } else {
-      const updatedItem = await API.updateRssItemLike(
-        props.article.id,
-        userData.id
-      );
+    switch (props.type) {
+      case EFeedType.RSS_ITEM:
+        const updatedItem = await API.updateRssItemLike(
+          props.article.id,
+          userData.id
+        );
 
-      if (updatedItem) {
-        const updatedList = feedList.map((item) => {
-          if (item.id === updatedItem.data._id) {
-            const obj = JSON.parse(JSON.stringify(item));
-            obj.likes = updatedItem.data.likes;
-            return obj;
+        if (updatedItem) {
+          const updatedList = feedList.map((item) => {
+            if (item.id === updatedItem.data._id) {
+              const obj = JSON.parse(JSON.stringify(item));
+              obj.likes = updatedItem.data.likes;
+              return obj;
+            }
+            return item;
+          });
+          dispatch(updateFeedList(updatedList));
+        }
+        break;
+
+      case EFeedType.CC_ITEM:
+        try {
+          if (!address) {
+            alert("address is missing!");
+            return;
           }
-          return item;
-        });
-        dispatch(updateFeedList(updatedList));
-      }
+          if (!props.article.id) {
+            alert("postId is missing!");
+            return;
+          }
+          const isLiked = props.article.likes.includes(userData.id);
+          await like(props.article.id, cyberConnectClient, !isLiked);
+
+          const updatedPost = await fetchPostById(props.article.id, address);
+          console.log(updatedPost, "updatedPost");
+          if (updatedPost) {
+            const post: any = {
+              sourceIcon: "",
+              sourceId: updatedPost.contentID,
+              itemTitle: updatedPost.title,
+              itemDescription: updatedPost.body.split("\n\n")[0],
+              itemImage: "",
+              itemLink: updatedPost.body.split("\n\n").reverse()[0],
+              likes: updatedPost.likedStatus.liked
+                ? new Array(updatedPost.likeCount).fill(userData.id)
+                : new Array(updatedPost.likeCount).fill("123"),
+              forwards: [],
+              linkCreated: new Date(updatedPost.createdAt).getTime().toString(),
+              id: updatedPost.contentID,
+            };
+
+            const updatedList = feedList.map((feed) => {
+              if (feed.id === updatedPost.contentID) {
+                return post;
+              }
+              return feed;
+            });
+            const updatedCCPosts = postList.map((p) => {
+              if (p.id === updatedPost.contentID) {
+                return post;
+              }
+              return p;
+            });
+            dispatch(setPostList(updatedCCPosts));
+            dispatch(updateFeedList(updatedList));
+          }
+        } catch (err) {
+          console.log(err);
+        }
+        break;
+
+      case EFeedType.GUM_ITEM:
+        break;
+
+      case EFeedType.USER_POST:
+        // Deprecate
+        await API.updateUserPostLike(props.article.id, userData.id);
+        window.location.reload();
+        break;
+
+      default:
+        throw "ERROR: unknown feed type";
     }
   };
 
@@ -110,7 +182,8 @@ const GridFeed = (props: IGridFeedProps) => {
         />
       </div>
       <div className={style.socialActionBlock}>{props.children}</div>
-      {props.type === EFeedType.RSS_ITEM && (
+      {(props.type === EFeedType.RSS_ITEM ||
+        props.type === EFeedType.CC_ITEM) && (
         <div
           className={style.socialActionBlock}
           onClick={(e) => {

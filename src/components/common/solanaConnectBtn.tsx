@@ -1,6 +1,13 @@
 import style from "@/styles/common/solanaConnectBtn.module.sass";
 import { IRootState } from "@/redux";
-import { setAddress, setProvider } from "@/redux/cyberConnectSlice";
+import {
+  setAddress,
+  setProvider,
+  setAccessToken,
+  setProfile,
+  setCyberConnectClient,
+  setIpfsClient,
+} from "@/redux/cyberConnectSlice";
 import {
   updateAuthModal,
   updateCurrentAddress,
@@ -22,7 +29,9 @@ const WalletMultiButtonDynamic = dynamic(
 );
 
 const SolanaConnectBtn = () => {
-  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+  const { provider } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const wallet = useWallet();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -30,9 +39,15 @@ const SolanaConnectBtn = () => {
   useEffect(() => {
     if (wallet.connected) {
       dispatch(updateUserProfilePageHandle(null));
+      dispatch(updateLoginStatus(true));
+
+      // set CyberConnect slice to null
       dispatch(setProvider(null));
       dispatch(setAddress(null));
-      dispatch(updateLoginStatus(true));
+      dispatch(setAccessToken(null));
+      dispatch(setProfile(null));
+      dispatch(setCyberConnectClient(null));
+      dispatch(setIpfsClient(null));
 
       const address = wallet.publicKey?.toBase58()!;
       dispatch(updateCurrentAddress(address));

@@ -12,7 +12,9 @@ interface IFeedList {
 
 const FeedList = (props: IFeedList) => {
   const [feedOptions, setFeedOptions] = useState({});
-  const { feedList } = useSelector((state: IRootState) => state.daily);
+  const { feedList } = useSelector(
+    (state: IRootState) => state.persistedReducer.daily
+  );
   const { ref, inView } = useInView({});
   const dispatch = useDispatch();
 

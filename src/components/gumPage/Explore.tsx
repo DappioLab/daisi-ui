@@ -52,7 +52,7 @@ const ExplorePosts = () => {
   const dispatch = useDispatch();
   const sdk = useGumSDK();
   const { userProfile, following, followers, userAccounts } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
   const [explore, setExplore] = useState<postInterface[]>([]);
   const [postLink, setPostLink] = useState("");

@@ -2,7 +2,7 @@ import {
   CREATE_PROFILE_TYPED_DATA,
   RELAY,
 } from "@/graphql/cyberConnect/mutation";
-import { cyberConnectEndpoint } from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 import { IRootState } from "@/redux";
 import request from "graphql-request";
 import { useState } from "react";
@@ -12,14 +12,14 @@ const CreateProfile = () => {
   const [handle, setHandle] = useState("");
   const [avatar, setAvatar] = useState("");
   const { accessToken, address } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
 
   const handleOnClick = async () => {
     try {
       // TODO: Upload metadata to IPFS
       const createProfileTypedDataResult = await request({
-        url: cyberConnectEndpoint,
+        url: CYBER_CONNECT_ENDPOINT,
         document: CREATE_PROFILE_TYPED_DATA,
         variables: {
           input: {
@@ -41,7 +41,7 @@ const CreateProfile = () => {
         createProfileTypedDataResult?.createCreateProfileTypedData?.typedDataID;
 
       const relayResult = await request({
-        url: cyberConnectEndpoint,
+        url: CYBER_CONNECT_ENDPOINT,
         document: RELAY,
         variables: {
           input: {

@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   IApiRssListResponse,
+  IParsedRssData,
   updateFeedList,
   updateModalData,
 } from "@/redux/dailySlice";
@@ -20,13 +21,22 @@ import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
 import GridFeedList from "@/components/homePage/gridFeedList";
 import API from "@/axios/api";
 import { updateLoadingStatus } from "@/redux/globalSlice";
+import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const { feedList, modalData } = useSelector(
-    (state: IRootState) => state.daily
+    (state: IRootState) => state.persistedReducer.daily
   );
-  const { screenWidth } = useSelector((state: IRootState) => state.global);
+  const { screenWidth, userData, address } = useSelector(
+    (state: IRootState) => {
+      return {
+        screenWidth: state.persistedReducer.global.screenWidth,
+        userData: state.persistedReducer.global.userData,
+        address: state.persistedReducer.cyberConnect.address,
+      };
+    }
+  );
   const [searchIndex, setSearchIndex] = useState(0);
   const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
@@ -52,28 +62,63 @@ const HomePage = () => {
   };
 
   const updateList = async () => {
-    dispatch(updateLoadingStatus(true));
-    const res: IApiRssListResponse[] = await getAnonymousList();
+    try {
+      dispatch(updateLoadingStatus(true));
+      let allPosts: IParsedRssData[] = [];
+      const res: IParsedRssData[] = await getAnonymousList();
+      console.log(res, "res");
+      let mappedCcFollowingsPosts: IParsedRssData[] = [];
+      if (address && userData.id && userData.id != "") {
+        const ccFollowingsPosts = await fetchFollowingsPosts(address);
+        mappedCcFollowingsPosts = ccFollowingsPosts.map((ccPost) => {
+          const post: any = {
+            sourceIcon: "",
+            sourceId: ccPost.contentID,
+            itemTitle: ccPost.title,
+            itemDescription: ccPost.body.split("\n\n")[0],
+            itemImage: "",
+            itemLink: ccPost.body.split("\n\n").reverse()[0],
+            likes: ccPost.likedStatus.liked
+              ? new Array(ccPost.likeCount).fill(userData.id)
+              : new Array(ccPost.likeCount).fill("123"),
+            forwards: [],
+            linkCreated: new Date(ccPost.createdAt).getTime().toString(),
+            id: ccPost.contentID,
+          };
+          return post;
+        });
+        console.log(mappedCcFollowingsPosts, "ccFollowingPost");
+      }
 
-    // let parsedData: any = [];
+      allPosts = [...res, ...mappedCcFollowingsPosts].sort((a, b) =>
+        Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
+      );
 
-    // res.map((source) => {
-    //   source.items.map((item) => {
-    //     const obj = { ...item, source: { ...source } };
-    //     parsedData.push(obj);
-    //   });
-    // });
-    // console.log(parsedData, "parsedData");
+      // let parsedData: any = [];
 
-    // dispatch(updateFeedList(parsedData));
+      // res.map((source) => {
+      //   source.items.map((item) => {
+      //     const obj = { ...item, source: { ...source } };
+      //     parsedData.push(obj);
+      //   });
+      // });
+      // console.log(parsedData, "parsedData");
 
-    dispatch(updateFeedList(res));
-    dispatch(updateLoadingStatus(false));
+      // dispatch(updateFeedList(parsedData));
+
+      dispatch(updateFeedList(allPosts));
+      dispatch(updateLoadingStatus(false));
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {
     updateList();
   }, []);
+  useEffect(() => {
+    updateList();
+  }, [address, userData]);
 
   useEffect(() => {
     const content = feedList.find((feed, index) => {

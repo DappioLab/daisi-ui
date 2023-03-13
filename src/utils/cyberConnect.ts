@@ -1,9 +1,6 @@
 import request from "graphql-request";
-import {
-  cyberConnectEndpoint,
-  PROFILES_WITH_POSTS_QUERY,
-} from "@/graphql/cyberConnect/query";
-// import { IFeed } from "@/components/homePage/feed";
+import { PROFILES_WITH_POSTS_QUERY } from "@/graphql/cyberConnect/query";
+import { CYBER_CONNECT_ENDPOINT } from "@/components/cyberConnectPage/constants";
 
 export interface ICyberConnectFeed {
   essenceID: string;
@@ -30,7 +27,7 @@ export interface IProfile {
 }
 
 export const getData = async () => {
-  const res = await request(cyberConnectEndpoint, PROFILES_WITH_POSTS_QUERY);
+  const res = await request(CYBER_CONNECT_ENDPOINT, PROFILES_WITH_POSTS_QUERY);
 
   // @ts-ignore
   const profiles = res.profiles.edges.map((edge: any) => edge.node);

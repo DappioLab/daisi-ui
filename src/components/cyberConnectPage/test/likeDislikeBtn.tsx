@@ -9,7 +9,9 @@ const likeDislikeBtn = ({
   contendId: string;
   isLike: boolean;
 }) => {
-  const { provider } = useSelector((state: IRootState) => state.cyberConnect);
+  const { provider } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
 
   const handleOnClick = async () => {
     try {

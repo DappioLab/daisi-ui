@@ -25,14 +25,14 @@ import { updateUserProfilePageData } from "@/redux/globalSlice";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
   const { userData, userProfilePageHandle } = useSelector(
-    (state: IRootState) => state.global
+    (state: IRootState) => state.persistedReducer.global
   );
   const [showUserList, setShowUserList] = useState(false);
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   // const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
   const [fetchedUser, setFetchedUser] = useState<IUser | null>(null);
   const { provider, address: metamaskAddress } = useSelector(
-    (state: IRootState) => state.cyberConnect
+    (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const wallet = useWallet();
   const router = useRouter();

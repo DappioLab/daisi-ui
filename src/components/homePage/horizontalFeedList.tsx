@@ -14,7 +14,9 @@ interface IFeedList {
 }
 
 const HorizontalFeedList = (props: IFeedList) => {
-  const { feedList } = useSelector((state: IRootState) => state.daily);
+  const { feedList } = useSelector(
+    (state: IRootState) => state.persistedReducer.daily
+  );
   // const { ref, inView } = useInView();
 
   // useEffect(() => {
@@ -44,7 +46,9 @@ const HorizontalFeedList = (props: IFeedList) => {
             <HorizontalFeed
               article={item}
               // setShowModal={props.setShowModal}
-              type={EFeedType.RSS_ITEM}
+              type={
+                item.id.length > 24 ? EFeedType.CC_ITEM : EFeedType.RSS_ITEM
+              }
             >
               {}
             </HorizontalFeed>

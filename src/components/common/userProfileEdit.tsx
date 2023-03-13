@@ -21,7 +21,9 @@ interface IUserProfileEditProps {
 
 const UserProfileEdit = (props: IUserProfileEditProps) => {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const [imgUploadProgress, setImgUploadProgress] = useState(0);
   const [img, setImg] = useState<File | null>(null);
   const [form, setForm] = useState<IUser>({

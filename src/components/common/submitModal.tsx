@@ -13,7 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { useRouter } from "next/router";
-import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper/post";
+import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 import API from "@/axios/api";
 
@@ -39,7 +39,9 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const [showGeneratingLoading, setShowGeneratingLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState(0);
   const [dots, detDots] = useState("");
@@ -47,8 +49,10 @@ const SubmitModal = (props: ISubmitModalProps) => {
     provider,
     profile: ccProfile,
     cyberConnectClient,
-  } = useSelector((state: IRootState) => state.cyberConnect);
-  const { userProfile } = useSelector((state: IRootState) => state.gum);
+  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
+  const { userProfile } = useSelector(
+    (state: IRootState) => state.persistedReducer.gum
+  );
   const [form, setForm] = useState({
     title: "",
     description: "",

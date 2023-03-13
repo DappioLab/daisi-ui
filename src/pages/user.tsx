@@ -6,7 +6,9 @@ import { useSelector } from "react-redux";
 import { IUser } from "./profile/[address]";
 
 const UserList = () => {
-  const { userData } = useSelector((state: IRootState) => state.global);
+  const { userData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const [userList, setUserList] = useState<IUser[]>([]);
 
   const updateUserFollowData = async (target_id: string) => {

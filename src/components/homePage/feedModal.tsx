@@ -16,10 +16,10 @@ interface IFeedModal {
 
 const FeedModal = (props: IFeedModal) => {
   const { modalData, feedList } = useSelector(
-    (state: IRootState) => state.daily
+    (state: IRootState) => state.persistedReducer.daily
   );
   const { screenWidth, userData, isLogin } = useSelector(
-    (state: IRootState) => state.global
+    (state: IRootState) => state.persistedReducer.global
   );
   const dispatch = useDispatch();
   const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);

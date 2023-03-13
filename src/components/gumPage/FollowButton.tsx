@@ -10,7 +10,7 @@ interface followButtonProp {
 }
 const FollowButton = (prop: followButtonProp) => {
   const { userProfile, following, followers, reactions } = useSelector(
-    (state: IRootState) => state.gum
+    (state: IRootState) => state.persistedReducer.gum
   );
   const wallet = useWallet();
   const sdk = useGumSDK();

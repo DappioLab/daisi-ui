@@ -4,7 +4,8 @@ import Sidebar from "@/components/common/sidebar";
 import style from "@/styles/_app/index.module.sass";
 import "@/styles/global/index.sass";
 import { Provider } from "react-redux";
-import store, { IRootState } from "@/redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { IRootState, store, persistor } from "@/redux";
 import Nav from "@/components/common/nav";
 import { useRouter } from "next/router";
 import nProgress from "nprogress";
@@ -66,22 +67,24 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <div className={style.appContainer}>
       <Provider store={store}>
-        <HeadMetadata />
-        <ConnectionProvider endpoint={endpoint}>
-          <WalletProvider wallets={wallets} autoConnect>
-            <WalletModalProvider>
-              <Global>
-                <Nav />
-                <div className={style.content}>
-                  <Sidebar />
-                  <div className={style.page}>
-                    <Component {...pageProps} />
+        <PersistGate loading={null} persistor={persistor}>
+          <HeadMetadata />
+          <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={wallets} autoConnect>
+              <WalletModalProvider>
+                <Global>
+                  <Nav />
+                  <div className={style.content}>
+                    <Sidebar />
+                    <div className={style.page}>
+                      <Component {...pageProps} />
+                    </div>
                   </div>
-                </div>
-              </Global>
-            </WalletModalProvider>
-          </WalletProvider>
-        </ConnectionProvider>
+                </Global>
+              </WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        </PersistGate>
       </Provider>
     </div>
   );
