@@ -44,7 +44,7 @@ const PostList = ({ address }: { address: string }) => {
     lastPostsUpdateTime,
     postList,
   } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
-  const { screenWidth, userData } = useSelector(
+  const { screenWidth, userData, userProfilePageData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
 
@@ -58,14 +58,23 @@ const PostList = ({ address }: { address: string }) => {
 
   const fetchData = async () => {
     try {
-      if (!(address && myAddress)) {
-        return;
+      // if (!(address && myAddress)) {
+      //   return;
+      // }
+
+      let obj = {
+        address,
+      };
+
+      if (myAddress) {
+        obj["myAddress"] = myAddress;
       }
 
-      const res = await request(CYBER_CONNECT_ENDPOINT, POST_BY_ADDRESS_QUERY, {
-        address,
-        myAddress,
-      });
+      const res = await request(
+        CYBER_CONNECT_ENDPOINT,
+        POST_BY_ADDRESS_QUERY,
+        obj
+      );
 
       // @ts-ignore
       let posts: Post[] = res.address.wallet.profiles.edges
@@ -94,7 +103,7 @@ const PostList = ({ address }: { address: string }) => {
             ? new Array(post.likeCount).fill(userData.id)
             : new Array(post.likeCount).fill("1"),
           forwards: [],
-          sourceIcon: "",
+          sourceIcon: userProfilePageData.profilePicture,
           linkCreated: post.createdAt as unknown as string,
           source: {} as IRssSourceData,
         } as IParsedRssData;

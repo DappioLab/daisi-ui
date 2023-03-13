@@ -69,7 +69,10 @@ export const POST_BY_ID_QUERY = gql`
 `;
 
 export const POST_BY_ADDRESS_QUERY = gql`
-  query getPostByAddress($address: AddressEVM!, $myAddress: AddressEVM!) {
+  query getPostByAddress(
+    $address: AddressEVM!
+    $myAddress: AddressEVM! = "0x0000000000000000000000000000000000000000"
+  ) {
     address(address: $address) {
       wallet {
         profiles {

@@ -62,7 +62,7 @@ const Post = (post: postState) => {
         sourceTitle: "string",
         sourceDescription: "string",
         sourceLink: "string",
-        sourceIcon: "https://picsum.photos/200/300",
+        sourceIcon: "",
         // "https://s1.1zoom.me/big3/471/Painting_Art_Back_view_Photographer_575380_3840x2400.jpg",
       },
       id: "",

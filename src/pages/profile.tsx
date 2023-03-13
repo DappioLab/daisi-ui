@@ -27,16 +27,21 @@ import {
 } from "@/redux/globalSlice";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
-  const { userData, userProfilePageHandle, isLogin } = useSelector(
-    (state: IRootState) => state.persistedReducer.global
+  const { userData, userProfilePageHandle, isLogin, userProfilePageData } =
+    useSelector((state: IRootState) => state.persistedReducer.global);
+  const { userProfile } = useSelector(
+    (state: IRootState) => state.persistedReducer.gum
   );
+
   const [showUserList, setShowUserList] = useState(false);
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   // const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
   const [fetchedUser, setFetchedUser] = useState<IUser | null>(null);
-  const { provider, address: metamaskAddress } = useSelector(
-    (state: IRootState) => state.persistedReducer.cyberConnect
-  );
+  const {
+    provider,
+    address: metamaskAddress,
+    accessToken,
+  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
   const wallet = useWallet();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -90,14 +95,15 @@ const ProfilePage = ({ user }: { user: IUser }) => {
             <div className={style.userInfoBlock}>
               <div className={style.userNameRow}>
                 <div>{fetchedUser.username}</div>
-                {isLogin && (
-                  <div
-                    className={style.editBtn}
-                    onClick={() => setShowUserEditModal(true)}
-                  >
-                    <i className="fa fa-pencil" aria-hidden="true"></i>
-                  </div>
-                )}
+                {isLogin &&
+                  userProfilePageData.address === userData.address && (
+                    <div
+                      className={style.editBtn}
+                      onClick={() => setShowUserEditModal(true)}
+                    >
+                      <i className="fa fa-pencil" aria-hidden="true"></i>
+                    </div>
+                  )}
               </div>
               <div className={style.userId}>
                 <span>@address - {fetchedUser.address.substring(0, 6)}</span>
@@ -143,7 +149,9 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                     <span>Cyber Connect</span>
                   )}
                 </div>
-                {!isLogin ? (
+                {!isLogin ||
+                (isCheckingSolanaAddress && !userProfile) ||
+                (!isCheckingSolanaAddress && !accessToken) ? (
                   <div
                     className={style.followBtn}
                     onClick={() => showLoginPrompt()}
@@ -152,11 +160,12 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                   </div>
                 ) : (
                   <>
-                    {isCheckingSolanaAddress ? (
+                    {userProfile && isCheckingSolanaAddress && (
                       <GumFollowButton
                         toProfile={userProfilePageHandle.toBase58()}
                       />
-                    ) : (
+                    )}
+                    {provider && !isCheckingSolanaAddress && (
                       <CyberConnectFollowBtn address={checkingAddress} />
                     )}
                   </>

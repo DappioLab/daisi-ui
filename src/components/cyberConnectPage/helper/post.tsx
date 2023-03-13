@@ -114,6 +114,8 @@ export const fetchFollowingsPosts = async (
 ): Promise<Post[]> => {
   let posts: Post[] = [];
 
+  console.log(address, "####");
+
   try {
     const res = await request(
       CYBER_CONNECT_ENDPOINT,

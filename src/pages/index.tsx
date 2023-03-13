@@ -22,6 +22,8 @@ import GridFeedList from "@/components/homePage/gridFeedList";
 import API from "@/axios/api";
 import { updateLoadingStatus } from "@/redux/globalSlice";
 import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
+import { IUser } from "@/pages/profile/[address]";
+import { toChecksumAddress } from "ethereum-checksum-address";
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -66,13 +68,32 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(true));
       let allPosts: IParsedRssData[] = [];
       const res: IParsedRssData[] = await getAnonymousList();
-      console.log(res, "res");
-      let mappedCcFollowingsPosts: IParsedRssData[] = [];
+
+      let parsedFollowingsPosts: IParsedRssData[] = [];
+
+      let postUserData = {};
+
       if (address && userData.id && userData.id != "") {
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
-        mappedCcFollowingsPosts = ccFollowingsPosts.map((ccPost) => {
+        console.log(ccFollowingsPosts, "ccFollowingsPosts");
+
+        for (let ccPost of ccFollowingsPosts) {
+          let user: IUser | null = null;
+          const userAddress = toChecksumAddress(ccPost.authorAddress);
+          if (!postUserData[userAddress]) {
+            user = await (await API.getUserByAddress(userAddress)).data;
+
+            if (!user) {
+              continue;
+            }
+            postUserData[userAddress] = user;
+          } else {
+            user = postUserData[userAddress];
+          }
+          // mappedCcFollowingsPosts = ccFollowingsPosts.map((ccPost) => {
+
           const post: any = {
-            sourceIcon: "",
+            sourceIcon: user.profilePicture,
             sourceId: ccPost.contentID,
             itemTitle: ccPost.title,
             itemDescription: ccPost.body.split("\n\n")[0],
@@ -85,12 +106,16 @@ const HomePage = () => {
             linkCreated: new Date(ccPost.createdAt).getTime().toString(),
             id: ccPost.contentID,
           };
-          return post;
-        });
-        console.log(mappedCcFollowingsPosts, "ccFollowingPost");
+
+          parsedFollowingsPosts.push(post);
+          // return post;
+          // });
+        }
+
+        console.log(parsedFollowingsPosts, "ccFollowingPost");
       }
 
-      allPosts = [...res, ...mappedCcFollowingsPosts].sort((a, b) =>
+      allPosts = [...res, ...parsedFollowingsPosts].sort((a, b) =>
         Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
       );
 

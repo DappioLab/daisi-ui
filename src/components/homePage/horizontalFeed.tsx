@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IFeedProps } from "./gridFeed";
 import { fetchPostById, like } from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
+import { updateAuthModal } from "@/redux/globalSlice";
 // import { IFeedProps } from "./feed";
 
 export enum EFeedType {
@@ -41,6 +42,10 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           state.persistedReducer.cyberConnect.cyberConnectClient,
       };
     });
+
+  const { userProfilePageData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   const dispatch = useDispatch();
 
   const updateLike = async () => {
@@ -72,11 +77,11 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       case EFeedType.CC_ITEM:
         try {
           if (!address) {
-            alert("address is missing!");
+            dispatch(updateAuthModal(true));
             return;
           }
           if (!props.article.id) {
-            alert("postId is missing!");
+            dispatch(updateAuthModal(true));
             return;
           }
           const isLiked = props.article.likes.includes(userData.id);
@@ -86,7 +91,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           console.log(updatedPost, "updatedPost");
           if (updatedPost) {
             const post: any = {
-              sourceIcon: "",
+              sourceIcon: userProfilePageData.profilePicture,
               sourceId: updatedPost.contentID,
               itemTitle: updatedPost.title,
               itemDescription: updatedPost.body.split("\n\n")[0],
@@ -141,14 +146,14 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       onMouseLeave={() => setShowLinkButton(false)}
     >
       <div className={style.articleIcon}>
-        {props.type === EFeedType.CC_ITEM ? (
+        {/* {props.type === EFeedType.CC_ITEM ? (
           <img
             src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
             alt="icon"
           />
-        ) : (
-          <img src={props.article.sourceIcon} alt="icon" />
-        )}
+        ) : ( */}
+        <img src={props.article.sourceIcon} alt="icon" />
+        {/* )} */}
       </div>
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">
