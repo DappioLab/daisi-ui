@@ -48,7 +48,11 @@ export interface ProfileAccount {
 }
 export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
-const ExplorePosts = () => {
+interface IExplorePostsProps {
+  checkingAddress: string;
+}
+
+const ExplorePosts = (props: IExplorePostsProps) => {
   const wallet = useWallet();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -118,84 +122,73 @@ const ExplorePosts = () => {
   };
   const fetchPostData = async () => {
     try {
-      if (wallet.publicKey) {
-        // const allPostAccounts =
-        //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
-        const address = router.asPath.split("address=")[1];
+      // if (wallet.publicKey) {
+      // const allPostAccounts =
+      //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+      const address = props.checkingAddress;
 
-        const allPostAccounts = [];
-        // parts for reply
-        // let replyMap = new Map<string, ReplyInterface[]>();
-        const allPostLocal = await sdk.post.getPostAccountsByUser(
-          new PublicKey(address)
-          // wallet.publicKey
-        );
+      const allPostAccounts = [];
+      // parts for reply
+      // let replyMap = new Map<string, ReplyInterface[]>();
+      const allPostLocal = await sdk.post.getPostAccountsByUser(
+        new PublicKey(address)
+        // wallet.publicKey
+      );
 
-        let userPostAccounts = allPostLocal
-          ? await Promise.all(
-              allPostLocal.map(async (post) => {
-                try {
-                  if (post.account.metadataUri.includes("/ipfs/")) {
-                    let postData = await axios.get(
-                      mainGateway +
-                        post.account.metadataUri.substring(
-                          post.account.metadataUri.indexOf("/ipfs/") + 6
-                        )
-                    );
-                    return {
-                      postData,
-                      metadatauri: post.account.metadataUri,
-                      cl_pubkey: post.publicKey,
-                      profile: post.account.profile as PublicKey,
-                      replyTo: post.account.replyTo
-                        ? (post.account.replyTo as PublicKey)
-                        : null,
-                    };
-                  }
-                  let postData = await axios.get(post.account.metadataUri);
-                  return {
-                    postData,
-                    metadatauri: post.account.metadataUri,
-                    cl_pubkey: post.publicKey,
-                    profile: post?.account.profile as PublicKey,
-                    replyTo: post.account.replyTo
-                      ? (post.account.replyTo as PublicKey)
-                      : null,
-                  };
-                } catch (err) {
-                  console.log(err);
-                }
-              })
-            )
-          : [];
-
-        let allPostsMetadata = await Promise.all(
-          allPostAccounts
-            .filter((post) => {
-              return !userPostAccounts.find((userPost) => {
-                return post.cl_pubkey == userPost?.cl_pubkey.toString();
-              });
-            })
-            .map(async (post) => {
+      let userPostAccounts = allPostLocal
+        ? await Promise.all(
+            allPostLocal.map(async (post) => {
               try {
-                if (post.metadatauri.includes("/ipfs/")) {
+                if (post.account.metadataUri.includes("/ipfs/")) {
                   let postData = await axios.get(
                     mainGateway +
-                      post.metadatauri.substring(
-                        post.metadatauri.indexOf("/ipfs/") + 6
+                      post.account.metadataUri.substring(
+                        post.account.metadataUri.indexOf("/ipfs/") + 6
                       )
                   );
                   return {
                     postData,
-                    metadatauri: post.metadatauri,
-                    cl_pubkey: new PublicKey(post.cl_pubkey),
-                    profile: new PublicKey(post.profile),
-                    replyTo: post.replyto ? new PublicKey(post.replyto) : null,
+                    metadatauri: post.account.metadataUri,
+                    cl_pubkey: post.publicKey,
+                    profile: post.account.profile as PublicKey,
+                    replyTo: post.account.replyTo
+                      ? (post.account.replyTo as PublicKey)
+                      : null,
                   };
                 }
+                let postData = await axios.get(post.account.metadataUri);
+                return {
+                  postData,
+                  metadatauri: post.account.metadataUri,
+                  cl_pubkey: post.publicKey,
+                  profile: post?.account.profile as PublicKey,
+                  replyTo: post.account.replyTo
+                    ? (post.account.replyTo as PublicKey)
+                    : null,
+                };
+              } catch (err) {
+                console.log(err);
+              }
+            })
+          )
+        : [];
 
-                let postData = await axios.get(post.metadatauri);
-
+      let allPostsMetadata = await Promise.all(
+        allPostAccounts
+          .filter((post) => {
+            return !userPostAccounts.find((userPost) => {
+              return post.cl_pubkey == userPost?.cl_pubkey.toString();
+            });
+          })
+          .map(async (post) => {
+            try {
+              if (post.metadatauri.includes("/ipfs/")) {
+                let postData = await axios.get(
+                  mainGateway +
+                    post.metadatauri.substring(
+                      post.metadatauri.indexOf("/ipfs/") + 6
+                    )
+                );
                 return {
                   postData,
                   metadatauri: post.metadatauri,
@@ -203,63 +196,74 @@ const ExplorePosts = () => {
                   profile: new PublicKey(post.profile),
                   replyTo: post.replyto ? new PublicKey(post.replyto) : null,
                 };
-              } catch (err) {}
-            })
-        );
+              }
 
-        const data = [...userPostAccounts, ...allPostsMetadata]
-          .filter((data) => {
-            let postContext = data?.postData.data as postInterface;
-            return (
-              // @ts-ignore
-              postContext.daisiContent &&
-              // @ts-ignore
-              postContext.daisiContent.itemImage.includes("https") &&
-              data?.postData.status == 200 &&
-              postContext.content.blocks?.find((block) => {
-                return (
-                  block.type == "header" &&
-                  block.data.text == CREATED_IN_DAISI_TAG
-                );
-              })
-            );
+              let postData = await axios.get(post.metadatauri);
+
+              return {
+                postData,
+                metadatauri: post.metadatauri,
+                cl_pubkey: new PublicKey(post.cl_pubkey),
+                profile: new PublicKey(post.profile),
+                replyTo: post.replyto ? new PublicKey(post.replyto) : null,
+              };
+            } catch (err) {}
           })
-          .map((data) => {
-            let postContext = data?.postData.data as postInterface;
-            return {
-              ...postContext,
-              metadatauri: data?.metadatauri,
-              cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
-              profile: data ? data.profile : PublicKey.default,
-            };
-          });
+      );
 
-        if (data.length > 0) {
-          dispatch(updateUserProfilePageHandle(data[0].profile));
-        }
-        // @ts-ignore
-        setExplore(data);
-        fetchReaction();
-        // parts for reply
-        // [...userPostAccounts, ...allPostsMetadata]
-        //   .filter((data) => {
-        //     return data.replyTo && data.postData.data.content.content;
-        //   })
-        //   .forEach((data) => {
-        //     replyMap.set(data.replyTo.toString(), [
-        //       {
-        //         from: data.profile,
-        //         text: data.postData.data.content.content,
-        //         cl_pubkey: data.cl_pubkey,
-        //       },
-        //       ...(replyMap.has(data.replyTo.toString())
-        //         ? replyMap.get(data.replyTo.toString())
-        //         : []),
-        //     ]);
-        //   });
+      const data = [...userPostAccounts, ...allPostsMetadata]
+        .filter((data) => {
+          let postContext = data?.postData.data as postInterface;
+          return (
+            // @ts-ignore
+            postContext.daisiContent &&
+            // @ts-ignore
+            postContext.daisiContent.itemImage.includes("https") &&
+            data?.postData.status == 200 &&
+            postContext.content.blocks?.find((block) => {
+              return (
+                block.type == "header" &&
+                block.data.text == CREATED_IN_DAISI_TAG
+              );
+            })
+          );
+        })
+        .map((data) => {
+          let postContext = data?.postData.data as postInterface;
+          return {
+            ...postContext,
+            metadatauri: data?.metadatauri,
+            cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
+            profile: data ? data.profile : PublicKey.default,
+          };
+        });
 
-        // setReply(replyMap);
+      if (data.length > 0) {
+        dispatch(updateUserProfilePageHandle(data[0].profile));
       }
+      // @ts-ignore
+      setExplore(data);
+      fetchReaction();
+      // parts for reply
+      // [...userPostAccounts, ...allPostsMetadata]
+      //   .filter((data) => {
+      //     return data.replyTo && data.postData.data.content.content;
+      //   })
+      //   .forEach((data) => {
+      //     replyMap.set(data.replyTo.toString(), [
+      //       {
+      //         from: data.profile,
+      //         text: data.postData.data.content.content,
+      //         cl_pubkey: data.cl_pubkey,
+      //       },
+      //       ...(replyMap.has(data.replyTo.toString())
+      //         ? replyMap.get(data.replyTo.toString())
+      //         : []),
+      //     ]);
+      //   });
+
+      // setReply(replyMap);
+      // }
     } catch (err) {
       console.log("error", err);
     }
@@ -552,22 +556,6 @@ const ExplorePosts = () => {
 
   return (
     <div>
-      {/* <div>
-        <button onClick={handleAirdrop}>Airdrop 1 Sol</button>
-      </div> */}
-      {/* {userInfo} */}
-      {/* <div>{createProfileButton}</div> */}
-      {/* <div>
-        <button
-          onClick={() => {
-            setProfileEdit(profileEdit ? false : true);
-          }}
-        >
-          Edit Profile
-        </button>
-        {profileEdit && editProfile}
-      </div> */}
-      {/* <div>{form}</div> */}
       {explore?.map((post: postInterface) => {
         return (
           <div key={post.cl_pubkey.toString()} className="">

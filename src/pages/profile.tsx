@@ -38,24 +38,15 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [showUserEditModal, setShowUserEditModal] = useState(false);
-
-  // const updateUserFollowData = async () => {
-  //   if (!userData?.id) {
-  //     return;
-  //   }
-
-  //   await API.updateUserFollowData({ id: userData.id, targetId: user.id });
-  //   router.push(router.asPath);
-  // };
+  const [checkingAddress, setCheckingAddress] = useState("");
+  const [isCheckingSolanaAddress, setIsCheckingSolanaAddress] = useState(false);
 
   const getUser = async () => {
-    const address = router.asPath.split("address=")[1];
-
-    if (!address) {
+    if (!checkingAddress) {
       return;
     }
 
-    const user = await API.getUserByAddress(address);
+    const user = await API.getUserByAddress(checkingAddress);
 
     setFetchedUser(user.data);
     dispatch(updateUserProfilePageData(user.data));
@@ -63,9 +54,23 @@ const ProfilePage = ({ user }: { user: IUser }) => {
 
   useEffect(() => {
     (async () => {
-      await getUser();
+      const address = router.asPath.split("address=")[1];
+      setCheckingAddress(address);
+
+      try {
+        const value = PublicKey.isOnCurve(address);
+        if (value) {
+          setIsCheckingSolanaAddress(true);
+        }
+      } catch (err) {
+        setIsCheckingSolanaAddress(false);
+      }
     })();
   }, [router.asPath]);
+
+  useEffect(() => {
+    getUser();
+  }, [checkingAddress]);
 
   return (
     <div className={style.profileId}>
@@ -119,7 +124,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 {!fetchedUser.description ? "-" : fetchedUser.description}
               </div>
               <br />
-              {/* <div className={style.followDataBlock}>
+              <div className={style.followDataBlock}>
                 <div
                   onClick={() => {
                     setUserListType(EUserListType.FOLLOWINGS);
@@ -136,40 +141,32 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 >
                   {fetchedUser.followers.length} Followers
                 </div>
-              </div> */}
+              </div>
               <div className={style.userJoinedDate}>
                 Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
+              </div>
+              <div>
+                Support by{" "}
+                {isCheckingSolanaAddress ? (
+                  <span>Gum</span>
+                ) : (
+                  <span>Cyber Connect</span>
+                )}
               </div>
               {/* Solana follow btn */}
               {wallet.connected &&
               userProfilePageHandle &&
               userData &&
-              userData.address !== router.asPath.split("address=")[1] &&
-              !router.asPath
-                .split("address=")[1]
-                .substring(0, 2)
-                .includes("0x") ? (
+              userData.address !== checkingAddress &&
+              isCheckingSolanaAddress ? (
                 <FollowButton toProfile={userProfilePageHandle.toBase58()} />
               ) : null}
               {/* Metamask follow btn */}
-              {provider &&
-              metamaskAddress != router.asPath.split("address=")[1] ? (
+              {provider && metamaskAddress != checkingAddress ? (
                 <div>
-                  <FollowBtn address={router.asPath.split("address=")[1]} />
+                  <FollowBtn address={checkingAddress} />
                 </div>
               ) : null}
-              {/* {userData?.id && userData.id !== fetchedUser.id ? (
-                <div className={style.followBtnBlock}>
-                  <div
-                    className={style.followBtn}
-                    onClick={() => updateUserFollowData()}
-                  >
-                    {fetchedUser.followers.includes(userData.id)
-                      ? "Following"
-                      : "Follow"}
-                  </div>
-                </div>
-              ) : null} */}
               {showUserList && (
                 <UserListModal
                   setShowUserList={setShowUserList}
@@ -179,13 +176,10 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               )}
             </div>
           </div>
-          {wallet.connected && (
-            <div>
-              <ExplorePosts />
-            </div>
-          )}
-          {provider && (
-            <PostList address={router.asPath.split("address=")[1]} />
+          {isCheckingSolanaAddress ? (
+            <ExplorePosts checkingAddress={checkingAddress} />
+          ) : (
+            <PostList address={checkingAddress} />
           )}
         </>
       ) : null}
