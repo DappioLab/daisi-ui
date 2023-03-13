@@ -1,4 +1,5 @@
 import { gql } from "graphql-request";
+import { AddressZero } from "@ethersproject/constants";
 
 // CYBER_CONNECT_ENDPOINT = "https://api.cyberconnect.dev/testnet/";
 const ESSENCE_FRAGMENT = `
@@ -71,7 +72,7 @@ export const POST_BY_ID_QUERY = gql`
 export const POST_BY_ADDRESS_QUERY = gql`
   query getPostByAddress(
     $address: AddressEVM!
-    $myAddress: AddressEVM! = "0x0000000000000000000000000000000000000000"
+    $myAddress: AddressEVM! = AddressZero
   ) {
     address(address: $address) {
       wallet {
