@@ -5,7 +5,12 @@ import style from "@/styles/homePage/gridFeed.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
 import API from "@/axios/api";
-import { like, fetchPostById } from "../cyberConnectPage/helper";
+import {
+  like,
+  fetchPostById,
+  connectWallet,
+  createCyberConnectClient,
+} from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
 
 export enum EFeedType {
@@ -29,18 +34,17 @@ export interface IFeedProps {
 const GridFeed = (props: IGridFeedProps) => {
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
-  const { userData, isLogin, feedList, address, postList, cyberConnectClient } =
-    useSelector((state: IRootState) => {
+  const { userData, isLogin, feedList, address, postList } = useSelector(
+    (state: IRootState) => {
       return {
         userData: state.persistedReducer.global.userData,
         isLogin: state.persistedReducer.global.isLogin,
         feedList: state.persistedReducer.daily.feedList,
         address: state.persistedReducer.cyberConnect.address,
         postList: state.persistedReducer.cyberConnect.postList,
-        cyberConnectClient:
-          state.persistedReducer.cyberConnect.cyberConnectClient,
       };
-    });
+    }
+  );
 
   const updateLike = async () => {
     if (!userData?.id || !isLogin) {
@@ -79,6 +83,8 @@ const GridFeed = (props: IGridFeedProps) => {
             return;
           }
           const isLiked = props.article.likes.includes(userData.id);
+          const provider = await connectWallet();
+          const cyberConnectClient = createCyberConnectClient(provider);
           await like(props.article.id, cyberConnectClient, !isLiked);
 
           const updatedPost = await fetchPostById(props.article.id, address);

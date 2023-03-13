@@ -11,7 +11,12 @@ import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IFeedProps } from "./gridFeed";
-import { fetchPostById, like } from "../cyberConnectPage/helper";
+import {
+  connectWallet,
+  createCyberConnectClient,
+  fetchPostById,
+  like,
+} from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { updateAuthModal } from "@/redux/globalSlice";
 // import { IFeedProps } from "./feed";
@@ -30,18 +35,17 @@ interface IHorizontalFeedProps extends IFeedProps {
 
 const HorizontalFeed = (props: IHorizontalFeedProps) => {
   const [showLinkButton, setShowLinkButton] = useState(false);
-  const { userData, isLogin, feedList, address, postList, cyberConnectClient } =
-    useSelector((state: IRootState) => {
+  const { userData, isLogin, feedList, address, postList } = useSelector(
+    (state: IRootState) => {
       return {
         userData: state.persistedReducer.global.userData,
         isLogin: state.persistedReducer.global.isLogin,
         feedList: state.persistedReducer.daily.feedList,
         address: state.persistedReducer.cyberConnect.address,
         postList: state.persistedReducer.cyberConnect.postList,
-        cyberConnectClient:
-          state.persistedReducer.cyberConnect.cyberConnectClient,
       };
-    });
+    }
+  );
 
   const { userProfilePageData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
@@ -85,6 +89,9 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
             return;
           }
           const isLiked = props.article.likes.includes(userData.id);
+
+          const provider = await connectWallet();
+          const cyberConnectClient = createCyberConnectClient(provider);
           await like(props.article.id, cyberConnectClient, !isLiked);
 
           const updatedPost = await fetchPostById(props.article.id, address);

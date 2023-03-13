@@ -39,7 +39,6 @@ export interface Post extends Content {
 
 const PostList = ({ address }: { address: string }) => {
   const {
-    cyberConnectClient,
     address: myAddress,
     lastPostsUpdateTime,
     postList,

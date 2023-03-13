@@ -1,7 +1,12 @@
 import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
-import { follow, handleCreator } from "./helper";
+import {
+  connectWallet,
+  createCyberConnectClient,
+  follow,
+  handleCreator,
+} from "./helper";
 import { useEffect, useState } from "react";
 import request from "graphql-request";
 import { CYBER_CONNECT_ENDPOINT } from "./constants";
@@ -9,20 +14,22 @@ import { GET_FOLLOW_STATUS_QUERY } from "@/graphql/cyberConnect/query";
 import style from "@/styles/cyberConnectPage/followButton.module.sass";
 
 const FollowBtn = ({ address }: { address: string }) => {
-  const { address: myAddress, cyberConnectClient } = useSelector(
+  const { address: myAddress, accessToken } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [isFollowing, setFollowStatus] = useState(false);
   const daisiHandle = handleCreator(address);
 
   const handleOnClick = async (isFollow: boolean) => {
+    const provider = await connectWallet();
+    const cyberConnectClient = createCyberConnectClient(provider);
     await follow(daisiHandle, cyberConnectClient, isFollow);
     await fetchData();
   };
 
   const fetchData = async () => {
     try {
-      if (!(cyberConnectClient && address && myAddress)) {
+      if (!(accessToken && address && myAddress)) {
         return;
       }
       const res = await request(

@@ -13,7 +13,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { useRouter } from "next/router";
-import { createPost as createCyberConnectPost } from "@/components/cyberConnectPage/helper";
+import {
+  connectWallet,
+  createCyberConnectClient,
+  createPost as createCyberConnectPost,
+} from "@/components/cyberConnectPage/helper";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 import API from "@/axios/api";
 
@@ -45,11 +49,9 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const [showGeneratingLoading, setShowGeneratingLoading] = useState(false);
   const [loadingDots, setLoadingDots] = useState(0);
   const [dots, detDots] = useState("");
-  const {
-    provider,
-    profile: ccProfile,
-    cyberConnectClient,
-  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
+  const { profile: ccProfile, accessToken } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const { userProfile } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
@@ -149,7 +151,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
 
   const createCCPost = async () => {
     try {
-      if (!(ccProfile && cyberConnectClient)) {
+      if (!(ccProfile && accessToken)) {
         alert("Please connect wallet before summit post.");
         return;
       }
@@ -162,6 +164,9 @@ const SubmitModal = (props: ISubmitModalProps) => {
         itemImage: "https://picsum.photos/200/300",
         created: new Date(),
       };
+
+      const provider = await connectWallet();
+      const cyberConnectClient = createCyberConnectClient(provider);
 
       const result = await createCyberConnectPost(
         data.itemTitle,
@@ -186,11 +191,11 @@ const SubmitModal = (props: ISubmitModalProps) => {
 
   const createPost = () => {
     let type: EPostType | null = null;
-    if (provider && !solanaWallet.connected) {
+    if (accessToken && !solanaWallet.connected) {
       type = EPostType.CYBER_CONNECT;
     }
 
-    if (!provider && solanaWallet.connected) {
+    if (!accessToken && solanaWallet.connected) {
       type = EPostType.GUM;
     }
 
@@ -335,7 +340,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
         </div>
 
         <div className={style.bottomBlock}>
-          {!solanaWallet.connected && !provider ? (
+          {!solanaWallet.connected && !accessToken ? (
             <div className={style.operateBtn} style={{ pointerEvents: "none" }}>
               Please connect wallet first to send the link.
             </div>

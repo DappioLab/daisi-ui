@@ -2,7 +2,12 @@ import { IRootState } from "@/redux";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { like, fetchPosts } from "./helper";
+import {
+  like,
+  fetchPosts,
+  connectWallet,
+  createCyberConnectClient,
+} from "./helper";
 
 export interface Content {
   contentID: string;
@@ -30,11 +35,9 @@ export interface Post extends Content {
 }
 
 const PostList = ({ address }: { address: string }) => {
-  const {
-    cyberConnectClient,
-    address: myAddress,
-    lastPostsUpdateTime,
-  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
+  const { address: myAddress, lastPostsUpdateTime } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const [postList, setPostList] = useState<Post[]>([]);
 
   const fetchData = async () => {
@@ -51,6 +54,8 @@ const PostList = ({ address }: { address: string }) => {
   };
 
   const handleOnClick = async (contentID: string, isLike: boolean) => {
+    const provider = await connectWallet();
+    const cyberConnectClient = createCyberConnectClient(provider);
     await like(contentID, cyberConnectClient, isLike);
     await fetchData();
   };

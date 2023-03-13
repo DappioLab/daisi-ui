@@ -20,9 +20,6 @@ const Global = (props: IGlobalProps) => {
   const dispatch = useDispatch();
   const { showAuthModal, isLoading, screenWidth, showSubmitModal } =
     useSelector((state: IRootState) => state.persistedReducer.global);
-  const { provider } = useSelector(
-    (state: IRootState) => state.persistedReducer.cyberConnect
-  );
 
   const resize = () => {
     let width = window.innerWidth;
@@ -40,13 +37,6 @@ const Global = (props: IGlobalProps) => {
   useEffect(() => {
     resize();
   }, []);
-
-  // useEffect(() => {
-  //   if (!provider && !solanaWallet.connected) {
-  //     dispatch(updateLoginStatus(false));
-  //     dispatch(updateUserData(null));
-  //   }
-  // }, [provider, solanaWallet]);
 
   return (
     <div className={style.global}>
