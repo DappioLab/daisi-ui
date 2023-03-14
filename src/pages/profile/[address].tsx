@@ -38,6 +38,7 @@ const Feed = ({ user }: { user: IUser }) => {
     if (!userData?.id) {
       return;
     }
+    console.log("where am I?");
 
     await API.updateUserFollowData({ id: userData.id, targetId: user.id });
     router.push(router.asPath);
@@ -142,6 +143,7 @@ const Feed = ({ user }: { user: IUser }) => {
                   userListType={userListType}
                   setUserListType={setUserListType}
                   checkingUser={fetchedUser}
+                  getUser={getUser}
                 />
               )}
             </div>

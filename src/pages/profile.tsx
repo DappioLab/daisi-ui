@@ -259,10 +259,11 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               ) : null} */}
               {showUserList && (
                 <UserListModal
-                  setShowUserList={setShowUserList}
-                  userListType={userListType}
-                  setUserListType={setUserListType}
                   checkingUser={fetchedUser}
+                  userListType={userListType}
+                  setShowUserList={setShowUserList}
+                  setUserListType={setUserListType}
+                  getUser={getUser}
                 />
               )}
             </div>

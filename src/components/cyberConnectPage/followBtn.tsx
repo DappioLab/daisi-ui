@@ -2,6 +2,7 @@ import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
 import {
+  checkNetwork,
   connectWallet,
   createCyberConnectClient,
   follow,
@@ -23,12 +24,12 @@ const FollowBtn = (props: IFollowBtnProps) => {
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [isFollowing, setFollowStatus] = useState(false);
-  const daisiHandle = handleCreator(props.checkingAddress);
 
   const handleOnClick = async (isFollow: boolean) => {
     const provider = await connectWallet();
+    await checkNetwork(provider);
     const cyberConnectClient = createCyberConnectClient(provider);
-    await follow(daisiHandle, cyberConnectClient, isFollow);
+    await follow(props.checkingAddress, cyberConnectClient, isFollow);
     await fetchData();
     await props.getUser();
   };
@@ -41,6 +42,8 @@ const FollowBtn = (props: IFollowBtnProps) => {
         );
         return;
       }
+
+      const daisiHandle = handleCreator(props.checkingAddress);
       const res = await request(
         CYBER_CONNECT_ENDPOINT,
         GET_FOLLOW_STATUS_QUERY,

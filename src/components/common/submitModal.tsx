@@ -14,6 +14,7 @@ import { Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { useRouter } from "next/router";
 import {
+  checkNetwork,
   connectWallet,
   createCyberConnectClient,
   createPost as createCyberConnectPost,
@@ -166,6 +167,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
       };
 
       const provider = await connectWallet();
+      await checkNetwork(provider);
       const cyberConnectClient = createCyberConnectClient(provider);
 
       const result = await createCyberConnectPost(

@@ -2,7 +2,11 @@ import { useSelector } from "react-redux";
 import { Content } from "@cyberlab/cyberconnect-v2/src/types";
 import { IRootState } from "@/redux";
 import { useState } from "react";
-import { connectWallet, createCyberConnectClient } from "../helper";
+import {
+  checkNetwork,
+  connectWallet,
+  createCyberConnectClient,
+} from "../helper";
 
 const OffChainPost = () => {
   const { profile } = useSelector(
@@ -22,6 +26,7 @@ const OffChainPost = () => {
       }
 
       const provider = await connectWallet();
+      await checkNetwork(provider);
       const cyberConnectClient = createCyberConnectClient(provider);
 
       const res = await cyberConnectClient.createPost({

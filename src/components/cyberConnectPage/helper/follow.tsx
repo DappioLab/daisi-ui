@@ -9,15 +9,16 @@ import {
 import { handleCreator, isDaisiHandle } from "./profile";
 
 export const follow = async (
-  handle: string,
+  address: string,
   cyberConnect: CyberConnect,
   isFollow: boolean // true => follow the handle; false => un-follow the handle
 ) => {
+  const daisiHandle = handleCreator(address);
   try {
     if (isFollow) {
-      await cyberConnect.follow(handle);
+      await cyberConnect.follow(daisiHandle);
     } else {
-      await cyberConnect.unfollow(handle);
+      await cyberConnect.unfollow(daisiHandle);
     }
     // no return data
   } catch (err) {
