@@ -24,6 +24,7 @@ import { PublicKey } from "@solana/web3.js";
 import {
   updateAuthModal,
   updateUserProfilePageData,
+  updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
 import {
   fetchFollowers,
@@ -71,6 +72,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
       let profile = (
         await sdk.profile.getProfilesByUser(gumAddress)
       )[0].cl_pubkey.toString();
+      dispatch(updateUserProfilePageHandle(new PublicKey(profile)));
       if (followersMap.size && followersMap.size && profile) {
         let followProfiles = followersMap.get(profile);
         if (followProfiles)
