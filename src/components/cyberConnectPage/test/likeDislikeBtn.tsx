@@ -1,4 +1,8 @@
-import { connectWallet, createCyberConnectClient } from "../helper";
+import {
+  checkNetwork,
+  connectWallet,
+  createCyberConnectClient,
+} from "../helper";
 
 const likeDislikeBtn = ({
   contendId,
@@ -10,6 +14,7 @@ const likeDislikeBtn = ({
   const handleOnClick = async () => {
     try {
       const provider = await connectWallet();
+      await checkNetwork(provider);
       const cyberConnectClient = createCyberConnectClient(provider);
 
       if (isLike) {

@@ -122,7 +122,6 @@ export const fetchFollowingsPosts = async (
         address,
       }
     );
-    console.log("get following post res:", res);
     // @ts-ignore
     if (res.address.followingCount == 0) return posts;
 
@@ -132,7 +131,6 @@ export const fetchFollowingsPosts = async (
       .reduce((prev: any, curr: any) => prev.concat(curr), []) // flatten
       .filter((n: any) => n.posts.edges.length > 0); // get profiles who have at least 1 post
 
-    console.log("profiles:", profiles);
     posts = parsePostsByProfile(profiles);
 
     // filter Daisi created Handle only

@@ -13,6 +13,7 @@ import { ReactNode, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IFeedProps } from "./gridFeed";
 import {
+  checkNetwork,
   connectWallet,
   createCyberConnectClient,
   fetchPostById,
@@ -95,6 +96,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           const isLiked = props.article.likes.includes(userData.id);
 
           const provider = await connectWallet();
+          await checkNetwork(provider);
           const cyberConnectClient = createCyberConnectClient(provider);
           await like(props.article.id, cyberConnectClient, !isLiked);
 

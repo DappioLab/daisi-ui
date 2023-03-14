@@ -280,3 +280,62 @@ export const GET_FOLLOWINGS_POST_BY_ADDRESS_QUERY = gql`
     }
   }
 `;
+
+export const GET_FOLLOWER_QUERY = gql`
+  query getFollowers($handle: String!, $address: AddressEVM!) {
+    profileByHandle(handle: $handle) {
+      profileID
+      handle
+      avatar
+      metadata
+      followerCount
+      followers {
+        edges {
+          node {
+            address {
+              wallet {
+                profiles {
+                  edges {
+                    node {
+                      profileID
+                      handle
+                      avatar
+                      metadata
+                      isFollowedByMe(me: $address)
+                      owner {
+                        address
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_FOLLOWINGS_QUERY = gql`
+  query getFollowings($address: AddressEVM!, $myAddress: AddressEVM!) {
+    address(address: $address) {
+      followings {
+        edges {
+          node {
+            profile {
+              profileID
+              handle
+              avatar
+              metadata
+              isFollowedByMe(me: $myAddress)
+              owner {
+                address
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

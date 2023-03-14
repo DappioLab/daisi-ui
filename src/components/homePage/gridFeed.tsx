@@ -15,6 +15,7 @@ import {
   fetchPostById,
   connectWallet,
   createCyberConnectClient,
+  checkNetwork,
 } from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { EFeedType } from "./horizontalFeed";
@@ -95,6 +96,7 @@ const GridFeed = (props: IGridFeedProps) => {
           const isLiked = props.article.likes.includes(userData.id);
 
           const provider = await connectWallet();
+          await checkNetwork(provider);
           const cyberConnectClient = createCyberConnectClient(provider);
           await like(props.article.id, cyberConnectClient, !isLiked);
 

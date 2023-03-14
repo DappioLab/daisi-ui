@@ -25,10 +25,19 @@ import {
   updateAuthModal,
   updateUserProfilePageData,
 } from "@/redux/globalSlice";
+import {
+  fetchFollowers,
+  fetchFollowings,
+} from "@/components/cyberConnectPage/helper";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
-  const { userData, userProfilePageHandle, isLogin, userProfilePageData } =
-    useSelector((state: IRootState) => state.persistedReducer.global);
+  const {
+    userData,
+    userProfilePageHandle,
+    isLogin,
+    userProfilePageData,
+    currentAddress,
+  } = useSelector((state: IRootState) => state.persistedReducer.global);
   const { userProfile } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
@@ -54,7 +63,19 @@ const ProfilePage = ({ user }: { user: IUser }) => {
 
     const user = await API.getUserByAddress(checkingAddress);
 
-    setFetchedUser(user.data);
+    let followings: string[] = [];
+    let followers: string[] = [];
+    if (isCheckingSolanaAddress) {
+    } else {
+      followers = (await fetchFollowers(checkingAddress, currentAddress)).map(
+        (p) => p.owner.address
+      );
+      followings = (await fetchFollowings(checkingAddress, currentAddress)).map(
+        (p) => p.owner.address
+      );
+    }
+
+    setFetchedUser({ ...user.data, followings, followers });
     dispatch(updateUserProfilePageData(user.data));
   };
 
@@ -192,7 +213,10 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       </>
                     )}
                     {accessToken && !isCheckingSolanaAddress && (
-                      <CyberConnectFollowBtn address={checkingAddress} />
+                      <CyberConnectFollowBtn
+                        checkingAddress={checkingAddress}
+                        getUser={getUser}
+                      />
                     )}
                   </>
                 )}
@@ -228,16 +252,18 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 <FollowButton toProfile={userProfilePageHandle.toBase58()} />
               ) : null} */}
               {/* Metamask follow btn */}
-              {/* {provider && metamaskAddress != checkingAddress ? (
+              {/* {accessToken && metamaskAddress != checkingAddress ? (
                 <div>
                   <FollowBtn address={checkingAddress} />
                 </div>
               ) : null} */}
               {showUserList && (
                 <UserListModal
-                  setShowUserList={setShowUserList}
+                  checkingUser={fetchedUser}
                   userListType={userListType}
+                  setShowUserList={setShowUserList}
                   setUserListType={setUserListType}
+                  getUser={getUser}
                 />
               )}
             </div>

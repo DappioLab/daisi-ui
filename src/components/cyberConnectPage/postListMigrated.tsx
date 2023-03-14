@@ -125,7 +125,6 @@ const PostList = ({ address }: { address: string }) => {
       });
 
       dispatch(setPostList(formattedPosts));
-      console.log(formattedPosts);
     } catch (err) {
       console.error(err);
     }
@@ -165,7 +164,7 @@ const PostList = ({ address }: { address: string }) => {
           // } as IParsedRssData;
 
           return (
-            <div>
+            <div key={post.id}>
               {screenWidth > 900 ? (
                 <div
                   onClick={() => {
@@ -179,9 +178,18 @@ const PostList = ({ address }: { address: string }) => {
                   </HorizontalFeed>
                 </div>
               ) : (
-                <GridFeed article={post} type={EFeedType.CC_ITEM}>
-                  {}
-                </GridFeed>
+                <div
+                  key={post.id}
+                  onClick={() => {
+                    dispatch(updateFeedModalType(EFeedModalType.PROFILE_CC));
+                    dispatch(updateFeedModalIndex(index));
+                    dispatch(updateShowFeedModal(true));
+                  }}
+                >
+                  <GridFeed article={post} type={EFeedType.CC_ITEM}>
+                    {}
+                  </GridFeed>
+                </div>
               )}
             </div>
           );

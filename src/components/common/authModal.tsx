@@ -147,8 +147,6 @@ const AuthModal = () => {
           description: "This is a user profile description.",
         });
       } else {
-        console.log("?");
-
         const data: IUser = {
           username: user.username,
           description: user.description,

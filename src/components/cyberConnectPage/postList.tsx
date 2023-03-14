@@ -7,6 +7,7 @@ import {
   fetchPosts,
   connectWallet,
   createCyberConnectClient,
+  checkNetwork,
 } from "./helper";
 
 export interface Content {
@@ -55,6 +56,7 @@ const PostList = ({ address }: { address: string }) => {
 
   const handleOnClick = async (contentID: string, isLike: boolean) => {
     const provider = await connectWallet();
+    await checkNetwork(provider);
     const cyberConnectClient = createCyberConnectClient(provider);
     await like(contentID, cyberConnectClient, isLike);
     await fetchData();

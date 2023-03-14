@@ -42,8 +42,8 @@ const Profile = () => {
           {myProfiles.map((p: any) => (
             <div>
               <h2>{p.handle.slice(0, -3)}</h2>
-              <FollowBtn address={address} />
-              <FollowBtn address={address} />
+              <FollowBtn checkingAddress={address} getUser={async () => {}} />
+              <FollowBtn checkingAddress={address} getUser={async () => {}} />
             </div>
           ))}
           <hr />

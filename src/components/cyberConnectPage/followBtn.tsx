@@ -2,6 +2,7 @@ import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
 import {
+  checkNetwork,
   connectWallet,
   createCyberConnectClient,
   follow,
@@ -13,25 +14,36 @@ import { CYBER_CONNECT_ENDPOINT } from "./constants";
 import { GET_FOLLOW_STATUS_QUERY } from "@/graphql/cyberConnect/query";
 import style from "@/styles/cyberConnectPage/followButton.module.sass";
 
-const FollowBtn = ({ address }: { address: string }) => {
+interface IFollowBtnProps {
+  checkingAddress: string;
+  getUser: () => Promise<void>;
+}
+
+const FollowBtn = (props: IFollowBtnProps) => {
   const { address: myAddress, accessToken } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [isFollowing, setFollowStatus] = useState(false);
-  const daisiHandle = handleCreator(address);
 
   const handleOnClick = async (isFollow: boolean) => {
     const provider = await connectWallet();
+    await checkNetwork(provider);
     const cyberConnectClient = createCyberConnectClient(provider);
-    await follow(daisiHandle, cyberConnectClient, isFollow);
+    await follow(props.checkingAddress, cyberConnectClient, isFollow);
     await fetchData();
+    await props.getUser();
   };
 
   const fetchData = async () => {
     try {
-      if (!(accessToken && address && myAddress)) {
+      if (!(accessToken && props.checkingAddress && myAddress)) {
+        alert(
+          `ERROR: some params are missing.\naccessToken: ${accessToken}\naddress: ${props.checkingAddress}\nmyAddress: ${myAddress}`
+        );
         return;
       }
+
+      const daisiHandle = handleCreator(props.checkingAddress);
       const res = await request(
         CYBER_CONNECT_ENDPOINT,
         GET_FOLLOW_STATUS_QUERY,
@@ -55,9 +67,9 @@ const FollowBtn = ({ address }: { address: string }) => {
 
   useEffect(() => {
     fetchData();
-  }, [address, myAddress]);
+  }, [props.checkingAddress, myAddress]);
 
-  return address != myAddress ? (
+  return props.checkingAddress != myAddress ? (
     <button
       className={style.followButton}
       onClick={() => handleOnClick(!isFollowing)}

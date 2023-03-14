@@ -5,12 +5,23 @@ import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/styles/common/userListModal.module.sass";
-import { updateLoadingStatus } from "@/redux/globalSlice";
+import { updateLoadingStatus, updateUserData } from "@/redux/globalSlice";
+import { isAddress as isEvmAddress } from "ethers/lib/utils";
+import {
+  checkNetwork,
+  connectWallet,
+  createCyberConnectClient,
+  fetchFollowers,
+  fetchFollowings,
+  follow,
+} from "../cyberConnectPage/helper";
 
 export interface IUserListModalProps {
+  checkingUser: IUser;
   userListType: EUserListType | null;
   setUserListType: Dispatch<SetStateAction<EUserListType | null>>;
   setShowUserList: Dispatch<SetStateAction<boolean>>;
+  getUser: () => Promise<void>;
 }
 export enum EUserListType {
   "FOLLOWINGS" = "followings",
@@ -24,22 +35,39 @@ const UserListModal = (props: IUserListModalProps) => {
   const [userList, setUserList] = useState<IUser[]>([]);
   const dispatch = useDispatch();
 
-  const updateUserFollowData = async (targetId: string) => {
+  const updateUserFollowData = async (address: string) => {
     if (!userData) {
       alert("please login first");
       return;
     }
 
-    await API.updateUserFollowData({
-      id: userData.id,
-      targetId: targetId,
-    });
-
-    if (props.userListType === EUserListType.FOLLOWERS) {
-      getFollowerUserList();
+    if (!isEvmAddress(address)) {
+      // Gum
     } else {
-      getFollowingUserList();
+      // CyberConnect
+      const provider = await connectWallet();
+      await checkNetwork(provider);
+      const cyberConnectClient = createCyberConnectClient(provider);
+      const isFollowing = userData.followings.includes(address);
+
+      await follow(address, cyberConnectClient, !isFollowing);
+
+      // Update UserData
+      const followers = (await fetchFollowers(userData.address)).map(
+        (p) => p.owner.address
+      );
+      const followings = (await fetchFollowings(userData.address)).map(
+        (p) => p.owner.address
+      );
+      dispatch(updateUserData({ ...userData, followers, followings }));
+      await props.getUser();
     }
+
+    // if (props.userListType === EUserListType.FOLLOWERS) {
+    //   await getFollowerUserList();
+    // } else {
+    //   await getFollowingUserList();
+    // }
   };
 
   const getFollowingUserList = async () => {
@@ -50,8 +78,28 @@ const UserListModal = (props: IUserListModalProps) => {
 
     props.setUserListType(EUserListType.FOLLOWINGS);
     dispatch(updateLoadingStatus(true));
-    const res = await API.getFollowingListByAddress(userData?.address);
-    setUserList(res.data);
+
+    const users = (await API.getUsers()).data as IUser[];
+    let followingUserList: IUser[] = [];
+    if (!isEvmAddress(props.checkingUser.address)) {
+      // Gum
+    } else {
+      // CyberConnect
+      for (const address of props.checkingUser.followings) {
+        const user = users.find((user) => user.address == address);
+        if (user) {
+          const followers = (
+            await fetchFollowers(address, userData.address)
+          ).map((p) => p.owner.address);
+          const followings = (
+            await fetchFollowings(address, userData.address)
+          ).map((p) => p.owner.address);
+          followingUserList.push({ ...user, followers, followings });
+        }
+      }
+    }
+
+    setUserList(followingUserList);
     dispatch(updateLoadingStatus(false));
   };
 
@@ -63,18 +111,40 @@ const UserListModal = (props: IUserListModalProps) => {
 
     props.setUserListType(EUserListType.FOLLOWERS);
     dispatch(updateLoadingStatus(true));
-    const res = await API.getFollowerListByAddress(userData?.address);
-    setUserList(res.data);
+
+    const users = (await API.getUsers()).data as IUser[];
+    let followerUserList: IUser[] = [];
+    if (!isEvmAddress(props.checkingUser.address)) {
+      // Gum
+    } else {
+      // CyberConnect
+      for (const address of props.checkingUser.followers) {
+        const user = users.find((user) => user.address == address);
+        if (user) {
+          const followers = (
+            await fetchFollowers(address, userData.address)
+          ).map((p) => p.owner.address);
+          const followings = (
+            await fetchFollowings(address, userData.address)
+          ).map((p) => p.owner.address);
+          followerUserList.push({ ...user, followers, followings });
+        }
+      }
+    }
+
+    setUserList(followerUserList);
     dispatch(updateLoadingStatus(false));
   };
 
   useEffect(() => {
-    if (props.userListType === EUserListType.FOLLOWERS) {
-      getFollowerUserList();
-    } else {
-      getFollowingUserList();
-    }
-  }, [props.userListType]);
+    (async () => {
+      if (props.userListType === EUserListType.FOLLOWERS) {
+        await getFollowerUserList();
+      } else {
+        await getFollowingUserList();
+      }
+    })();
+  }, [props.userListType, props.checkingUser]);
 
   return (
     <div className={style.userListModal}>
@@ -108,12 +178,12 @@ const UserListModal = (props: IUserListModalProps) => {
             return (
               <div className={style.listItem} key={user.address}>
                 <h3>{user.address}</h3>
-                {userData?.id && userData.id !== user.id ? (
+                {userData?.address && userData.address !== user.address ? (
                   <div
                     className={style.followBtn}
-                    onClick={() => updateUserFollowData(user.id)}
+                    onClick={() => updateUserFollowData(user.address)}
                   >
-                    {user.followers.includes(userData.id)
+                    {user.followers.includes(userData.address)
                       ? "Following"
                       : "Follow"}
                   </div>
