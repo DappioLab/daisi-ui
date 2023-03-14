@@ -33,6 +33,7 @@ import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
 import { IUser } from "@/pages/profile/[address]";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
+import useGumState, { filterPostList } from "@/components/gumPage/gumState";
 
 const HomePage = () => {
   // const [showModal, setShowModal] = useState(false);
@@ -48,9 +49,15 @@ const HomePage = () => {
       };
     }
   );
+  const {
+    userProfile,
+    allPosts: gumPosts,
+    following,
+    allUser,
+  } = useSelector((state: IRootState) => state.persistedReducer.gum);
   // const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
-
+  useGumState();
   // const getCurrentModalIndex = (index: number) => {
   //   setPo
   // };
@@ -97,7 +104,43 @@ const HomePage = () => {
       let parsedFollowingsPosts: IFeedList[] = [];
 
       let postUserData = {};
+      let gumFeeds: IFeedList[] = [];
+      if (userProfile && gumPosts.length > 0 && allUser.size > 0) {
+        let gumFollowing = following.map((conn) => {
+          return conn.follow;
+        });
+        let posts = filterPostList(gumPosts, [
+          ...gumFollowing,
+          userProfile.profile,
+        ]);
+        for (let post of posts) {
+          let wallet = allUser.get(post.profile.toString()).wallet;
+          let user: IUser = (await API.getUserByAddress(wallet.toString()))
+            .data;
 
+          if (user) {
+            let daisiContent = post.daisiContent;
+            const feed: IFeedList = {
+              isUserPost: true,
+              type: EFeedType.GUM_ITEM,
+              sourceId: "",
+              userAddress: address,
+              id: "",
+              itemTitle: daisiContent.itemTitle,
+              itemDescription: daisiContent.itemDescription,
+              itemLink: daisiContent.itemLink,
+              itemImage: daisiContent.itemImage,
+              created: moment(daisiContent.created).valueOf().toString(),
+              likes: [],
+              forwards: [],
+              sourceIcon: user.profilePicture ? user.profilePicture : "",
+              linkCreated: moment(daisiContent.created).valueOf().toString(),
+              cl_pubkey: post.cl_pubkey,
+            };
+            gumFeeds.push(feed);
+          }
+        }
+      }
       if (address && userData.id && userData.id != "") {
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
 
@@ -138,7 +181,7 @@ const HomePage = () => {
         }
       }
 
-      allPosts = [...res, ...parsedFollowingsPosts].sort((a, b) =>
+      allPosts = [...res, ...parsedFollowingsPosts, ...gumFeeds].sort((a, b) =>
         Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
       );
 
@@ -170,7 +213,7 @@ const HomePage = () => {
 
   useEffect(() => {
     updateList();
-  }, [address, userData]);
+  }, [address, userData, userProfile, following]);
 
   // useEffect(() => {
   //   const content = feedList.find((feed, index) => {
