@@ -6,12 +6,14 @@ import {
   ReactionInterface,
   ProfileAccount,
 } from "@/components/gumPage/Explore";
+import { IFeedList } from "./dailySlice";
 export interface IGumInitialState {
   userProfile: ProfileAccount | null;
   userAccounts: PublicKey[];
   following: ConnectionInterface[];
   followers: PublicKey[];
   reactions: Map<string, ReactionInterface[]>;
+  postList: IFeedList[] | null;
 }
 
 const initialState: IGumInitialState = {
@@ -20,6 +22,7 @@ const initialState: IGumInitialState = {
   following: [],
   followers: [],
   reactions: new Map(),
+  postList: null,
 };
 
 export const gumSlice = createSlice({
@@ -55,6 +58,9 @@ export const gumSlice = createSlice({
     ) => {
       state.reactions = action.payload;
     },
+    updatePostList: (state, action) => {
+      state.postList = action.payload;
+    },
   },
 });
 
@@ -64,6 +70,7 @@ export const {
   updateFollowing,
   updateFollowers,
   updateReactions,
+  updatePostList,
 } = gumSlice.actions;
 
 export default gumSlice.reducer;

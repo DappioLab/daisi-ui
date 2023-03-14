@@ -1,6 +1,7 @@
 // import { IFeed } from "@/components/homePage/feed";
 import { EFeedType } from "@/components/homePage/horizontalFeed";
 import { createSlice } from "@reduxjs/toolkit";
+import { PublicKey } from "@solana/web3.js";
 
 export interface IRssSourceData {
   id: string;
@@ -40,6 +41,8 @@ export interface IFeedList extends IRssSourceItem {
   sourceId: string;
   isUserPost: boolean;
   userAddress: string;
+  isLastItem?: boolean;
+  cl_pubkey?: PublicKey; // gum need this for update
 }
 
 const initialState: IDailyInitialState = {

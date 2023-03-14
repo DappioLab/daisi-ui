@@ -16,10 +16,14 @@ import {
   updateFollowers,
   updateFollowing,
   updateReactions,
+  updatePostList,
 } from "../../redux/gumSlice";
 import { IRootState } from "@/redux";
 import { useRouter } from "next/router";
 import { updateUserProfilePageHandle } from "@/redux/globalSlice";
+import { IFeedList } from "@/redux/dailySlice";
+import { EFeedType } from "../homePage/horizontalFeed";
+import moment from "moment";
 interface PostAccount {
   cl_pubkey: string;
   metadatauri: string;
@@ -66,6 +70,9 @@ const ExplorePosts = (props: IExplorePostsProps) => {
   const [description, setDescription] = useState("");
   const [profileImg, setProfileImg] = useState<File | null>(null);
   const [profileEdit, setProfileEdit] = useState(false);
+  const { userProfilePageData } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
   // parts for reply
   // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
   //   new Map()
@@ -241,8 +248,64 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       if (data.length > 0) {
         dispatch(updateUserProfilePageHandle(data[0].profile));
       }
-      // @ts-ignore
+
+      // // @ts-ignore
       setExplore(data);
+
+      let parsedPostList = [];
+
+      for (let item of data) {
+        // @ts-ignore
+        const daisiContent = item.daisiContent;
+
+        console.log(item, "##");
+
+        const obj: IFeedList = {
+          isUserPost: true,
+          type: EFeedType.GUM_ITEM,
+          sourceId: "",
+          userAddress: address,
+          id: "",
+          itemTitle: daisiContent.itemTitle,
+          itemDescription: daisiContent.itemDescription,
+          itemLink: daisiContent.itemLink,
+          itemImage: daisiContent.itemImage,
+          created: moment(daisiContent.created).valueOf().toString(),
+          likes: [],
+          forwards: [],
+          sourceIcon: userProfilePageData.profilePicture,
+          linkCreated: moment(daisiContent.created).valueOf().toString(),
+          // @ts-ignore
+          cl_pubkey: item.cl_pubkey,
+        };
+        parsedPostList.push(obj);
+      }
+
+      // // @ts-ignore
+      // setExplore(data);
+
+      // const parsedPostList = data.map((post) => {
+      //   // @ts-ignore
+      //   const daisiContent = post.post.daisiContent;
+      //   const obj: IFeedList = {
+      //     isUserPost: true,
+      //     type: EFeedType.GUM_ITEM,
+      //     sourceId: "",
+      //     userAddress: address,
+      //     id: "",
+      //     itemTitle: daisiContent.itemTitle,
+      //     itemDescription: daisiContent.itemDescription,
+      //     itemLink: daisiContent.itemLink,
+      //     itemImage: daisiContent.itemImage,
+      //     created: daisiContent.created,
+      //     likes: [],
+      //     forwards: [],
+      //     sourceIcon: userProfilePageData.profilePicture,
+      //     linkCreated: daisiContent.linkCreated,
+      //   };
+      //   return obj;
+      // });
+      dispatch(updatePostList(parsedPostList));
       fetchReaction();
       // parts for reply
       // [...userPostAccounts, ...allPostsMetadata]
@@ -556,14 +619,15 @@ const ExplorePosts = (props: IExplorePostsProps) => {
 
   return (
     <div>
-      {explore?.map((post: postInterface) => {
+      {explore?.map((post: postInterface, index: number) => {
         return (
-          <div key={post.cl_pubkey.toString()} className="">
+          <div key={post.cl_pubkey.toString()}>
             <Post
               post={post}
               sdk={sdk}
               setData={setExplore}
               fetchPostData={fetchPostData}
+              postIndex={index}
             />
           </div>
         );

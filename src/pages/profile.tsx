@@ -158,10 +158,21 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                   </div>
                 ) : (
                   <>
-                    {userProfile && isCheckingSolanaAddress && (
-                      <GumFollowButton
-                        toProfile={userProfilePageHandle.toBase58()}
-                      />
+                    {!userProfilePageHandle ? (
+                      <div
+                        className={style.followBtn}
+                        onClick={() => showLoginPrompt()}
+                      >
+                        Follow{" "}
+                      </div>
+                    ) : (
+                      <>
+                        {userProfile && isCheckingSolanaAddress && (
+                          <GumFollowButton
+                            toProfile={userProfilePageHandle.toBase58()}
+                          />
+                        )}
+                      </>
                     )}
                     {accessToken && !isCheckingSolanaAddress && (
                       <CyberConnectFollowBtn address={checkingAddress} />

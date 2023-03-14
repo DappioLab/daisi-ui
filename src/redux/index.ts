@@ -1,34 +1,31 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import dailySlice, { IDailyInitialState } from "./dailySlice";
-import globalSlice, { IGlobalInitialState } from "./globalSlice";
-import cyberConnectSlice, {
-  ICyberConnectInitialState,
-} from "./cyberConnectSlice";
+import dailySlice from "./dailySlice";
+import globalSlice from "./globalSlice";
+import cyberConnectSlice from "./cyberConnectSlice";
 import gumSlice, { IGumInitialState } from "./gumSlice";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
+import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { getPersistConfig } from "redux-deep-persist";
 
-const persistConfig = {
-  key: "root",
-  version: 1,
-  storage,
-  blacklist: ["gum"],
-};
+// const persistConfig = {
+//   key: "root",
+//   version: 1,
+//   storage,
+//   blacklist: ["gum", "global.showFeedModal"],
+// };
 
 const rootReducer = combineReducers({
   global: globalSlice,
   daily: dailySlice,
   cyberConnect: cyberConnectSlice,
   gum: gumSlice,
+});
+
+const persistConfig = getPersistConfig({
+  key: "root",
+  storage,
+  blacklist: ["gum", "global.showFeedModal"],
+  rootReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

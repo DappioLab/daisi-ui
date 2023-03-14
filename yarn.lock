@@ -5299,12 +5299,10 @@ redent@^4.0.0:
     indent-string "^5.0.0"
     strip-indent "^4.0.0"
 
-redux-persist-transform-filter@^0.0.22:
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/redux-persist-transform-filter/-/redux-persist-transform-filter-0.0.22.tgz#181480570a43b5061389991fc43ca52c6d114318"
-  integrity sha512-XtGN7UQ8w7b3qaxQfdYY1UmuYULqIIemD47IWxIyM8AOF48I6C74m9XxA7gQoC2nIi+rz4URi9Mye4fIbHhZPQ==
-  dependencies:
-    lodash "^4.17.21"
+redux-deep-persist@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/redux-deep-persist/-/redux-deep-persist-1.0.7.tgz#fbbd00dcee6111b42624c9d8590b7e124b94476e"
+  integrity sha512-PsD5UXbfCFvDruIPIHKAyaZ3wPhEWBMU8Rtcr/c1pXJT8aYoKbgKUS8JBkaWc3EB1ONlnLTdDDmnC/TOD39hqA==
 
 redux-persist@^6.0.0:
   version "6.0.0"

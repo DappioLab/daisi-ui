@@ -1,7 +1,7 @@
 import style from "@/styles/homePage/feedModal.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { IFeedList, updateFeedList } from "@/redux/dailySlice";
 import API from "@/axios/api";
@@ -20,6 +20,11 @@ import {
   createCyberConnectClient,
 } from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { SDK } from "./../../gpl-core/src";
+import { useGumSDK } from "@/hooks/useGumSDK";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
 
 // interface IFeedModal {
 // setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -33,11 +38,28 @@ const FeedModal = () => {
   // const { feedList } = useSelector(
   //   (state: IRootState) => state.persistedReducer.daily
   // );
+  const connection = useMemo(
+    () =>
+      new Connection(
+        "https://lingering-holy-wind.solana-devnet.discover.quiknode.pro/169c1aa008961ed4ec13c040acd5037e8ead18b1/",
+        "confirmed"
+      ),
+    []
+  );
+
+  const { userProfile, following, followers, userAccounts } = useSelector(
+    (state: IRootState) => state.persistedReducer.gum
+  );
+  let sdk = useGumSDK(
+    connection,
+    { preflightCommitment: "confirmed" },
+    "devnet",
+    GRAPHQL_ENDPOINTS.devnet
+  );
   const { screenWidth, feedModalIndex, feedModalData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
   const dispatch = useDispatch();
-  const [disabledPrevBtn, setDisabledPrevBtn] = useState(false);
   const { userData, isLogin, feedList, address, postList } = useSelector(
     (state: IRootState) => {
       return {
@@ -49,6 +71,7 @@ const FeedModal = () => {
       };
     }
   );
+  const wallet = useWallet();
 
   const updateLike = async () => {
     if (!userData?.id || !isLogin) {
@@ -136,8 +159,8 @@ const FeedModal = () => {
         break;
 
       case EFeedType.GUM_ITEM:
+        handleLike();
         break;
-
       case EFeedType.USER_POST:
         // Deprecate
         await API.updateUserPostLike(feedModalData.id, userData.id);
@@ -148,6 +171,57 @@ const FeedModal = () => {
         throw "ERROR: unknown feed type";
     }
     dispatch(updateLoadingStatus(false));
+  };
+
+  const handleLike = async () => {
+    try {
+      dispatch(updateLoadingStatus(true));
+
+      let result = await createGumLike(feedModalData.cl_pubkey.toString());
+
+      if (result.success) {
+        console.log("like update success");
+
+        setTimeout(() => {
+          dispatch(updateLoadingStatus(false));
+          window.location.reload();
+        }, 5000);
+
+        //   let likeOnDb = await API.updateRssItemLike(
+        //     post.post.cl_pubkey.toString(),
+        //     userData.id
+        //   );
+        //   console.log(likeOnDb);
+      }
+
+      // setTimeout(() => {
+      //   console.log("in");
+
+      // }, 10000);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const createGumLike = async (post: string) => {
+    try {
+      if (!wallet.publicKey) {
+        throw "wallet Not Connected";
+      }
+      let likeTx = (
+        await sdk?.reaction.create(
+          userProfile.profile,
+          new PublicKey(post),
+          "Like",
+          userProfile.user,
+          wallet.publicKey
+        )
+      )?.instructionMethodBuilder.rpc();
+    } catch (err) {
+      console.log(err);
+      return { success: false };
+    }
+    return { success: true };
   };
 
   // const updateLike = async () => {
@@ -175,6 +249,10 @@ const FeedModal = () => {
   // };
 
   const getAdjoiningPost = (value: number) => {
+    const nextNumber = feedModalIndex + value;
+    if (nextNumber < 0) {
+      return;
+    }
     dispatch(updateFeedModalIndex(feedModalIndex + value));
   };
 
@@ -194,12 +272,15 @@ const FeedModal = () => {
               <div className={style.quickBtnBlock}>
                 <div
                   onClick={() => getAdjoiningPost(-1)}
-                  className={`${disabledPrevBtn && style.disabledBtn}`}
+                  className={`${feedModalIndex === 0 && style.disabledBtn}`}
                 >
                   <i className="fa fa-arrow-left"></i>
                 </div>
                 <br />
-                <div onClick={() => getAdjoiningPost(1)}>
+                <div
+                  onClick={() => getAdjoiningPost(1)}
+                  className={`${feedModalData.isLastItem && style.disabledBtn}`}
+                >
                   <i className="fa fa-arrow-right"></i>
                 </div>
               </div>
@@ -217,10 +298,12 @@ const FeedModal = () => {
             </div>
 
             <h1>{feedModalData.itemTitle}</h1>
-            <div className={style.summaryBlock}>
-              <div className={style.title}>TL;DR</div>
-              <div>{feedModalData.itemDescription}</div>
-            </div>
+            {feedModalData.itemDescription !== "" && (
+              <div className={style.summaryBlock}>
+                <div className={style.title}>TL;DR</div>
+                <div>{feedModalData.itemDescription}</div>
+              </div>
+            )}
             {/* <div className={style.tagBlock}>
           {feedModalData.post.tags.map((tag: string) => {
             return (

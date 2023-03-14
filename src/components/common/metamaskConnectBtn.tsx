@@ -36,6 +36,8 @@ const MetamaskConnectBtn = () => {
   const connect = async () => {
     try {
       await solanaWallet.disconnect();
+      dispatch(updateUserProfilePageHandle(null));
+
       const provider = await connectWallet();
       await checkNetwork(provider);
 
@@ -44,8 +46,6 @@ const MetamaskConnectBtn = () => {
       const accessToken = await signIn(address, provider);
       dispatch(setAccessToken(accessToken));
       dispatch(setAddress(address));
-
-      dispatch(updateUserProfilePageHandle(null));
       dispatch(updateLoginStatus(true));
 
       const daisiHandle = handleCreator(address);

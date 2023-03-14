@@ -17,10 +17,18 @@ import { ReactionType } from "../../gpl-core/src/reaction";
 import { ipfsClient, mainGateway } from "./storage";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
-import { IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
+import { IFeedList, IParsedRssData, IRssSourceItem } from "@/redux/dailySlice";
 import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import GridFeed from "../homePage/gridFeed";
-import { updateAuthModal } from "@/redux/globalSlice";
+import {
+  EFeedModalType,
+  updateAuthModal,
+  updateFeedModalIndex,
+  updateFeedModalType,
+  updateLoadingStatus,
+  updateShowFeedModal,
+} from "@/redux/globalSlice";
+import moment from "moment";
 export interface postInterface {
   metadatauri: string;
   cl_pubkey: PublicKey;
@@ -37,6 +45,7 @@ interface postState {
   sdk: SDK;
   setData: Dispatch<SetStateAction<postInterface[]>>;
   fetchPostData: () => Promise<void>;
+  postIndex: number;
 }
 
 const Post = (post: postState) => {
@@ -51,30 +60,28 @@ const Post = (post: postState) => {
     (state: IRootState) => state.persistedReducer.global
   );
   const sdk = post.sdk;
-  const [daisiContent, setDaisiContent] = useState<IParsedRssData | null>();
+  const [daisiContent, setDaisiContent] = useState<IFeedList | null>();
 
   useEffect(() => {
     // @ts-ignore
     const daisiContent = post.post.daisiContent;
+    // console.log(daisiContent, "daisiContent");
+
     setDaisiContent({
-      source: {
-        id: "string",
-        sourceTitle: "string",
-        sourceDescription: "string",
-        sourceLink: "string",
-        sourceIcon: "",
-        // "https://s1.1zoom.me/big3/471/Painting_Art_Back_view_Photographer_575380_3840x2400.jpg",
-      },
+      isUserPost: true,
+      type: EFeedType.GUM_ITEM,
+      sourceId: "",
+      userAddress: "",
       id: "",
       itemTitle: daisiContent.itemTitle,
       itemDescription: daisiContent.itemDescription,
       itemLink: daisiContent.itemLink,
       itemImage: daisiContent.itemImage,
-      created: daisiContent.created,
+      created: moment(daisiContent.created).valueOf().toString(),
       likes: [],
       forwards: [],
       sourceIcon: userProfilePageData.profilePicture,
-      linkCreated: daisiContent.linkCreated,
+      linkCreated: moment(daisiContent.created).valueOf().toString(),
     });
   }, [post]);
 
@@ -182,17 +189,18 @@ const Post = (post: postState) => {
       console.log(err);
     }
   };
-  const handleLike = async (e: any) => {
+  const handleLike = async () => {
     try {
       console.log("like trigger");
+      dispatch(updateLoadingStatus(true));
 
       let result = await createGunLike(post.post.cl_pubkey.toString());
-      console.log("k");
 
       if (result.success) {
-        console.log("done");
+        console.log("like update success");
 
         setTimeout(() => {
+          dispatch(updateLoadingStatus(false));
           post.fetchPostData();
         }, 3000);
 
@@ -333,7 +341,13 @@ const Post = (post: postState) => {
   let reactionButton = null;
   if (userProfile) {
     let likeButton = (
-      <div className={style.btn} onClick={handleLike}>
+      <div
+        className={style.btn}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleLike();
+        }}
+      >
         <div style={{ fontSize: "1.6rem" }}>
           <i className="fa fa-heart-o"></i>
         </div>
@@ -354,7 +368,8 @@ const Post = (post: postState) => {
       likeButton = (
         <div
           className={style.btn}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             deleteLike(like.cl_pubkey);
           }}
         >
@@ -368,7 +383,8 @@ const Post = (post: postState) => {
       disLikeButton = (
         <div
           className={style.btn}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             deleteDislike(disLike.cl_pubkey);
           }}
         >
@@ -411,35 +427,59 @@ const Post = (post: postState) => {
       {daisiContent && (
         <>
           {screenWidth > 900 ? (
-            <HorizontalFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
-              <div className={style.btnBlock}>
-                {reactionButton ? (
-                  reactionButton
-                ) : (
-                  <div
-                    style={{ fontSize: "1.6rem" }}
-                    onClick={() => showLoginPrompt()}
-                  >
-                    <i className="fa fa-heart-o"></i>
-                  </div>
-                )}
-              </div>
-            </HorizontalFeed>
+            <div
+              onClick={() => {
+                dispatch(updateFeedModalType(EFeedModalType.PROFILE_GUM));
+                dispatch(updateFeedModalIndex(post.postIndex));
+                dispatch(updateShowFeedModal(true));
+              }}
+            >
+              {" "}
+              <HorizontalFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
+                <div className={style.btnBlock}>
+                  {reactionButton ? (
+                    reactionButton
+                  ) : (
+                    <div
+                      style={{ fontSize: "1.6rem" }}
+                      onClick={(e) => {
+                        showLoginPrompt();
+                        e.stopPropagation();
+                      }}
+                    >
+                      <i className="fa fa-heart-o"></i>
+                    </div>
+                  )}
+                </div>
+              </HorizontalFeed>
+            </div>
           ) : (
-            <GridFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
-              <div className={style.btnBlock}>
-                {reactionButton ? (
-                  reactionButton
-                ) : (
-                  <div
-                    style={{ fontSize: "1.6rem" }}
-                    onClick={() => showLoginPrompt()}
-                  >
-                    <i className="fa fa-heart-o"></i>
-                  </div>
-                )}
-              </div>
-            </GridFeed>
+            <div
+              onClick={() => {
+                dispatch(updateFeedModalType(EFeedModalType.PROFILE_GUM));
+                dispatch(updateFeedModalIndex(post.postIndex));
+                dispatch(updateShowFeedModal(true));
+              }}
+            >
+              {" "}
+              <GridFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
+                <div className={style.btnBlock}>
+                  {reactionButton ? (
+                    reactionButton
+                  ) : (
+                    <div
+                      style={{ fontSize: "1.6rem" }}
+                      onClick={(e) => {
+                        showLoginPrompt();
+                        e.stopPropagation();
+                      }}
+                    >
+                      <i className="fa fa-heart-o"></i>
+                    </div>
+                  )}
+                </div>
+              </GridFeed>
+            </div>
           )}
         </>
       )}

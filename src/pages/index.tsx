@@ -32,6 +32,7 @@ import {
 import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
 import { IUser } from "@/pages/profile/[address]";
 import { toChecksumAddress } from "ethereum-checksum-address";
+import moment from "moment";
 
 const HomePage = () => {
   // const [showModal, setShowModal] = useState(false);
@@ -113,7 +114,6 @@ const HomePage = () => {
           } else {
             user = postUserData[userAddress];
           }
-          // mappedCcFollowingsPosts = ccFollowingsPosts.map((ccPost) => {
 
           const post: IFeedList = {
             isUserPost: true,
@@ -128,18 +128,14 @@ const HomePage = () => {
               ? new Array(ccPost.likeCount).fill(userData.id)
               : new Array(ccPost.likeCount).fill("123"),
             forwards: [],
-            linkCreated: new Date(ccPost.createdAt).getTime().toString(),
+            linkCreated: moment(ccPost.createdAt).valueOf().toString(),
             id: ccPost.contentID,
             type: EFeedType.CC_ITEM,
             created: new Date(ccPost.createdAt).getTime().toString(),
           };
 
           parsedFollowingsPosts.push(post);
-          // return post;
-          // });
         }
-
-        console.log(parsedFollowingsPosts, "ccFollowingPost");
       }
 
       allPosts = [...res, ...parsedFollowingsPosts].sort((a, b) =>
@@ -171,6 +167,7 @@ const HomePage = () => {
     dispatch(updateShowFeedModal(false));
     dispatch(updateFeedModalData(null));
   }, []);
+
   useEffect(() => {
     updateList();
   }, [address, userData]);

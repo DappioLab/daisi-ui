@@ -5,7 +5,12 @@ import { Dispatch, SetStateAction, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { IRootState } from "@/redux";
 import GridFeed from "./gridFeed";
-import { updateFeedModalIndex, updateShowFeedModal } from "@/redux/globalSlice";
+import {
+  EFeedModalType,
+  updateFeedModalIndex,
+  updateFeedModalType,
+  updateShowFeedModal,
+} from "@/redux/globalSlice";
 
 interface IFeedList {
   // setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -43,10 +48,9 @@ const GridFeedList = (props: IFeedList) => {
             key={`${index}`}
             ref={ref}
             onClick={() => {
+              dispatch(updateFeedModalType(EFeedModalType.DISCOVER_ITEM));
               dispatch(updateFeedModalIndex(index));
               dispatch(updateShowFeedModal(true));
-              // props.setPostModalIndex(index);
-              // props.setShowModal(true);
             }}
           >
             <GridFeed

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IParsedRssData } from "./dailySlice";
+import { IFeedList, IParsedRssData } from "./dailySlice";
 
 export interface IProfile {
   profileID: number;
@@ -13,7 +13,7 @@ export interface ICyberConnectInitialState {
   accessToken: string | null;
   profile: IProfile | null;
   lastPostsUpdateTime: Date;
-  postList: IParsedRssData[];
+  postList: IFeedList[];
 }
 
 const initialState: ICyberConnectInitialState = {

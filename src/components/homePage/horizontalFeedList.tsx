@@ -4,7 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { IRootState } from "@/redux";
-import { updateFeedModalIndex, updateShowFeedModal } from "@/redux/globalSlice";
+import {
+  EFeedModalType,
+  updateFeedModalIndex,
+  updateFeedModalType,
+  updateShowFeedModal,
+} from "@/redux/globalSlice";
 
 interface IFeedList {
   // setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -41,10 +46,9 @@ const HorizontalFeedList = (props: IFeedList) => {
           <div
             key={`${index}`}
             onClick={() => {
+              dispatch(updateFeedModalType(EFeedModalType.DISCOVER_ITEM));
               dispatch(updateFeedModalIndex(index));
               dispatch(updateShowFeedModal(true));
-              // props.setPostModalIndex(index);
-              // props.setShowModal(true);
             }}
           >
             <HorizontalFeed

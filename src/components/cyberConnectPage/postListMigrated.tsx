@@ -1,16 +1,24 @@
 import { POST_BY_ADDRESS_QUERY } from "@/graphql/cyberConnect/query";
 import { IRootState } from "@/redux";
-import { IParsedRssData, IRssSourceData } from "@/redux/dailySlice";
-import { updateUserProfilePageHandle } from "@/redux/globalSlice";
+import { IFeedList, IParsedRssData, IRssSourceData } from "@/redux/dailySlice";
+import {
+  EFeedModalType,
+  updateFeedModalIndex,
+  updateFeedModalType,
+  updateShowFeedModal,
+  updateUserProfilePageHandle,
+} from "@/redux/globalSlice";
 import request from "graphql-request";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import GridFeed, { EFeedType } from "../homePage/gridFeed";
-import HorizontalFeed from "../homePage/horizontalFeed";
+import GridFeed from "../homePage/gridFeed";
+import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import { like } from "./helper/like";
 import { handleCreator } from "./helper/profile";
 import { CYBER_CONNECT_ENDPOINT } from "./constants";
 import { setPostList } from "@/redux/cyberConnectSlice";
+import { toChecksumAddress } from "ethereum-checksum-address";
+import moment from "moment";
 
 export interface Content {
   contentID: string;
@@ -88,10 +96,8 @@ const PostList = ({ address }: { address: string }) => {
         (post: Post) => post.authorHandle.split(".")[0] == daisiHandle
       );
 
-      console.log(posts, "posts");
-
       const formattedPosts = posts.map((post) => {
-        const formattedPost = {
+        const formattedPost: IFeedList = {
           id: post.contentID,
           itemTitle: post.title,
           itemDescription: post.body.split("\n\n")[0],
@@ -103,9 +109,12 @@ const PostList = ({ address }: { address: string }) => {
             : new Array(post.likeCount).fill("1"),
           forwards: [],
           sourceIcon: userProfilePageData.profilePicture,
-          linkCreated: post.createdAt as unknown as string,
-          source: {} as IRssSourceData,
-        } as IParsedRssData;
+          linkCreated: moment(post.createdAt).valueOf().toString(),
+          isUserPost: true,
+          userAddress: toChecksumAddress(post.authorAddress),
+          type: EFeedType.CC_ITEM,
+          sourceId: "",
+        };
 
         return formattedPost;
       });
@@ -133,7 +142,7 @@ const PostList = ({ address }: { address: string }) => {
   return (
     <div>
       {postList &&
-        postList.map((post) => {
+        postList.map((post, index) => {
           // const article = {
           //   id: post.contentID,
           //   itemTitle: post.title,
@@ -153,48 +162,20 @@ const PostList = ({ address }: { address: string }) => {
           return (
             <div>
               {screenWidth > 900 ? (
-                <HorizontalFeed article={post} type={EFeedType.CC_ITEM}>
-                  {/* {post.likedStatus.liked ? (
-                  <div
-                    style={{ fontSize: "1.6rem" }}
-                    onClick={() => {
-                      handleOnClick(post.contentID, false);
-                    }}
-                  >
-                    <i className="fa fa-heart" aria-hidden="true"></i>
-                  </div>
-                ) : (
-                  <div
-                    style={{ fontSize: "1.6rem" }}
-                    onClick={() => {
-                      handleOnClick(post.contentID, true);
-                    }}
-                  >
-                    <i className="fa fa-heart-o"></i>
-                  </div>
-                )} */}
-                </HorizontalFeed>
+                <div
+                  onClick={() => {
+                    dispatch(updateFeedModalType(EFeedModalType.PROFILE_CC));
+                    dispatch(updateFeedModalIndex(index));
+                    dispatch(updateShowFeedModal(true));
+                  }}
+                >
+                  <HorizontalFeed article={post} type={EFeedType.CC_ITEM}>
+                    {}
+                  </HorizontalFeed>
+                </div>
               ) : (
                 <GridFeed article={post} type={EFeedType.CC_ITEM}>
-                  {/* {post.likedStatus.liked ? (
-                  <div
-                    style={{ fontSize: "1.6rem" }}
-                    onClick={() => {
-                      handleOnClick(post.contentID, false);
-                    }}
-                  >
-                    <i className="fa fa-heart" aria-hidden="true"></i>
-                  </div>
-                ) : (
-                  <div
-                    style={{ fontSize: "1.6rem" }}
-                    onClick={() => {
-                      handleOnClick(post.contentID, true);
-                    }}
-                  >
-                    <i className="fa fa-heart-o"></i>
-                  </div>
-                )} */}
+                  {}
                 </GridFeed>
               )}
             </div>

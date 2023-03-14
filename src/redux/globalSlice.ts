@@ -9,6 +9,12 @@ import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
 import { IFeedList, IRssSourceItem } from "./dailySlice";
 
+export enum EFeedModalType {
+  DISCOVER_ITEM = 1,
+  PROFILE_CC = 2,
+  PROFILE_GUM = 3,
+}
+
 export interface IGlobalInitialState {
   submitModalData: ISubmitModal;
   isLogin: boolean;
@@ -23,6 +29,7 @@ export interface IGlobalInitialState {
   showFeedModal: boolean;
   feedModalIndex: number | null;
   feedModalData: IFeedList | null;
+  feedModalType: EFeedModalType | null;
 }
 
 const initialState: IGlobalInitialState = {
@@ -52,6 +59,7 @@ const initialState: IGlobalInitialState = {
   showFeedModal: false,
   feedModalIndex: null,
   feedModalData: null,
+  feedModalType: null,
 };
 
 export const globalSlice = createSlice({
@@ -97,6 +105,9 @@ export const globalSlice = createSlice({
     updateFeedModalData: (state, action) => {
       state.feedModalData = action.payload;
     },
+    updateFeedModalType: (state, action) => {
+      state.feedModalType = action.payload;
+    },
   },
 });
 
@@ -114,6 +125,7 @@ export const {
   updateShowFeedModal,
   updateFeedModalIndex,
   updateFeedModalData,
+  updateFeedModalType,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;
