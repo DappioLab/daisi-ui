@@ -33,17 +33,17 @@ export interface IApiRssListResponse extends IRssSourceData {
 
 export interface IDailyInitialState {
   feedList: IFeedList[];
-  // modalData: any;
 }
 
 export interface IFeedList extends IRssSourceItem {
   type: EFeedType;
   sourceId: string;
+  isUserPost: boolean;
+  userAddress: string;
 }
 
 const initialState: IDailyInitialState = {
   feedList: [],
-  // modalData: null,
 };
 
 export const dailySlice = createSlice({
@@ -53,9 +53,6 @@ export const dailySlice = createSlice({
     updateFeedList: (state, action) => {
       state.feedList = action.payload;
     },
-    // updateModalData: (state, action) => {
-    //   state.modalData = action.payload;
-    // },
   },
 });
 

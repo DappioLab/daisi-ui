@@ -52,4 +52,4 @@ export type IRootState = ReturnType<typeof store.getState>;
 export type appDispatch = typeof store.dispatch;
 
 // @ts-ignore
-export const persistor = persistStore(store, { blacklist: ["global"] });
+export const persistor = persistStore(store);

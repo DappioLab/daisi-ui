@@ -72,7 +72,26 @@ const HomePage = () => {
     try {
       dispatch(updateLoadingStatus(true));
       let allPosts: IFeedList[] = [];
-      const res: IFeedList[] = await getAnonymousList();
+      let res: IFeedList[] = await getAnonymousList();
+      res = res.map((item: IRssSourceItem) => {
+        const obj: IFeedList = {
+          isUserPost: false,
+          userAddress: null,
+          sourceIcon: item.sourceIcon,
+          sourceId: item.id,
+          itemTitle: item.itemTitle,
+          itemDescription: "",
+          itemImage: "",
+          itemLink: item.itemLink,
+          likes: item.likes,
+          forwards: [],
+          linkCreated: item.linkCreated,
+          id: item.id,
+          type: EFeedType.RSS_ITEM,
+          created: item.created,
+        };
+        return obj;
+      });
 
       let parsedFollowingsPosts: IFeedList[] = [];
 
@@ -80,7 +99,6 @@ const HomePage = () => {
 
       if (address && userData.id && userData.id != "") {
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
-        console.log(ccFollowingsPosts, "ccFollowingsPosts");
 
         for (let ccPost of ccFollowingsPosts) {
           let user: IUser | null = null;
@@ -98,6 +116,8 @@ const HomePage = () => {
           // mappedCcFollowingsPosts = ccFollowingsPosts.map((ccPost) => {
 
           const post: IFeedList = {
+            isUserPost: true,
+            userAddress,
             sourceIcon: user.profilePicture,
             sourceId: ccPost.contentID,
             itemTitle: ccPost.title,

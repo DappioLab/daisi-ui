@@ -7,11 +7,7 @@ import { EFeedType } from "@/components/homePage/horizontalFeed";
 import { IUser } from "@/pages/profile/[address]";
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
-import { IRssSourceItem } from "./dailySlice";
-
-interface IFeedModalData extends IRssSourceItem {
-  type: EFeedType;
-}
+import { IFeedList, IRssSourceItem } from "./dailySlice";
 
 export interface IGlobalInitialState {
   submitModalData: ISubmitModal;
@@ -26,7 +22,7 @@ export interface IGlobalInitialState {
   userProfilePageData: IUser;
   showFeedModal: boolean;
   feedModalIndex: number | null;
-  feedModalData: IFeedModalData | null;
+  feedModalData: IFeedList | null;
 }
 
 const initialState: IGlobalInitialState = {

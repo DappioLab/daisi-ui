@@ -1,6 +1,7 @@
 import API from "@/axios/api";
 import { IRootState } from "@/redux";
 import {
+  IFeedList,
   IRssSourceData,
   IRssSourceItem,
   updateFeedList,
@@ -18,8 +19,9 @@ import {
   like,
 } from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
-import { updateAuthModal } from "@/redux/globalSlice";
+import { updateAuthModal, updateLoadingStatus } from "@/redux/globalSlice";
 // import { IFeedProps } from "./feed";
+import { toChecksumAddress } from "ethereum-checksum-address";
 
 export enum EFeedType {
   USER_POST = "USER POST",
@@ -58,6 +60,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       return;
     }
 
+    dispatch(updateLoadingStatus(true));
     switch (props.type) {
       case EFeedType.RSS_ITEM:
         const updatedItem = await API.updateRssItemLike(
@@ -95,10 +98,14 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           await like(props.article.id, cyberConnectClient, !isLiked);
 
           const updatedPost = await fetchPostById(props.article.id, address);
-          console.log(updatedPost, "updatedPost");
+
           if (updatedPost) {
-            const post: any = {
-              sourceIcon: userProfilePageData.profilePicture,
+            const post: IFeedList = {
+              type: EFeedType.CC_ITEM,
+              created: new Date(updatedPost.createdAt).getTime().toString(),
+              isUserPost: true,
+              userAddress: props.article.userAddress,
+              sourceIcon: props.article.sourceIcon,
               sourceId: updatedPost.contentID,
               itemTitle: updatedPost.title,
               itemDescription: updatedPost.body.split("\n\n")[0],
@@ -144,6 +151,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       default:
         throw "ERROR: unknown feed type";
     }
+    dispatch(updateLoadingStatus(false));
   };
 
   return (

@@ -1,4 +1,5 @@
 import {
+  IFeedList,
   IParsedRssData,
   IRssSourceItem,
   updateFeedList,
@@ -17,6 +18,7 @@ import {
 } from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { EFeedType } from "./horizontalFeed";
+import { updateAuthModal, updateLoadingStatus } from "@/redux/globalSlice";
 
 // export enum EFeedType {
 //   USER_POST = "USER POST",
@@ -31,7 +33,7 @@ interface IGridFeedProps extends IFeedProps {
 }
 
 export interface IFeedProps {
-  article: IRssSourceItem;
+  article: IFeedList;
   // setShowModal: Dispatch<SetStateAction<boolean>>;
   // getPost: (id: string) => Promise<void>;
 }
@@ -57,6 +59,7 @@ const GridFeed = (props: IGridFeedProps) => {
       return;
     }
 
+    dispatch(updateLoadingStatus(true));
     switch (props.type) {
       case EFeedType.RSS_ITEM:
         const updatedItem = await API.updateRssItemLike(
@@ -80,23 +83,28 @@ const GridFeed = (props: IGridFeedProps) => {
       case EFeedType.CC_ITEM:
         try {
           if (!address) {
-            alert("address is missing!");
+            dispatch(updateAuthModal(true));
             return;
           }
           if (!props.article.id) {
-            alert("postId is missing!");
+            dispatch(updateAuthModal(true));
             return;
           }
           const isLiked = props.article.likes.includes(userData.id);
+
           const provider = await connectWallet();
           const cyberConnectClient = createCyberConnectClient(provider);
           await like(props.article.id, cyberConnectClient, !isLiked);
 
           const updatedPost = await fetchPostById(props.article.id, address);
-          console.log(updatedPost, "updatedPost");
+
           if (updatedPost) {
-            const post: any = {
-              sourceIcon: "",
+            const post: IFeedList = {
+              type: EFeedType.CC_ITEM,
+              created: new Date(updatedPost.createdAt).getTime().toString(),
+              isUserPost: true,
+              userAddress: props.article.userAddress,
+              sourceIcon: props.article.sourceIcon,
               sourceId: updatedPost.contentID,
               itemTitle: updatedPost.title,
               itemDescription: updatedPost.body.split("\n\n")[0],
@@ -142,7 +150,101 @@ const GridFeed = (props: IGridFeedProps) => {
       default:
         throw "ERROR: unknown feed type";
     }
+    dispatch(updateLoadingStatus(false));
   };
+  // const updateLike = async () => {
+  //   if (!userData?.id || !isLogin) {
+  //     alert("Please login");
+  //     return;
+  //   }
+
+  //   switch (props.type) {
+  //     case EFeedType.RSS_ITEM:
+  //       const updatedItem = await API.updateRssItemLike(
+  //         props.article.id,
+  //         userData.id
+  //       );
+
+  //       if (updatedItem) {
+  //         const updatedList = feedList.map((item) => {
+  //           if (item.id === updatedItem.data._id) {
+  //             const obj = JSON.parse(JSON.stringify(item));
+  //             obj.likes = updatedItem.data.likes;
+  //             return obj;
+  //           }
+  //           return item;
+  //         });
+  //         dispatch(updateFeedList(updatedList));
+  //       }
+  //       break;
+
+  //     case EFeedType.CC_ITEM:
+  //       try {
+  //         if (!address) {
+  //           dispatch(updateAuthModal(true));
+  //           return;
+  //         }
+  //         if (!props.article.id) {
+  //           dispatch(updateAuthModal(true));
+  //           return;
+  //         }
+
+  //         const isLiked = props.article.likes.includes(userData.id);
+  //         const provider = await connectWallet();
+  //         const cyberConnectClient = createCyberConnectClient(provider);
+  //         await like(props.article.id, cyberConnectClient, !isLiked);
+
+  //         const updatedPost = await fetchPostById(props.article.id, address);
+  //         console.log(updatedPost, "updatedPost");
+  //         if (updatedPost) {
+  //           const post: any = {
+  //             sourceIcon: "",
+  //             sourceId: updatedPost.contentID,
+  //             itemTitle: updatedPost.title,
+  //             itemDescription: updatedPost.body.split("\n\n")[0],
+  //             itemImage: "",
+  //             itemLink: updatedPost.body.split("\n\n").reverse()[0],
+  //             likes: updatedPost.likedStatus.liked
+  //               ? new Array(updatedPost.likeCount).fill(userData.id)
+  //               : new Array(updatedPost.likeCount).fill("123"),
+  //             forwards: [],
+  //             linkCreated: new Date(updatedPost.createdAt).getTime().toString(),
+  //             id: updatedPost.contentID,
+  //           };
+
+  //           const updatedList = feedList.map((feed) => {
+  //             if (feed.id === updatedPost.contentID) {
+  //               return post;
+  //             }
+  //             return feed;
+  //           });
+  //           const updatedCCPosts = postList.map((p) => {
+  //             if (p.id === updatedPost.contentID) {
+  //               return post;
+  //             }
+  //             return p;
+  //           });
+  //           dispatch(setPostList(updatedCCPosts));
+  //           dispatch(updateFeedList(updatedList));
+  //         }
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+  //       break;
+
+  //     case EFeedType.GUM_ITEM:
+  //       break;
+
+  //     case EFeedType.USER_POST:
+  //       // Deprecate
+  //       await API.updateUserPostLike(props.article.id, userData.id);
+  //       window.location.reload();
+  //       break;
+
+  //     default:
+  //       throw "ERROR: unknown feed type";
+  //   }
+  // };
 
   return (
     <div
