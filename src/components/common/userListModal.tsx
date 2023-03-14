@@ -331,7 +331,9 @@ const UserListModal = (props: IUserListModalProps) => {
                 ) : null}
                 {userProfile && !isEvmAddress(user.address) ? (
                   <div>
-                    <FollowButton toProfile={user.address}></FollowButton>
+                    <FollowButton
+                      toProfile={new PublicKey(user.address)}
+                    ></FollowButton>
                   </div>
                 ) : null}
               </div>
