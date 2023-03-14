@@ -1,4 +1,4 @@
-import Post, { postInterface } from "./PostsMigrated";
+import Post, { postInterface } from "./Posts";
 import React, { useEffect, useState, useMemo } from "react";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";
@@ -14,6 +14,7 @@ import {
   updateFollowing,
   updateReactions,
   updatePosts,
+  updateAllUser,
 } from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
 
@@ -92,7 +93,7 @@ const useGumState = () => {
       // parts for reply
       // let replyMap = new Map<string, ReplyInterface[]>();
       const allPostLocal = await sdk.post.getPostAccounts();
-      console.log(allPostAccounts.length, allPostLocal.length);
+
       let userPostAccounts = allPostLocal
         ? await Promise.all(
             allPostLocal.map(async (post) => {
@@ -173,11 +174,12 @@ const useGumState = () => {
           [...userPostAccounts, ...allPostsMetadata]
             .filter((data) => {
               let postCotext = data?.postData.data as postInterface;
+
               return (
                 // @ts-ignore
-                postContext.daisiContent &&
+                postCotext.daisiContent &&
                 // @ts-ignore
-                postContext.daisiContent.itemImage.includes("https") &&
+                postCotext.daisiContent.itemImage.includes("https") &&
                 data?.postData.status == 200 &&
                 postCotext.content.blocks?.find((block) => {
                   return (
@@ -188,7 +190,6 @@ const useGumState = () => {
               );
             })
             .map((data) => {
-    
               let postCotext = data?.postData.data as postInterface;
               return {
                 ...postCotext,
@@ -276,7 +277,28 @@ const useGumState = () => {
     });
     dispatch(updateReactions(map));
   };
-
+  const fetchUsers = async () => {
+    let allUser = await sdk.profile.getProfileAccountsByUser();
+    let userKey = await sdk.user.getAllUsersAccounts();
+    let userMap = new Map(
+      userKey.map((userA) => {
+        return [userA.cl_pubkey.toString(), userA.authority];
+      })
+    );
+    let map: Map<string, ProfileAccount> = new Map(
+      allUser.map((user) => {
+        return [
+          user.publicKey.toString(),
+          {
+            profile: user.publicKey,
+            user: user.account.user,
+            wallet: userMap.get(user.account.user.toString()),
+          },
+        ];
+      })
+    );
+    dispatch(updateAllUser(map));
+  };
   useEffect(() => {
     fetchProfile();
     fetchConnections();
@@ -284,6 +306,7 @@ const useGumState = () => {
   useEffect(() => {
     fetchPostData();
     fetchReaction();
+    fetchUsers();
   }, []);
 };
 export default useGumState;
@@ -292,36 +315,32 @@ export const PostList = (prop: { profiles?: PublicKey[] }) => {
   const { allPosts } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
-
-  if (prop.profiles) {
-    return (
-      <div>
-        {allPosts.length > 0 &&
-          prop.profiles.length > 1 &&
-          allPosts
-            .filter((post) => {
-              return prop.profiles.includes(post.profile);
-            })
-            .map((post, index) => {
-              return (
-                <div key={post.cl_pubkey.toString()} className="">
-                  <Post post={post} postIndex={index} fetchPostData={null} />
-                </div>
-              );
-            })}
-      </div>
-    );
-  }
+  let filtered = filterPostList(allPosts, prop.profiles);
+  console.log(filtered);
   return (
     <div>
-      {allPosts.length > 0 &&
-        allPosts.map((post, index) => {
+      {filtered.length > 0 &&
+        filtered.map((post) => {
           return (
             <div key={post.cl_pubkey.toString()} className="">
-              <Post post={post} postIndex={index} fetchPostData={null} />
+              <Post post={post} />
             </div>
           );
         })}
     </div>
   );
 };
+export function filterPostList(
+  allPosts: postInterface[],
+  profiles?: PublicKey[]
+) {
+  if (profiles) {
+    let strProfile = profiles.map((pro) => {
+      return pro.toString();
+    });
+    return allPosts.filter((post) => {
+      return strProfile.includes(post.profile.toString());
+    });
+  }
+  return allPosts;
+}

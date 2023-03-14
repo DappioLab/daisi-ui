@@ -12,6 +12,7 @@ import { ipfsClient, mainGateway } from "./storage";
 import { useDispatch, useSelector } from "react-redux";
 import { PostList } from "./gumState";
 import { IRootState } from "@/redux";
+import { updateLoadingStatus } from "@/redux/globalSlice";
 
 export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
@@ -27,6 +28,7 @@ const ExplorePosts = () => {
   const [description, setDescription] = useState("");
   const [profileImg, setProfileImg] = useState<File | null>(null);
   const [profileEdit, setProfileEdit] = useState(false);
+  const dispatch = useDispatch();
   // parts for reply
   // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
   //   new Map()
@@ -134,7 +136,9 @@ const ExplorePosts = () => {
     }
   };
 
-  useEffect(() => {}, [allPosts]);
+  useEffect(() => {
+    dispatch(updateLoadingStatus(false));
+  }, [allPosts]);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {

@@ -21,7 +21,6 @@ import {
 } from "@/components/cyberConnectPage/helper";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 import API from "@/axios/api";
-
 export interface ISubmitModal {
   title: string;
   description: string;

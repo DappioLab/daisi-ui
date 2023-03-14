@@ -22,6 +22,13 @@ import LikeButton from "./LikeButton";
 export interface postInterface {
   metadatauri: string;
   cl_pubkey: PublicKey;
+  daisiContent: {
+    itemTitle: string;
+    itemDescription: string;
+    itemLink: string;
+    itemImage: string;
+    created: Date;
+  };
   content: { blocks: BlockInterface[] };
   type: string;
   title: string;

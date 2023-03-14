@@ -32,6 +32,13 @@ import moment from "moment";
 import { useGumSDK } from "@/hooks/useGumSDK";
 export interface postInterface {
   metadatauri: string;
+  daisiContent: {
+    itemTitle: string;
+    itemDescription: string;
+    itemLink: string;
+    itemImage: string;
+    created: Date;
+  };
   cl_pubkey: PublicKey;
   content: { blocks: BlockInterface[] };
   type: string;

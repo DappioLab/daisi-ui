@@ -16,6 +16,7 @@ export interface IGumInitialState {
   reactions: Map<string, ReactionInterface[]>;
   postList: IFeedList[] | null;
   allPosts: postInterface[];
+  allUser: Map<string, ProfileAccount>;
 }
 
 const initialState: IGumInitialState = {
@@ -26,6 +27,7 @@ const initialState: IGumInitialState = {
   reactions: new Map<string, ReactionInterface[]>(),
   postList: null,
   allPosts: [],
+  allUser: new Map<string, ProfileAccount>(),
 };
 
 export const gumSlice = createSlice({
@@ -67,6 +69,12 @@ export const gumSlice = createSlice({
     updatePosts: (state, action: { payload: postInterface[] }) => {
       state.allPosts = action.payload;
     },
+    updateAllUser: (
+      state,
+      action: { payload: Map<string, ProfileAccount> }
+    ) => {
+      state.allUser = action.payload;
+    },
   },
 });
 
@@ -78,6 +86,7 @@ export const {
   updateReactions,
   updatePostList,
   updatePosts,
+  updateAllUser,
 } = gumSlice.actions;
 
 export default gumSlice.reducer;

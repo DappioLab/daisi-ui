@@ -24,7 +24,12 @@ export class Profile {
   /**
    * @deprecated This function is slow and may cause performance issues. Consider using getProfilesByUser instead.
    */
-  public async getProfileAccountsByUser(user: anchor.web3.PublicKey): Promise<anchor.ProgramAccount<any>[]> {
+  public async getProfileAccountsByUser(
+    user?: anchor.web3.PublicKey
+  ): Promise<anchor.ProgramAccount<any>[]> {
+    if (!user) {
+      return await this.sdk.program.account.profile.all();
+    }
     const users = await this.sdk.user.getUserAccountsByUser(user);
     const userPDAs = users.map((u) => u.publicKey);
     let profiles = [];
@@ -39,7 +44,7 @@ export class Profile {
 
   /**
    * Gets or creates a profile for a given user account and namespace.
-   * 
+   *
    * To use this method, you must first initialize an instance of the SDK and pass a GraphQL client to the constructor.
    * The client will be used to fetch profile information.
    */
@@ -47,7 +52,8 @@ export class Profile {
     metadataUri: String,
     userAccount: anchor.web3.PublicKey,
     namespace: Namespace,
-    owner: anchor.web3.PublicKey): Promise<anchor.web3.PublicKey> {
+    owner: anchor.web3.PublicKey
+  ): Promise<anchor.web3.PublicKey> {
     try {
       const profile = await this.getProfile(userAccount, namespace);
       if (profile?.username && profile?.namespace && profile?.cl_pubkey) {
@@ -55,7 +61,12 @@ export class Profile {
         return new anchor.web3.PublicKey(profilePDAstr);
       }
 
-      const profilePDA = await this.createProfileWithProfileMetadata(metadataUri, userAccount, namespace, owner);
+      const profilePDA = await this.createProfileWithProfileMetadata(
+        metadataUri,
+        userAccount,
+        namespace,
+        owner
+      );
       return profilePDA;
     } catch (e) {
       throw new Error(`Error getting or creating profile: ${e.message}`);
@@ -65,7 +76,8 @@ export class Profile {
   public async create(
     userAccount: anchor.web3.PublicKey,
     namespace: Namespace,
-    owner: anchor.web3.PublicKey) {
+    owner: anchor.web3.PublicKey
+  ) {
     const instructionMethodBuilder = this.sdk.program.methods
       .createProfile(namespace)
       .accounts({
@@ -84,14 +96,23 @@ export class Profile {
     metadataUri: String,
     userAccount: anchor.web3.PublicKey,
     namespace: Namespace,
-    owner: anchor.web3.PublicKey) {
+    owner: anchor.web3.PublicKey
+  ) {
     const createProfile = await this.create(userAccount, namespace, owner);
     const profilePDA = createProfile.profilePDA;
 
-    const profileMetadata = await this.sdk.profileMetadata.create(metadataUri, profilePDA, userAccount, owner);
-    const profileMetadataIx = await profileMetadata.instructionMethodBuilder.instruction();
-    
-    await createProfile.instructionMethodBuilder.postInstructions([profileMetadataIx]).rpc();
+    const profileMetadata = await this.sdk.profileMetadata.create(
+      metadataUri,
+      profilePDA,
+      userAccount,
+      owner
+    );
+    const profileMetadataIx =
+      await profileMetadata.instructionMethodBuilder.instruction();
+
+    await createProfile.instructionMethodBuilder
+      .postInstructions([profileMetadataIx])
+      .rpc();
 
     return profilePDA;
   }
@@ -99,20 +120,22 @@ export class Profile {
   public delete(
     profileAccount: anchor.web3.PublicKey,
     userAccount: anchor.web3.PublicKey,
-    owner: anchor.web3.PublicKey) {
+    owner: anchor.web3.PublicKey
+  ) {
     const { program } = this.sdk;
-    return program.methods
-      .deleteProfile()
-      .accounts({
-        profile: profileAccount,
-        user: userAccount,
-        authority: owner,
-      })
+    return program.methods.deleteProfile().accounts({
+      profile: profileAccount,
+      user: userAccount,
+      authority: owner,
+    });
   }
 
   // GraphQL API methods
 
-  public async getProfile(userAccount: anchor.web3.PublicKey, namespace: Namespace): Promise<GumDecodedProfile> {
+  public async getProfile(
+    userAccount: anchor.web3.PublicKey,
+    namespace: Namespace
+  ): Promise<GumDecodedProfile> {
     const namespaceString = JSON.stringify({ [namespace.toLowerCase()]: {} });
     const query = gql`
       query GetProfile ($namespace: String) {
@@ -129,12 +152,18 @@ export class Profile {
       }`;
     const variables = { namespace: namespaceString };
 
-    const data = await this.sdk.gqlClient.request<{ gum_0_1_0_decoded_profile: GumDecodedProfile[] }>(query, variables);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profile: GumDecodedProfile[];
+    }>(query, variables);
     return {
-      username: new anchor.web3.PublicKey(data.gum_0_1_0_decoded_profile[0].username),
+      username: new anchor.web3.PublicKey(
+        data.gum_0_1_0_decoded_profile[0].username
+      ),
       namespace: data.gum_0_1_0_decoded_profile[0].namespace,
-      cl_pubkey: new anchor.web3.PublicKey(data.gum_0_1_0_decoded_profile[0].cl_pubkey),
-    }
+      cl_pubkey: new anchor.web3.PublicKey(
+        data.gum_0_1_0_decoded_profile[0].cl_pubkey
+      ),
+    };
   }
 
   public async getAllProfiles(): Promise<GumDecodedProfile[]> {
@@ -145,18 +174,25 @@ export class Profile {
           namespace
           cl_pubkey
         }
-      }`;
+      }
+    `;
     const data: any = await this.sdk.gqlClient.request(query);
     return data.gum_0_1_0_decoded_profile;
   }
 
-  public async getProfilesByUser(userPubkey: anchor.web3.PublicKey): Promise<GumDecodedProfile[]> {
+  public async getProfilesByUser(
+    userPubkey: anchor.web3.PublicKey
+  ): Promise<GumDecodedProfile[]> {
     const users = await this.sdk.user.getUserAccountsByAuthority(userPubkey);
-    const userPDAs = users.map(user => user.cl_pubkey) as anchor.web3.PublicKey[];
+    const userPDAs = users.map(
+      (user) => user.cl_pubkey
+    ) as anchor.web3.PublicKey[];
     const query = gql`
       query UserProfiles {
         gum_0_1_0_decoded_profile(
-          where: {username: {_in: [${userPDAs.map(pda => `"${pda}"`).join(',')}] }}
+          where: {username: {_in: [${userPDAs
+            .map((pda) => `"${pda}"`)
+            .join(",")}] }}
         ) {
           username
           namespace
@@ -168,10 +204,12 @@ export class Profile {
     return data.gum_0_1_0_decoded_profile;
   }
 
-  public async getProfilesByNamespace(namespace: Namespace): Promise<GumDecodedProfile[]> {
+  public async getProfilesByNamespace(
+    namespace: Namespace
+  ): Promise<GumDecodedProfile[]> {
     const namespaceString = JSON.stringify({ [namespace.toLowerCase()]: {} });
     const query = gql`
-      query ProfilesByNamespace ($namespace: String) {
+      query ProfilesByNamespace($namespace: String) {
         gum_0_1_0_decoded_profile(where: { namespace: { _eq: $namespace } }) {
           username
           namespace
@@ -179,19 +217,26 @@ export class Profile {
         }
       }
     `;
-    const data: any = await this.sdk.gqlClient.request(query, { namespace: namespaceString });
+    const data: any = await this.sdk.gqlClient.request(query, {
+      namespace: namespaceString,
+    });
     return data.gum_0_1_0_decoded_profile;
   }
 
-  public async getProfilesByUserAndNamespace(userPubkey: anchor.web3.PublicKey, namespace: Namespace): Promise<GumDecodedProfile[]> {
+  public async getProfilesByUserAndNamespace(
+    userPubkey: anchor.web3.PublicKey,
+    namespace: Namespace
+  ): Promise<GumDecodedProfile[]> {
     const users = await this.sdk.user.getUserAccountsByAuthority(userPubkey);
-    const userPDAs = users.map(user => user.cl_pubkey) as anchor.web3.PublicKey[];
+    const userPDAs = users.map(
+      (user) => user.cl_pubkey
+    ) as anchor.web3.PublicKey[];
     const namespaceString = JSON.stringify({ [namespace.toLowerCase()]: {} });
     const query = gql`
       query ProfileByUserAndNamespace ($namespace: String) {
         gum_0_1_0_decoded_profile(
           where: {
-            username: {_in: [${userPDAs.map(pda => `"${pda}"`).join(',')}] },
+            username: {_in: [${userPDAs.map((pda) => `"${pda}"`).join(",")}] },
             namespace: { _eq: $namespace }
           }
         ) {
@@ -201,7 +246,9 @@ export class Profile {
         }
       }
     `;
-    const data: any = await this.sdk.gqlClient.request(query, { namespace: namespaceString });
+    const data: any = await this.sdk.gqlClient.request(query, {
+      namespace: namespaceString,
+    });
     return data.gum_0_1_0_decoded_profile;
   }
 }
