@@ -19,6 +19,7 @@ import {
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { EFeedType } from "./horizontalFeed";
 import { updateAuthModal, updateLoadingStatus } from "@/redux/globalSlice";
+import { useRouter } from "next/router";
 
 // export enum EFeedType {
 //   USER_POST = "USER POST",
@@ -39,6 +40,7 @@ export interface IFeedProps {
 }
 
 const GridFeed = (props: IGridFeedProps) => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const [showLinkButton, setShowLinkButton] = useState(false);
   const { userData, isLogin, feedList, address, postList } = useSelector(
@@ -249,23 +251,26 @@ const GridFeed = (props: IGridFeedProps) => {
   return (
     <div
       className={style.feed}
-      onClick={(e) => {
-        // updateCurrentID(props.article.id);
-        // props.getPost(props.article.id);
-        // e.preventDefault();
-      }}
       onMouseEnter={() => setShowLinkButton(true)}
       onMouseLeave={() => setShowLinkButton(false)}
     >
-      <div className={style.articleIcon}>
-        {props.type === EFeedType.CC_ITEM ? (
+      <div
+        className={style.articleIcon}
+        onClick={(e) => {
+          if (props.article.userAddress) {
+            e.stopPropagation();
+            router.push(`/profile?address=${props.article.userAddress}`);
+          }
+        }}
+      >
+        {/* {props.type === EFeedType.CC_ITEM ? (
           <img
             src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
             alt="icon"
           />
-        ) : (
-          <img src={props.article.sourceIcon} alt="icon" />
-        )}
+        ) : ( */}
+        <img src={props.article.sourceIcon} alt="icon" />
+        {/* )} */}
       </div>
       {/* <div className={style.articleIcon}>
         <img src={props.article.sourceIcon} alt="icon" />

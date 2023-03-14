@@ -249,8 +249,18 @@ const ExplorePosts = (props: IExplorePostsProps) => {
         dispatch(updateUserProfilePageHandle(data[0].profile));
       }
 
-      // // @ts-ignore
-      setExplore(data);
+      const sortedData = data
+        .map((item) => {
+          return {
+            ...item,
+            // @ts-ignore
+            created: item.daisiContent.created,
+          };
+        })
+        .sort((a, b) =>
+          a.created < b.created ? 1 : a.created > b.created ? -1 : 0
+        );
+      setExplore(sortedData);
 
       let parsedPostList = [];
 

@@ -36,6 +36,7 @@ interface IHorizontalFeedProps extends IFeedProps {
 }
 
 const HorizontalFeed = (props: IHorizontalFeedProps) => {
+  const router = useRouter();
   const [showLinkButton, setShowLinkButton] = useState(false);
   const { userData, isLogin, feedList, address, postList } = useSelector(
     (state: IRootState) => {
@@ -160,7 +161,15 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       onMouseEnter={() => setShowLinkButton(true)}
       onMouseLeave={() => setShowLinkButton(false)}
     >
-      <div className={style.articleIcon}>
+      <div
+        className={style.articleIcon}
+        onClick={(e) => {
+          if (props.article.userAddress) {
+            e.stopPropagation();
+            router.push(`/profile?address=${props.article.userAddress}`);
+          }
+        }}
+      >
         {/* {props.type === EFeedType.CC_ITEM ? (
           <img
             src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
