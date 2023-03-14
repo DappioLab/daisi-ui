@@ -221,10 +221,16 @@ const AuthModal = () => {
           </div>
           <div>
             <MetamaskConnectBtn />
+            <div style={{ marginTop: ".5rem" }}>
+              * Please switch to BSC testnet{" "}
+            </div>
           </div>
           <br />
           <div>
             <SolanaConnectBtn />
+            <div style={{ marginTop: ".5rem" }}>
+              * Please switch to Solana devnet
+            </div>
           </div>
         </div>
       </div>

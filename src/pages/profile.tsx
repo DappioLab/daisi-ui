@@ -147,12 +147,21 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               <br />
 
               <div className={style.followBtnBlock}>
-                <div>
+                <div className={style.supportByBlock}>
                   <span>Supported by </span>
                   {isCheckingSolanaAddress ? (
-                    <span>Gum</span>
+                    <img
+                      className={style.icon}
+                      src="https://pbs.twimg.com/profile_images/1621492955868545024/CpsOM4M3_400x400.jpg"
+                      alt="icon"
+                    />
                   ) : (
-                    <span>Cyber Connect</span>
+                    <img
+                      className={style.icon}
+                      src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
+                      alt="icon"
+                    />
+                    // <span>Cyber Connect</span>
                   )}
                 </div>
                 {!isLogin ||
