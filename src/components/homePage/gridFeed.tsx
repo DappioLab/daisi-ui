@@ -1,4 +1,8 @@
-import { IParsedRssData, updateFeedList } from "@/redux/dailySlice";
+import {
+  IParsedRssData,
+  IRssSourceItem,
+  updateFeedList,
+} from "@/redux/dailySlice";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/styles/homePage/gridFeed.module.sass";
@@ -12,13 +16,14 @@ import {
   createCyberConnectClient,
 } from "../cyberConnectPage/helper";
 import { setPostList } from "@/redux/cyberConnectSlice";
+import { EFeedType } from "./horizontalFeed";
 
-export enum EFeedType {
-  USER_POST = "USER POST",
-  RSS_ITEM = "RSS ITEM",
-  CC_ITEM = "CC ITEM",
-  GUM_ITEM = "GUM ITEM",
-}
+// export enum EFeedType {
+//   USER_POST = "USER POST",
+//   RSS_ITEM = "RSS ITEM",
+//   CC_ITEM = "CC ITEM",
+//   GUM_ITEM = "GUM ITEM",
+// }
 
 interface IGridFeedProps extends IFeedProps {
   type: EFeedType;
@@ -26,7 +31,7 @@ interface IGridFeedProps extends IFeedProps {
 }
 
 export interface IFeedProps {
-  article: IParsedRssData;
+  article: IRssSourceItem;
   // setShowModal: Dispatch<SetStateAction<boolean>>;
   // getPost: (id: string) => Promise<void>;
 }

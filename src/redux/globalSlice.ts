@@ -3,9 +3,15 @@ import {
   ISubmitModal,
   ISubmitModalProps,
 } from "@/components/common/submitModal";
+import { EFeedType } from "@/components/homePage/horizontalFeed";
 import { IUser } from "@/pages/profile/[address]";
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
+import { IRssSourceItem } from "./dailySlice";
+
+interface IFeedModalData extends IRssSourceItem {
+  type: EFeedType;
+}
 
 export interface IGlobalInitialState {
   submitModalData: ISubmitModal;
@@ -18,6 +24,9 @@ export interface IGlobalInitialState {
   screenWidth: number | null;
   userProfilePageHandle: PublicKey | null;
   userProfilePageData: IUser;
+  showFeedModal: boolean;
+  feedModalIndex: number | null;
+  feedModalData: IFeedModalData | null;
 }
 
 const initialState: IGlobalInitialState = {
@@ -44,6 +53,9 @@ const initialState: IGlobalInitialState = {
   screenWidth: null,
   userProfilePageHandle: null,
   userProfilePageData: null,
+  showFeedModal: false,
+  feedModalIndex: null,
+  feedModalData: null,
 };
 
 export const globalSlice = createSlice({
@@ -80,6 +92,15 @@ export const globalSlice = createSlice({
     updateUserProfilePageData: (state, action) => {
       state.userProfilePageData = action.payload;
     },
+    updateShowFeedModal: (state, action) => {
+      state.showFeedModal = action.payload;
+    },
+    updateFeedModalIndex: (state, action) => {
+      state.feedModalIndex = action.payload;
+    },
+    updateFeedModalData: (state, action) => {
+      state.feedModalData = action.payload;
+    },
   },
 });
 
@@ -94,6 +115,9 @@ export const {
   updateShowSubmitModal,
   updateUserProfilePageHandle,
   updateUserProfilePageData,
+  updateShowFeedModal,
+  updateFeedModalIndex,
+  updateFeedModalData,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

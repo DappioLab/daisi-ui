@@ -11,23 +11,31 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   IApiRssListResponse,
+  IFeedList,
   IParsedRssData,
+  IRssSourceItem,
   updateFeedList,
-  updateModalData,
 } from "@/redux/dailySlice";
 import { IRootState } from "@/redux";
-import HorizontalFeed from "@/components/homePage/horizontalFeed";
+import HorizontalFeed, {
+  EFeedType,
+} from "@/components/homePage/horizontalFeed";
 import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
 import GridFeedList from "@/components/homePage/gridFeedList";
 import API from "@/axios/api";
-import { updateLoadingStatus } from "@/redux/globalSlice";
+import {
+  updateFeedModalData,
+  updateFeedModalIndex,
+  updateLoadingStatus,
+  updateShowFeedModal,
+} from "@/redux/globalSlice";
 import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
 import { IUser } from "@/pages/profile/[address]";
 import { toChecksumAddress } from "ethereum-checksum-address";
 
 const HomePage = () => {
-  const [showModal, setShowModal] = useState(false);
-  const { feedList, modalData } = useSelector(
+  // const [showModal, setShowModal] = useState(false);
+  const { feedList } = useSelector(
     (state: IRootState) => state.persistedReducer.daily
   );
   const { screenWidth, userData, address } = useSelector(
@@ -39,8 +47,7 @@ const HomePage = () => {
       };
     }
   );
-  const [searchIndex, setSearchIndex] = useState(0);
-  const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
+  // const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
 
   // const getCurrentModalIndex = (index: number) => {
@@ -57,8 +64,6 @@ const HomePage = () => {
   // };
 
   const getAnonymousList = async () => {
-    let nextNumber = searchIndex + 1;
-    setSearchIndex(nextNumber);
     const res = await API.getRssData();
     return res.data;
   };
@@ -66,10 +71,10 @@ const HomePage = () => {
   const updateList = async () => {
     try {
       dispatch(updateLoadingStatus(true));
-      let allPosts: IParsedRssData[] = [];
-      const res: IParsedRssData[] = await getAnonymousList();
+      let allPosts: IFeedList[] = [];
+      const res: IFeedList[] = await getAnonymousList();
 
-      let parsedFollowingsPosts: IParsedRssData[] = [];
+      let parsedFollowingsPosts: IFeedList[] = [];
 
       let postUserData = {};
 
@@ -92,7 +97,7 @@ const HomePage = () => {
           }
           // mappedCcFollowingsPosts = ccFollowingsPosts.map((ccPost) => {
 
-          const post: any = {
+          const post: IFeedList = {
             sourceIcon: user.profilePicture,
             sourceId: ccPost.contentID,
             itemTitle: ccPost.title,
@@ -105,6 +110,8 @@ const HomePage = () => {
             forwards: [],
             linkCreated: new Date(ccPost.createdAt).getTime().toString(),
             id: ccPost.contentID,
+            type: EFeedType.CC_ITEM,
+            created: new Date(ccPost.createdAt).getTime().toString(),
           };
 
           parsedFollowingsPosts.push(post);
@@ -140,60 +147,63 @@ const HomePage = () => {
 
   useEffect(() => {
     updateList();
+    dispatch(updateFeedModalIndex(null));
+    dispatch(updateShowFeedModal(false));
+    dispatch(updateFeedModalData(null));
   }, []);
   useEffect(() => {
     updateList();
   }, [address, userData]);
 
-  useEffect(() => {
-    const content = feedList.find((feed, index) => {
-      if (index === postModalIndex) {
-        return feed;
-      }
-    });
+  // useEffect(() => {
+  //   const content = feedList.find((feed, index) => {
+  //     if (index === postModalIndex) {
+  //       return feed;
+  //     }
+  //   });
 
-    dispatch(updateModalData(content));
-  }, [postModalIndex, feedList]);
+  //   dispatch(updateModalData(content));
+  // }, [postModalIndex, feedList]);
 
-  useEffect(() => {
-    if (modalData) {
-      setShowModal(true);
-    }
-  }, [modalData]);
+  // useEffect(() => {
+  //   if (modalData) {
+  //     setShowModal(true);
+  //   }
+  // }, [modalData]);
 
-  useEffect(() => {
-    if (!showModal) {
-      setPostModalIndex(null);
-    }
-  }, [showModal]);
+  // useEffect(() => {
+  //   if (!showModal) {
+  //     setPostModalIndex(null);
+  //   }
+  // }, [showModal]);
 
   return (
     <div className={`pageContent ${style.homePage}`}>
       {/* <PageTitle title="Daily" /> */}
       {screenWidth < 960 ? (
         <GridFeedList
-          setShowModal={setShowModal}
+          // setShowModal={setShowModal}
           // getPost={getPost}
           // getCurrentModalIndex={getCurrentModalIndex}
-          setPostModalIndex={setPostModalIndex}
+          // setPostModalIndex={setPostModalIndex}
           updateList={updateList}
         />
       ) : (
         <HorizontalFeedList
-          setShowModal={setShowModal}
+          // setShowModal={setShowModal}
           // getPost={getPost}
-          setPostModalIndex={setPostModalIndex}
+          // setPostModalIndex={setPostModalIndex}
           updateList={updateList}
         />
       )}
-      {showModal ? (
+      {/* {showModal ? (
         <FeedModal
           setShowModal={setShowModal}
           postModalIndex={postModalIndex}
           // getPost={getPost}
           setPostModalIndex={setPostModalIndex}
         />
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

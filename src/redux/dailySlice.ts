@@ -1,4 +1,5 @@
 // import { IFeed } from "@/components/homePage/feed";
+import { EFeedType } from "@/components/homePage/horizontalFeed";
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface IRssSourceData {
@@ -31,13 +32,18 @@ export interface IApiRssListResponse extends IRssSourceData {
 }
 
 export interface IDailyInitialState {
-  feedList: IParsedRssData[];
-  modalData: any;
+  feedList: IFeedList[];
+  // modalData: any;
+}
+
+export interface IFeedList extends IRssSourceItem {
+  type: EFeedType;
+  sourceId: string;
 }
 
 const initialState: IDailyInitialState = {
   feedList: [],
-  modalData: null,
+  // modalData: null,
 };
 
 export const dailySlice = createSlice({
@@ -47,12 +53,12 @@ export const dailySlice = createSlice({
     updateFeedList: (state, action) => {
       state.feedList = action.payload;
     },
-    updateModalData: (state, action) => {
-      state.modalData = action.payload;
-    },
+    // updateModalData: (state, action) => {
+    //   state.modalData = action.payload;
+    // },
   },
 });
 
-export const { updateFeedList, updateModalData } = dailySlice.actions;
+export const { updateFeedList } = dailySlice.actions;
 
 export default dailySlice.reducer;

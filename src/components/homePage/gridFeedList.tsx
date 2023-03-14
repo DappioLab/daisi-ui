@@ -5,12 +5,13 @@ import { Dispatch, SetStateAction, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { IRootState } from "@/redux";
 import GridFeed from "./gridFeed";
+import { updateFeedModalIndex, updateShowFeedModal } from "@/redux/globalSlice";
 
 interface IFeedList {
-  setShowModal: Dispatch<SetStateAction<boolean>>;
+  // setShowModal: Dispatch<SetStateAction<boolean>>;
   // getPost: (id: string) => Promise<void>;
   // getCurrentModalIndex: (index: number) => number;
-  setPostModalIndex: Dispatch<SetStateAction<number | null>>;
+  // setPostModalIndex: Dispatch<SetStateAction<number | null>>;
   updateList: () => void;
 }
 
@@ -19,6 +20,7 @@ const GridFeedList = (props: IFeedList) => {
     (state: IRootState) => state.persistedReducer.daily
   );
   const { ref, inView } = useInView();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (inView) {
@@ -41,7 +43,9 @@ const GridFeedList = (props: IFeedList) => {
             key={`${index}`}
             ref={ref}
             onClick={() => {
-              props.setPostModalIndex(index);
+              dispatch(updateFeedModalIndex(index));
+              dispatch(updateShowFeedModal(true));
+              // props.setPostModalIndex(index);
               // props.setShowModal(true);
             }}
           >
