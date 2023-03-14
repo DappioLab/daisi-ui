@@ -16,11 +16,16 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import {
+  createFilter,
+  createBlacklistFilter,
+} from "redux-persist-transform-filter";
 
 const persistConfig = {
   key: "root",
   version: 1,
   storage,
+  blacklist: ["gum"],
 };
 
 const rootReducer = combineReducers({
@@ -29,6 +34,9 @@ const rootReducer = combineReducers({
   cyberConnect: cyberConnectSlice,
   gum: gumSlice,
 });
+
+const persistingReducers = createFilter(`gum`);
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // export interface IRootState {
@@ -49,4 +57,5 @@ export const store = configureStore({
 export type IRootState = ReturnType<typeof store.getState>;
 export type appDispatch = typeof store.dispatch;
 
-export const persistor = persistStore(store);
+// @ts-ignore
+export const persistor = persistStore(store, { blacklist: ["global"] });
