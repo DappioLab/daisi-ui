@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SDK } from "@/gpl-core/src";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { ReactionInterface } from "./Explore";
+import { ReactionInterface } from "./gumState";
 interface likeButtonProp {
   toPost: string;
 }
@@ -14,11 +14,15 @@ const LikeButton = (prop: likeButtonProp) => {
   );
   let toPost = new PublicKey(prop.toPost);
   let reactionsFromUser: ReactionInterface[] = [];
-  let postReaction = reactions.get(toPost.toString());
-  if (postReaction) {
-    reactionsFromUser = postReaction.filter((reaction) => {
-      if (userProfile) return reaction.from.equals(userProfile.profile);
-    });
+  let postReaction: ReactionInterface[] = [];
+  if (reactions.size) {
+    postReaction = reactions.get(toPost.toString());
+    if (postReaction) {
+      reactionsFromUser = postReaction.filter((reaction) => {
+        if (userProfile)
+          return reaction.from.toString() == userProfile.profile.toString();
+      });
+    }
   }
 
   const createGumLike = async (post: string) => {
@@ -28,10 +32,10 @@ const LikeButton = (prop: likeButtonProp) => {
       }
       let likeTx = (
         await sdk?.reaction.create(
-          userProfile.profile,
+          new PublicKey(userProfile.profile),
           new PublicKey(post),
           "Like",
-          userProfile.user,
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
@@ -50,8 +54,8 @@ const LikeButton = (prop: likeButtonProp) => {
         await sdk?.reaction.delete(
           account,
           toPost,
-          userProfile.profile,
-          userProfile.user,
+          new PublicKey(userProfile.profile),
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
       )?.rpc();

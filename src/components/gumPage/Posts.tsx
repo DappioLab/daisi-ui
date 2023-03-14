@@ -7,7 +7,7 @@ import {
   ProfileAccount,
   ReactionInterface,
   ReplyInterface,
-} from "./Explore";
+} from "./gumState";
 import style from "@/styles/gumPage/post.module.sass";
 import { PublicKey } from "@solana/web3.js";
 
@@ -32,7 +32,6 @@ export interface postInterface {
 
 interface postState {
   post: postInterface;
-  setData: Dispatch<SetStateAction<postInterface[]>>;
 }
 
 const Post = (post: postState) => {
@@ -47,11 +46,15 @@ const Post = (post: postState) => {
   );
   const sdk = useGumSDK();
   let reactionsFromUser: ReactionInterface[] = [];
-  let postReaction = reactions.get(post.post.cl_pubkey.toString());
-  if (postReaction) {
-    reactionsFromUser = postReaction.filter((reaction) => {
-      if (userProfile) return reaction.from.equals(userProfile.profile);
-    });
+  let postReaction: ReactionInterface[] = [];
+  if (reactions.size) {
+    postReaction = reactions.get(post.post.cl_pubkey.toString());
+    if (postReaction) {
+      reactionsFromUser = postReaction.filter((reaction) => {
+        if (userProfile)
+          return reaction.from.toString() == userProfile.profile.toString();
+      });
+    }
   }
 
   const handleDelete = async (e: any) => {
@@ -62,8 +65,8 @@ const Post = (post: postState) => {
       let deleteTx = await sdk?.post
         .delete(
           post.post.cl_pubkey,
-          userProfile.profile,
-          userProfile.user,
+          new PublicKey(userProfile.profile),
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
         ?.rpc();
@@ -80,10 +83,10 @@ const Post = (post: postState) => {
       }
       let likeTx = (
         await sdk?.reaction.create(
-          userProfile.profile,
+          new PublicKey(userProfile.profile),
           post.post.cl_pubkey,
           "Dislike",
-          userProfile.user,
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
@@ -100,8 +103,8 @@ const Post = (post: postState) => {
         await sdk?.reaction.delete(
           account,
           post.post.cl_pubkey,
-          userProfile.profile,
-          userProfile.user,
+          new PublicKey(userProfile.profile),
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
       )?.rpc();
@@ -136,7 +139,10 @@ const Post = (post: postState) => {
   // };
 
   let deleteButton = null;
-  if (userProfile && userProfile.profile.equals(post.post.profile)) {
+  if (
+    userProfile &&
+    userProfile.profile.toString() == post.post.profile.toString()
+  ) {
     deleteButton = (
       <div>
         <button className={""} onClick={handleDelete}>

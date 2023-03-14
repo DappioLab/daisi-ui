@@ -14,12 +14,13 @@ const WalletMultiButtonDynamic = dynamic(
 
 import React, { useMemo } from "react";
 import ExplorePost from "../components/gumPage/Explore";
+import useGumState from "@/components/gumPage/gumState";
 // Use require instead of import since order matters
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 const GumPage = () => {
   const wallet = useWallet();
-
+  useGumState();
   return (
     <div className={style.gumPage}>
       <PageTitle title="Gum" />
