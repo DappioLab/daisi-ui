@@ -141,6 +141,7 @@ const Feed = ({ user }: { user: IUser }) => {
                   setShowUserList={setShowUserList}
                   userListType={userListType}
                   setUserListType={setUserListType}
+                  checkingUser={fetchedUser}
                 />
               )}
             </div>

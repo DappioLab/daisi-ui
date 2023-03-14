@@ -6,8 +6,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/styles/common/userListModal.module.sass";
 import { updateLoadingStatus } from "@/redux/globalSlice";
+import { isAddress as isEvmAddress } from "ethers/lib/utils";
+import { fetchFollowers, fetchFollowings } from "../cyberConnectPage/helper";
 
 export interface IUserListModalProps {
+  checkingUser: IUser;
   userListType: EUserListType | null;
   setUserListType: Dispatch<SetStateAction<EUserListType | null>>;
   setShowUserList: Dispatch<SetStateAction<boolean>>;
@@ -50,8 +53,28 @@ const UserListModal = (props: IUserListModalProps) => {
 
     props.setUserListType(EUserListType.FOLLOWINGS);
     dispatch(updateLoadingStatus(true));
-    const res = await API.getFollowingListByAddress(userData?.address);
-    setUserList(res.data);
+
+    const users = (await API.getUsers()).data as IUser[];
+    let followingUserList: IUser[] = [];
+    if (!isEvmAddress(props.checkingUser.address)) {
+      // Gum
+    } else {
+      // CyberConnect
+      for (const address of props.checkingUser.followings) {
+        const user = users.find((user) => user.address == address);
+        if (user) {
+          let followers = (await fetchFollowers(address, userData.address)).map(
+            (p) => p.owner.address
+          );
+          const followings = (
+            await fetchFollowings(address, userData.address)
+          ).map((p) => p.owner.address);
+          followingUserList.push({ ...user, followers, followings });
+        }
+      }
+    }
+
+    setUserList(followingUserList);
     dispatch(updateLoadingStatus(false));
   };
 
@@ -63,8 +86,28 @@ const UserListModal = (props: IUserListModalProps) => {
 
     props.setUserListType(EUserListType.FOLLOWERS);
     dispatch(updateLoadingStatus(true));
-    const res = await API.getFollowerListByAddress(userData?.address);
-    setUserList(res.data);
+
+    const users = (await API.getUsers()).data as IUser[];
+    let followerUserList: IUser[] = [];
+    if (!isEvmAddress(props.checkingUser.address)) {
+      // Gum
+    } else {
+      // CyberConnect
+      for (const address of props.checkingUser.followers) {
+        const user = users.find((user) => user.address == address);
+        if (user) {
+          let followers = (await fetchFollowers(address, userData.address)).map(
+            (p) => p.owner.address
+          );
+          const followings = (
+            await fetchFollowings(address, userData.address)
+          ).map((p) => p.owner.address);
+          followerUserList.push({ ...user, followers, followings });
+        }
+      }
+    }
+
+    setUserList(followerUserList);
     dispatch(updateLoadingStatus(false));
   };
 
@@ -113,7 +156,7 @@ const UserListModal = (props: IUserListModalProps) => {
                     className={style.followBtn}
                     onClick={() => updateUserFollowData(user.id)}
                   >
-                    {user.followers.includes(userData.id)
+                    {user.followers.includes(userData.address)
                       ? "Following"
                       : "Follow"}
                   </div>
