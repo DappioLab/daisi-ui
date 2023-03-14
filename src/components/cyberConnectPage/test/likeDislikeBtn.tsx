@@ -1,6 +1,4 @@
-import CyberConnect from "@cyberlab/cyberconnect-v2";
-import { IRootState } from "@/redux";
-import { useSelector } from "react-redux";
+import { connectWallet, createCyberConnectClient } from "../helper";
 
 const likeDislikeBtn = ({
   contendId,
@@ -9,24 +7,16 @@ const likeDislikeBtn = ({
   contendId: string;
   isLike: boolean;
 }) => {
-  const { provider } = useSelector(
-    (state: IRootState) => state.persistedReducer.cyberConnect
-  );
-
   const handleOnClick = async () => {
     try {
-      const cyberConnect = new CyberConnect({
-        namespace: "CyberConnect",
-        env: "STAGING",
-        provider: provider,
-        signingMessageEntity: "CyberConnect",
-      });
+      const provider = await connectWallet();
+      const cyberConnectClient = createCyberConnectClient(provider);
 
       if (isLike) {
-        const res = await cyberConnect.like(contendId);
+        const res = await cyberConnectClient.like(contendId);
         console.log("like btn response:", res);
       } else {
-        const res = await cyberConnect.dislike(contendId);
+        const res = await cyberConnectClient.dislike(contendId);
         console.log("dislike btn response:", res);
       }
     } catch (err) {

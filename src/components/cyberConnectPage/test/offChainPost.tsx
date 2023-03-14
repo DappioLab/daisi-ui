@@ -1,11 +1,11 @@
-import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { useSelector } from "react-redux";
 import { Content } from "@cyberlab/cyberconnect-v2/src/types";
 import { IRootState } from "@/redux";
 import { useState } from "react";
+import { connectWallet, createCyberConnectClient } from "../helper";
 
 const OffChainPost = () => {
-  const { provider, profile } = useSelector(
+  const { profile } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
   const [post, setPost] = useState<Omit<Content, "id">>({
@@ -21,13 +21,10 @@ const OffChainPost = () => {
         return;
       }
 
-      const cyberConnect = new CyberConnect({
-        namespace: "CyberConnect",
-        env: "STAGING",
-        provider: provider,
-        signingMessageEntity: "CyberConnect",
-      });
-      const res = await cyberConnect.createPost({
+      const provider = await connectWallet();
+      const cyberConnectClient = createCyberConnectClient(provider);
+
+      const res = await cyberConnectClient.createPost({
         ...post,
         author: profile.handle,
       });

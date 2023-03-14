@@ -1,7 +1,6 @@
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setProvider,
   setAddress,
   setAccessToken,
   setProfile,
@@ -24,7 +23,6 @@ const SigninBtn = () => {
     try {
       const provider = await connectWallet();
       await checkNetwork(provider);
-      dispatch(setProvider(provider));
 
       /* Get the signer from the provider */
       const signer = provider.getSigner();

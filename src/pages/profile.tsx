@@ -37,11 +37,9 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
   // const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
   const [fetchedUser, setFetchedUser] = useState<IUser | null>(null);
-  const {
-    provider,
-    address: metamaskAddress,
-    accessToken,
-  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
+  const { address: metamaskAddress, accessToken } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
   const wallet = useWallet();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -112,7 +110,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               </div>
               {userProfilePageHandle && (
                 <div className={style.userId}>
-                  {wallet.connected && !provider ? (
+                  {wallet.connected && !accessToken ? (
                     <>
                       <span>
                         @handle -{" "}
@@ -122,7 +120,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       <span>{userProfilePageHandle.toBase58().slice(-6)}</span>
                     </>
                   ) : null}
-                  {provider && (
+                  {accessToken && (
                     <>
                       <span>
                         @handle -{" "}
@@ -165,7 +163,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                         toProfile={userProfilePageHandle.toBase58()}
                       />
                     )}
-                    {provider && !isCheckingSolanaAddress && (
+                    {accessToken && !isCheckingSolanaAddress && (
                       <CyberConnectFollowBtn address={checkingAddress} />
                     )}
                   </>
