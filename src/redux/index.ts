@@ -16,10 +16,6 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import {
-  createFilter,
-  createBlacklistFilter,
-} from "redux-persist-transform-filter";
 
 const persistConfig = {
   key: "root",
@@ -34,8 +30,6 @@ const rootReducer = combineReducers({
   cyberConnect: cyberConnectSlice,
   gum: gumSlice,
 });
-
-const persistingReducers = createFilter(`gum`);
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
