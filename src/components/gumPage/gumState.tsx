@@ -1,4 +1,4 @@
-import Post, { postInterface } from "./Posts";
+import Post, { postInterface } from "./PostsMigrated";
 import React, { useEffect, useState, useMemo } from "react";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";
@@ -53,7 +53,7 @@ const useGumState = () => {
   );
 
   const fetchProfile = async () => {
-    if (wallet.publicKey) {
+    if (wallet.publicKey && !userProfile) {
       let profileKeys = await sdk?.profile.getProfileAccountsByUser(
         wallet.publicKey
       );
@@ -174,6 +174,10 @@ const useGumState = () => {
             .filter((data) => {
               let postCotext = data?.postData.data as postInterface;
               return (
+                // @ts-ignore
+                postContext.daisiContent &&
+                // @ts-ignore
+                postContext.daisiContent.itemImage.includes("https") &&
                 data?.postData.status == 200 &&
                 postCotext.content.blocks?.find((block) => {
                   return (
@@ -184,6 +188,7 @@ const useGumState = () => {
               );
             })
             .map((data) => {
+    
               let postCotext = data?.postData.data as postInterface;
               return {
                 ...postCotext,
@@ -297,10 +302,10 @@ export const PostList = (prop: { profiles?: PublicKey[] }) => {
             .filter((post) => {
               return prop.profiles.includes(post.profile);
             })
-            .map((post) => {
+            .map((post, index) => {
               return (
                 <div key={post.cl_pubkey.toString()} className="">
-                  <Post post={post} />
+                  <Post post={post} postIndex={index} fetchPostData={null} />
                 </div>
               );
             })}
@@ -310,10 +315,10 @@ export const PostList = (prop: { profiles?: PublicKey[] }) => {
   return (
     <div>
       {allPosts.length > 0 &&
-        allPosts.map((post) => {
+        allPosts.map((post, index) => {
           return (
             <div key={post.cl_pubkey.toString()} className="">
-              <Post post={post} />
+              <Post post={post} postIndex={index} fetchPostData={null} />
             </div>
           );
         })}

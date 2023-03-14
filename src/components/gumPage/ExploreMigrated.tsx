@@ -69,7 +69,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
   const [username, setUserName] = useState("");
   const [description, setDescription] = useState("");
   const [profileImg, setProfileImg] = useState<File | null>(null);
-  const [profileEdit, setProfileEdit] = useState(false);
+
   const { userProfilePageData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -134,7 +134,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
       const address = props.checkingAddress;
 
-      const allPostAccounts = [];
       // parts for reply
       // let replyMap = new Map<string, ReplyInterface[]>();
       const allPostLocal = await sdk.post.getPostAccountsByUser(
@@ -180,45 +179,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
           )
         : [];
 
-      let allPostsMetadata = await Promise.all(
-        allPostAccounts
-          .filter((post) => {
-            return !userPostAccounts.find((userPost) => {
-              return post.cl_pubkey == userPost?.cl_pubkey.toString();
-            });
-          })
-          .map(async (post) => {
-            try {
-              if (post.metadatauri.includes("/ipfs/")) {
-                let postData = await axios.get(
-                  mainGateway +
-                    post.metadatauri.substring(
-                      post.metadatauri.indexOf("/ipfs/") + 6
-                    )
-                );
-                return {
-                  postData,
-                  metadatauri: post.metadatauri,
-                  cl_pubkey: new PublicKey(post.cl_pubkey),
-                  profile: new PublicKey(post.profile),
-                  replyTo: post.replyto ? new PublicKey(post.replyto) : null,
-                };
-              }
-
-              let postData = await axios.get(post.metadatauri);
-
-              return {
-                postData,
-                metadatauri: post.metadatauri,
-                cl_pubkey: new PublicKey(post.cl_pubkey),
-                profile: new PublicKey(post.profile),
-                replyTo: post.replyto ? new PublicKey(post.replyto) : null,
-              };
-            } catch (err) {}
-          })
-      );
-
-      const data = [...userPostAccounts, ...allPostsMetadata]
+      const data = [...userPostAccounts]
         .filter((data) => {
           let postContext = data?.postData.data as postInterface;
           return (
@@ -631,13 +592,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       {explore?.map((post: postInterface, index: number) => {
         return (
           <div key={post.cl_pubkey.toString()}>
-            <Post
-              post={post}
-              sdk={sdk}
-              setData={setExplore}
-              fetchPostData={fetchPostData}
-              postIndex={index}
-            />
+            <Post post={post} fetchPostData={fetchPostData} postIndex={index} />
           </div>
         );
       })}

@@ -29,6 +29,7 @@ import {
   updateShowFeedModal,
 } from "@/redux/globalSlice";
 import moment from "moment";
+import { useGumSDK } from "@/hooks/useGumSDK";
 export interface postInterface {
   metadatauri: string;
   cl_pubkey: PublicKey;
@@ -42,8 +43,6 @@ export interface postInterface {
 
 interface postState {
   post: postInterface;
-  sdk: SDK;
-  setData: Dispatch<SetStateAction<postInterface[]>>;
   fetchPostData: () => Promise<void>;
   postIndex: number;
 }
@@ -59,7 +58,7 @@ const Post = (post: postState) => {
   const { userData, userProfilePageData, screenWidth } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
-  const sdk = post.sdk;
+  const sdk = useGumSDK();
   const [daisiContent, setDaisiContent] = useState<IFeedList | null>();
 
   useEffect(() => {
