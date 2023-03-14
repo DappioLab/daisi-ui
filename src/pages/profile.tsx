@@ -72,12 +72,16 @@ const ProfilePage = ({ user }: { user: IUser }) => {
         await sdk.profile.getProfilesByUser(gumAddress)
       )[0].cl_pubkey.toString();
       if (followersMap.size && followersMap.size && profile) {
-        followers = followersMap.get(profile).map((acc) => {
-          return acc.profile.toString();
-        });
-        followings = followingMap.get(profile).map((acc) => {
-          return acc.profile.toString();
-        });
+        let followProfiles = followersMap.get(profile);
+        if (followProfiles)
+          followers = followProfiles.map((acc) => {
+            return acc.profile.toString();
+          });
+        let followerProfile = followingMap.get(profile);
+        if (followerProfile)
+          followings = followerProfile.map((acc) => {
+            return acc.profile.toString();
+          });
       }
     } else {
       followers = (await fetchFollowers(checkingAddress, currentAddress))?.map(
