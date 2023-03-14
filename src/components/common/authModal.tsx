@@ -170,11 +170,19 @@ const AuthModal = () => {
 
     (async () => {
       const res = await fetchProfile();
+
       if (!res) {
         return;
       }
 
       if (res.length <= 0) {
+        const account = await connection.getAccountInfo(solanaWallet.publicKey);
+        console.log(account, "account");
+        if (!account || account.lamports === 0) {
+          alert("Please request some SOL from devnet to create your profile.");
+          return;
+        }
+
         createUserAccount();
       }
     })();

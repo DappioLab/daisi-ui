@@ -32,7 +32,7 @@ const SolanaConnectBtn = () => {
 
   useEffect(() => {
     if (wallet.connected) {
-      dispatch(updateUserProfilePageHandle(null));
+      // dispatch(updateUserProfilePageHandle(null));
       dispatch(updateLoginStatus(true));
 
       // set CyberConnect slice to nulls

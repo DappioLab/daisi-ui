@@ -137,11 +137,14 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                         <>
                           <span>
                             @handle -{" "}
-                            {userProfilePageHandle.toBase58().substring(0, 6)}
+                            {JSON.stringify(userProfilePageHandle).substring(
+                              0,
+                              6
+                            )}
                           </span>
                           <span>...</span>
                           <span>
-                            {userProfilePageHandle.toBase58().slice(-6)}
+                            {JSON.stringify(userProfilePageHandle).slice(-6)}
                           </span>
                         </>
                       ) : null}
@@ -196,7 +199,8 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                   </div>
                 ) : (
                   <>
-                    {!userProfilePageHandle ? (
+                    {!userProfilePageHandle ||
+                    typeof userProfilePageHandle === "string" ? (
                       <div
                         className={style.followBtn}
                         onClick={() => showLoginPrompt()}
@@ -205,10 +209,20 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       </div>
                     ) : (
                       <>
-                        {userProfile && isCheckingSolanaAddress && (
-                          <GumFollowButton
-                            toProfile={userProfilePageHandle.toBase58()}
-                          />
+                        {userProfile &&
+                        isCheckingSolanaAddress &&
+                        !userProfilePageHandle
+                          .toString()
+                          //@ts-ignore
+                          .includes("daisi") ? (
+                          <GumFollowButton toProfile={userProfilePageHandle} />
+                        ) : (
+                          <div
+                            className={style.followBtn}
+                            onClick={() => showLoginPrompt()}
+                          >
+                            Follow{" "}
+                          </div>
                         )}
                       </>
                     )}

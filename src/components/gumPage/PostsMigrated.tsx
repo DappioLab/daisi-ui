@@ -434,7 +434,6 @@ const Post = (post: postState) => {
                 dispatch(updateShowFeedModal(true));
               }}
             >
-              {" "}
               <HorizontalFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
                 <div className={style.btnBlock}>
                   {reactionButton ? (

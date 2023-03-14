@@ -36,7 +36,7 @@ const MetamaskConnectBtn = () => {
   const connect = async () => {
     try {
       await solanaWallet.disconnect();
-      dispatch(updateUserProfilePageHandle(null));
+      // dispatch(updateUserProfilePageHandle(null));
 
       const provider = await connectWallet();
       await checkNetwork(provider);

@@ -6,7 +6,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { SDK } from "@/gpl-core/src";
 import { useGumSDK } from "@/hooks/useGumSDK";
 interface followButtonProp {
-  toProfile: string;
+  toProfile: PublicKey;
 }
 const FollowButton = (prop: followButtonProp) => {
   const { userProfile, following, followers, reactions } = useSelector(
@@ -14,7 +14,8 @@ const FollowButton = (prop: followButtonProp) => {
   );
   const wallet = useWallet();
   const sdk = useGumSDK();
-  const toProfile = new PublicKey(prop.toProfile);
+  // const toProfile = new PublicKey(prop.toProfile);
+  const toProfile = prop.toProfile;
   const createGunFollow = async (profile: string) => {
     try {
       if (!wallet.publicKey) {

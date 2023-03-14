@@ -301,7 +301,11 @@ const FeedModal = () => {
             {feedModalData.itemDescription !== "" && (
               <div className={style.summaryBlock}>
                 <div className={style.title}>TL;DR</div>
-                <div>{feedModalData.itemDescription}</div>
+                <div>
+                  {feedModalData.itemDescription.split("- ").map((item) => {
+                    return <div>• {item}</div>;
+                  })}
+                </div>
               </div>
             )}
             {/* <div className={style.tagBlock}>

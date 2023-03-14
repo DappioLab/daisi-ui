@@ -268,8 +268,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
         // @ts-ignore
         const daisiContent = item.daisiContent;
 
-        console.log(item, "##");
-
         const obj: IFeedList = {
           isUserPost: true,
           type: EFeedType.GUM_ITEM,
@@ -315,6 +313,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       //   };
       //   return obj;
       // });
+
       dispatch(updatePostList(parsedPostList));
       fetchReaction();
       // parts for reply
