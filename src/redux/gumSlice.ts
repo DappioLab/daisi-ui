@@ -17,6 +17,8 @@ export interface IGumInitialState {
   postList: IFeedList[] | null;
   allPosts: postInterface[];
   allUser: Map<string, ProfileAccount>;
+  followingMap: Map<string, ProfileAccount[]>;
+  followersMap: Map<string, ProfileAccount[]>;
 }
 
 const initialState: IGumInitialState = {
@@ -28,6 +30,8 @@ const initialState: IGumInitialState = {
   postList: null,
   allPosts: [],
   allUser: new Map<string, ProfileAccount>(),
+  followersMap: new Map<string, ProfileAccount[]>(),
+  followingMap: new Map<string, ProfileAccount[]>(),
 };
 
 export const gumSlice = createSlice({
@@ -75,6 +79,18 @@ export const gumSlice = createSlice({
     ) => {
       state.allUser = action.payload;
     },
+    updateAllFollow: (
+      state,
+      action: {
+        payload: {
+          following: Map<string, ProfileAccount[]>;
+          followers: Map<string, ProfileAccount[]>;
+        };
+      }
+    ) => {
+      state.followersMap = action.payload.following;
+      state.followingMap = action.payload.followers;
+    },
   },
 });
 
@@ -87,6 +103,7 @@ export const {
   updatePostList,
   updatePosts,
   updateAllUser,
+  updateAllFollow,
 } = gumSlice.actions;
 
 export default gumSlice.reducer;

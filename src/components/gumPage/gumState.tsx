@@ -15,6 +15,7 @@ import {
   updateReactions,
   updatePosts,
   updateAllUser,
+  updateAllFollow,
 } from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
 
@@ -49,7 +50,7 @@ const useGumState = () => {
   const wallet = useWallet();
   const dispatch = useDispatch();
   const sdk = useGumSDK();
-  const { userProfile } = useSelector(
+  const { userProfile, allUser } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
 
@@ -256,6 +257,38 @@ const useGumState = () => {
       console.log("error", err);
     }
   };
+  const fetchAllConnection = async () => {
+    if (allUser.size) {
+      let connections = await sdk.connection.getALlConnectionAccounts();
+      let followingMap: Map<string, ProfileAccount[]> = new Map();
+      let followByMap: Map<string, ProfileAccount[]> = new Map();
+      for (let connection of connections) {
+        let toUser = allUser.get(connection.account.toProfile.toString());
+        followByMap.set(
+          connection.account.fromProfile.toString(),
+          followByMap.has(connection.account.fromProfile.toString())
+            ? [
+                ...followByMap.get(connection.account.fromProfile.toString()),
+                toUser,
+              ]
+            : [toUser]
+        );
+        let fromUser = allUser.get(connection.account.fromProfile.toString());
+        followingMap.set(
+          connection.account.toProfile.toString(),
+          followingMap.has(connection.account.toProfile.toString())
+            ? [
+                ...followingMap.get(connection.account.toProfile.toString()),
+                fromUser,
+              ]
+            : [fromUser]
+        );
+      }
+      dispatch(
+        updateAllFollow({ following: followingMap, followers: followByMap })
+      );
+    }
+  };
   const fetchReaction = async () => {
     let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
     // let reactions = await sdk.reaction.getAllReactions();
@@ -292,7 +325,7 @@ const useGumState = () => {
           {
             profile: user.publicKey,
             user: user.account.user,
-            wallet: userMap.get(user.account.user.toString()),
+            wallet: new PublicKey(userMap.get(user.account.user.toString())),
           },
         ];
       })
@@ -308,6 +341,9 @@ const useGumState = () => {
     fetchReaction();
     fetchUsers();
   }, []);
+  useEffect(() => {
+    fetchAllConnection();
+  }, [allUser]);
 };
 export default useGumState;
 
@@ -316,7 +352,6 @@ export const PostList = (prop: { profiles?: PublicKey[] }) => {
     (state: IRootState) => state.persistedReducer.gum
   );
   let filtered = filterPostList(allPosts, prop.profiles);
-  console.log(filtered);
   return (
     <div>
       {filtered.length > 0 &&
