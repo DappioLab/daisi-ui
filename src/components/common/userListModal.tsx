@@ -102,7 +102,10 @@ const UserListModal = (props: IUserListModalProps) => {
                 return user.address == address.wallet.toString();
               });
               if (user) {
-                followerUserList.push({ ...user, address: profile.toString() });
+                followerUserList.push({
+                  ...user,
+                  address: address.profile.toString(),
+                });
               }
             });
           }
