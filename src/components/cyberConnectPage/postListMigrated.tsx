@@ -19,6 +19,7 @@ import { CYBER_CONNECT_ENDPOINT } from "./constants";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
+import { useRouter } from "next/router";
 
 export interface Content {
   contentID: string;
@@ -50,18 +51,22 @@ const PostList = ({ address }: { address: string }) => {
     address: myAddress,
     lastPostsUpdateTime,
     postList,
+    accessToken,
   } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
   const { screenWidth, userData, userProfilePageData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
 
-  screenWidth;
   // const [postList, setPostList] = useState<Post[]>([]);
   const daisiHandle = handleCreator(address);
-
   const dispatch = useDispatch();
+  const router = useRouter();
 
-  dispatch(updateUserProfilePageHandle(daisiHandle));
+  useEffect(() => {
+    if (accessToken) {
+      dispatch(updateUserProfilePageHandle(daisiHandle));
+    }
+  }, [accessToken]);
 
   const fetchData = async () => {
     try {
@@ -137,7 +142,7 @@ const PostList = ({ address }: { address: string }) => {
 
   useEffect(() => {
     fetchData();
-  }, [myAddress, address, lastPostsUpdateTime]);
+  }, [myAddress, address, lastPostsUpdateTime, userProfilePageData]);
 
   return (
     <div>

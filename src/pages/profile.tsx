@@ -108,29 +108,37 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                 <span>...</span>
                 <span>{fetchedUser.address.slice(-6)}</span>
               </div>
-              {userProfilePageHandle && (
-                <div className={style.userId}>
-                  {wallet.connected && !accessToken ? (
-                    <>
-                      <span>
-                        @handle -{" "}
-                        {userProfilePageHandle.toBase58().substring(0, 6)}
-                      </span>
-                      <span>...</span>
-                      <span>{userProfilePageHandle.toBase58().slice(-6)}</span>
-                    </>
-                  ) : null}
-                  {accessToken && (
-                    <>
-                      <span>
-                        @handle -{" "}
-                        {userProfilePageHandle.toString().substring(0, 6)}
-                      </span>
-                      <span>...</span>
-                      <span>{userProfilePageHandle.toString().slice(-6)}</span>
-                    </>
+              {checkingAddress === userData.address && (
+                <>
+                  {userProfilePageHandle && (
+                    <div className={style.userId}>
+                      {wallet.connected && !accessToken ? (
+                        <>
+                          <span>
+                            @handle -{" "}
+                            {userProfilePageHandle.toBase58().substring(0, 6)}
+                          </span>
+                          <span>...</span>
+                          <span>
+                            {userProfilePageHandle.toBase58().slice(-6)}
+                          </span>
+                        </>
+                      ) : null}
+                      {accessToken && (
+                        <>
+                          <span>
+                            @handle -{" "}
+                            {userProfilePageHandle.toString().substring(0, 6)}
+                          </span>
+                          <span>...</span>
+                          <span>
+                            {userProfilePageHandle.toString().slice(-6)}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   )}
-                </div>
+                </>
               )}
               <div className={style.userBio}>
                 <div>Bio</div>
