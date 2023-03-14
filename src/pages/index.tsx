@@ -29,7 +29,10 @@ import {
   updateLoadingStatus,
   updateShowFeedModal,
 } from "@/redux/globalSlice";
-import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
+import {
+  fetchFollowingsPosts,
+  fetchPosts,
+} from "@/components/cyberConnectPage/helper";
 import { IUser } from "@/pages/profile/[address]";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
@@ -122,9 +125,11 @@ const HomePage = () => {
 
       if (address && userData.id && userData.id != "" && ccFeed.length <= 0) {
         dispatch(updateLoadingStatus(true));
+        const ccUserPosts = await fetchPosts(address, address);
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
+        const allCcPosts = [...ccUserPosts, ...ccFollowingsPosts];
 
-        for (let ccPost of ccFollowingsPosts) {
+        for (let ccPost of allCcPosts) {
           let user: IUser | null = null;
           const userAddress = toChecksumAddress(ccPost.authorAddress);
           if (!postUserData[userAddress]) {
