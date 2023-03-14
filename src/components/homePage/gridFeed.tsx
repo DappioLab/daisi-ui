@@ -142,8 +142,8 @@ const GridFeed = (props: IGridFeedProps) => {
         }
         break;
 
-      case EFeedType.GUM_ITEM:
-        break;
+      // case EFeedType.GUM_ITEM:
+      //   break;
 
       case EFeedType.USER_POST:
         // Deprecate

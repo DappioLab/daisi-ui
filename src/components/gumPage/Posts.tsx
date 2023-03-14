@@ -191,7 +191,7 @@ const Post = (post: postState) => {
     <div className={style.feed}>
       <div className={style.title}>
         {"@" + post.post.profile.toString().slice(0, 10)}
-        <FollowButton toProfile={post.post.profile.toString()}></FollowButton>
+        <FollowButton toProfile={post.post.profile}></FollowButton>
       </div>
       {post.post.content.blocks &&
         post.post.content.blocks.map((block: BlockInterface) => {

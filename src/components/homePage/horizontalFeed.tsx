@@ -142,14 +142,14 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         }
         break;
 
-      case EFeedType.GUM_ITEM:
-        break;
+      // case EFeedType.GUM_ITEM:
+      //   break;
 
       case EFeedType.USER_POST:
-        // Deprecate
-        await API.updateUserPostLike(props.article.id, userData.id);
-        window.location.reload();
-        break;
+      // Deprecate
+      // await API.updateUserPostLike(props.article.id, userData.id);
+      // window.location.reload();
+      // break;
 
       default:
         throw "ERROR: unknown feed type";
