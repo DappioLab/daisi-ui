@@ -10,46 +10,18 @@ import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
 import { ipfsClient, mainGateway } from "./storage";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateUserAccounts,
-  updateUserProfile,
-  updateFollowers,
-  updateFollowing,
-  updateReactions,
-  updatePostList,
-} from "../../redux/gumSlice";
+import { updatePostList } from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
 import { useRouter } from "next/router";
-import { updateUserProfilePageHandle } from "@/redux/globalSlice";
+import {
+  updateLoadingStatus,
+  updateUserProfilePageHandle,
+} from "@/redux/globalSlice";
 import { IFeedList } from "@/redux/dailySlice";
 import { EFeedType } from "../homePage/horizontalFeed";
 import moment from "moment";
-interface PostAccount {
-  cl_pubkey: string;
-  metadatauri: string;
-  profile: string;
-  replyto?: string;
-}
-export interface ConnectionInterface {
-  follow: PublicKey;
-  cl_pubkey: PublicKey;
-}
-export interface ReactionInterface {
-  from: PublicKey;
-  type: ReactionType;
-  cl_pubkey: PublicKey;
-  replyTo?: PublicKey;
-}
-export interface ReplyInterface {
-  from: PublicKey;
-  text: string;
-  cl_pubkey: PublicKey;
-}
-export interface ProfileAccount {
-  profile: PublicKey;
-  user: PublicKey;
-  wallet: PublicKey;
-}
+import useGumState from "./gumState";
+
 export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
 interface IExplorePostsProps {
@@ -59,7 +31,9 @@ interface IExplorePostsProps {
 const ExplorePosts = (props: IExplorePostsProps) => {
   const wallet = useWallet();
   const router = useRouter();
+  useGumState();
   const dispatch = useDispatch();
+  //dispatch(updateLoadingStatus(false));
   const { userProfile, following, followers, userAccounts } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
@@ -69,7 +43,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
   const [username, setUserName] = useState("");
   const [description, setDescription] = useState("");
   const [profileImg, setProfileImg] = useState<File | null>(null);
-  const [profileEdit, setProfileEdit] = useState(false);
+
   const { userProfilePageData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -93,40 +67,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
     GRAPHQL_ENDPOINTS.devnet
   );
 
-  const fetchProfile = async () => {
-    if (wallet.publicKey) {
-      let profileKeys = await sdk?.profile.getProfileAccountsByUser(
-        wallet.publicKey
-      );
-
-      if (!userProfile && profileKeys && profileKeys.length > 0) {
-        dispatch(
-          updateUserProfile(
-            profileKeys
-              .map((pa) => {
-                return {
-                  profile: pa.publicKey,
-                  user: pa.account.user,
-                  wallet: wallet.publicKey,
-                };
-              })
-              .sort()[0]
-          )
-        );
-      }
-      const address = router;
-      let userKeys = await sdk?.user.getUserAccountsByUser(wallet.publicKey);
-      if (userKeys && userKeys.length > 0) {
-        dispatch(
-          updateUserAccounts(
-            userKeys.map((account) => {
-              return account.publicKey;
-            })
-          )
-        );
-      }
-    }
-  };
   const fetchPostData = async () => {
     try {
       // if (wallet.publicKey) {
@@ -134,7 +74,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
       const address = props.checkingAddress;
 
-      const allPostAccounts = [];
       // parts for reply
       // let replyMap = new Map<string, ReplyInterface[]>();
       const allPostLocal = await sdk.post.getPostAccountsByUser(
@@ -180,45 +119,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
           )
         : [];
 
-      let allPostsMetadata = await Promise.all(
-        allPostAccounts
-          .filter((post) => {
-            return !userPostAccounts.find((userPost) => {
-              return post.cl_pubkey == userPost?.cl_pubkey.toString();
-            });
-          })
-          .map(async (post) => {
-            try {
-              if (post.metadatauri.includes("/ipfs/")) {
-                let postData = await axios.get(
-                  mainGateway +
-                    post.metadatauri.substring(
-                      post.metadatauri.indexOf("/ipfs/") + 6
-                    )
-                );
-                return {
-                  postData,
-                  metadatauri: post.metadatauri,
-                  cl_pubkey: new PublicKey(post.cl_pubkey),
-                  profile: new PublicKey(post.profile),
-                  replyTo: post.replyto ? new PublicKey(post.replyto) : null,
-                };
-              }
-
-              let postData = await axios.get(post.metadatauri);
-
-              return {
-                postData,
-                metadatauri: post.metadatauri,
-                cl_pubkey: new PublicKey(post.cl_pubkey),
-                profile: new PublicKey(post.profile),
-                replyTo: post.replyto ? new PublicKey(post.replyto) : null,
-              };
-            } catch (err) {}
-          })
-      );
-
-      const data = [...userPostAccounts, ...allPostsMetadata]
+      const data = [...userPostAccounts]
         .filter((data) => {
           let postContext = data?.postData.data as postInterface;
           return (
@@ -315,7 +216,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       // });
 
       dispatch(updatePostList(parsedPostList));
-      fetchReaction();
+
       // parts for reply
       // [...userPostAccounts, ...allPostsMetadata]
       //   .filter((data) => {
@@ -339,60 +240,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
     } catch (err) {
       console.log("error", err);
     }
-  };
-  const fetchConnections = async () => {
-    try {
-      if (wallet.publicKey && userProfile) {
-        let following = await sdk?.connection.getALlConnectionAccounts(
-          userProfile.profile
-        );
-        let followers = await sdk?.connection.getALlConnectionAccounts(
-          undefined,
-          userProfile.profile
-        );
-
-        dispatch(
-          updateFollowing(
-            (following ? following : []).map((conn) => {
-              return {
-                follow: conn.account.toProfile,
-                cl_pubkey: conn.publicKey,
-              };
-            })
-          )
-        );
-        dispatch(
-          updateFollowers(
-            (followers ? followers : []).map((conn) => {
-              return conn.account.fromProfile;
-            })
-          )
-        );
-      }
-    } catch (err) {
-      console.log("error", err);
-    }
-  };
-  const fetchReaction = async () => {
-    let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
-    // let reactions = await sdk.reaction.getAllReactions();
-    let map = new Map<
-      string,
-      { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]
-    >();
-    reactionAccounts.forEach((account) => {
-      map.set(account.account.toPost.toString(), [
-        {
-          from: account.account.fromProfile,
-          type: account.account.reactionType,
-          cl_pubkey: account.publicKey,
-        },
-        ...(map.has(account.account.toPost.toString())
-          ? map.get(account.account.toPost.toString())!
-          : []),
-      ]);
-    });
-    dispatch(updateReactions(map));
   };
 
   const createGumPost = async (postLink: string) => {
@@ -505,10 +352,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
     }
   };
   useEffect(() => {
-    fetchProfile();
     fetchPostData();
-    fetchConnections();
-    fetchReaction();
   }, [wallet.connected, userProfile]);
 
   const handleSubmit = async (e: any) => {
@@ -541,7 +385,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
           )
         )?.instructionMethodBuilder.rpc();
         console.log(result);
-        await fetchProfile();
       } else {
         console.log("creating user");
 
@@ -550,7 +393,6 @@ const ExplorePosts = (props: IExplorePostsProps) => {
         let result = await user?.instructionMethodBuilder.rpc();
 
         console.log(result);
-        await fetchProfile();
       }
     } catch (err) {
       console.log(err);
@@ -631,13 +473,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       {explore?.map((post: postInterface, index: number) => {
         return (
           <div key={post.cl_pubkey.toString()}>
-            <Post
-              post={post}
-              sdk={sdk}
-              setData={setExplore}
-              fetchPostData={fetchPostData}
-              postIndex={index}
-            />
+            <Post post={post} fetchPostData={fetchPostData} postIndex={index} />
           </div>
         );
       })}

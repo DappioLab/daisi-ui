@@ -21,7 +21,6 @@ import {
 } from "@/components/cyberConnectPage/helper";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 import API from "@/axios/api";
-
 export interface ISubmitModal {
   title: string;
   description: string;
@@ -260,7 +259,8 @@ const SubmitModal = (props: ISubmitModalProps) => {
         setShowGeneratingLoading(true);
         const res = await API.getGeneratedContent(form.link);
         setForm((old) => {
-          old.description = res.data;
+          old.description = res.data.Summary;
+          old.title = res.data.title;
           return JSON.parse(JSON.stringify(old));
         });
         setShowGeneratingLoading(false);
@@ -292,21 +292,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
         {/* <div className={style.description}>{props.description}</div> */}
         <div className={style.formBlock}>
           <div className={style.inputBlock}>
-            <div className={style.inputLabel}>Title</div>
-            <input
-              type="text"
-              placeholder="title"
-              className={style.input}
-              value={form.title}
-              onChange={(e) => {
-                setForm((old) => {
-                  old.title = e.target.value;
-                  return JSON.parse(JSON.stringify(old));
-                });
-              }}
-            />
-          </div>
-          <div className={style.inputBlock}>
             <div className={style.inputLabel}>Link</div>
             <input
               type="text"
@@ -322,8 +307,32 @@ const SubmitModal = (props: ISubmitModalProps) => {
             />
           </div>
           <div className={style.inputBlock}>
-            <div className={style.inputLabel}>Description</div>
-            <textarea
+            {form.title != "" && <div className={style.inputLabel}>Title</div>}
+            {form.title != "" && (
+              <div className={style.input}>{form.title}</div>
+            )}
+            {/* <input
+              type="text"
+              placeholder="title"
+              className={style.input}
+              value={form.title}
+              onChange={(e) => {
+                setForm((old) => {
+                  old.title = e.target.value;
+                  return JSON.parse(JSON.stringify(old));
+                });
+              }}
+            /> */}
+          </div>
+
+          <div className={style.inputBlock}>
+            {form.description != "" && (
+              <div className={style.inputLabel}>Description</div>
+            )}
+            {form.description != "" && (
+              <div className={style.input}>{form.description} </div>
+            )}
+            {/* <textarea
               style={{ height: "400px" }}
               placeholder="description"
               className={style.input}
@@ -334,7 +343,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
                   return JSON.parse(JSON.stringify(old));
                 });
               }}
-            ></textarea>
+            ></textarea> */}
           </div>
           {showGeneratingLoading && (
             <div className={style.loadingText}>Generating summary{dots}</div>

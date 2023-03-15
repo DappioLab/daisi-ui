@@ -6,7 +6,7 @@ export interface IAxiosError extends AxiosError {
 
 const service = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}`,
-  timeout: 1000 * 10,
+  timeout: 1000 * 100,
 });
 
 service.interceptors.request.use(

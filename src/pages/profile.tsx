@@ -24,11 +24,13 @@ import { PublicKey } from "@solana/web3.js";
 import {
   updateAuthModal,
   updateUserProfilePageData,
+  updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
 import {
   fetchFollowers,
   fetchFollowings,
 } from "@/components/cyberConnectPage/helper";
+import { useGumSDK } from "@/hooks/useGumSDK";
 
 const ProfilePage = ({ user }: { user: IUser }) => {
   const {
@@ -38,7 +40,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     userProfilePageData,
     currentAddress,
   } = useSelector((state: IRootState) => state.persistedReducer.global);
-  const { userProfile } = useSelector(
+  const { userProfile, followersMap, followingMap } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
 
@@ -55,7 +57,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const [showUserEditModal, setShowUserEditModal] = useState(false);
   const [checkingAddress, setCheckingAddress] = useState("");
   const [isCheckingSolanaAddress, setIsCheckingSolanaAddress] = useState(false);
-
+  let sdk = useGumSDK();
   const getUser = async () => {
     if (!checkingAddress) {
       return;
@@ -66,13 +68,32 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     let followings: string[] = [];
     let followers: string[] = [];
     if (isCheckingSolanaAddress) {
+      let gumAddress = new PublicKey(checkingAddress);
+      let profile = (
+        await sdk.profile.getProfilesByUser(gumAddress)
+      )[0].cl_pubkey.toString();
+      dispatch(updateUserProfilePageHandle(new PublicKey(profile)));
+      if (followersMap.size && followersMap.size && profile) {
+        let followProfiles = followersMap.get(profile);
+        if (followProfiles)
+          followers = followProfiles.map((acc) => {
+            return acc.profile.toString();
+          });
+        let followerProfile = followingMap.get(profile);
+        if (followerProfile)
+          followings = followerProfile.map((acc) => {
+            return acc.profile.toString();
+          });
+      }
     } else {
-      followers = (await fetchFollowers(checkingAddress, currentAddress)).map(
+      followers = (await fetchFollowers(checkingAddress, currentAddress))?.map(
         (p) => p.owner.address
       );
-      followings = (await fetchFollowings(checkingAddress, currentAddress)).map(
-        (p) => p.owner.address
-      );
+      followers = followers ? followers : [];
+      followings = (
+        await fetchFollowings(checkingAddress, currentAddress)
+      )?.map((p) => p.owner.address);
+      followings = followings ? followings : [];
     }
 
     setFetchedUser({ ...user.data, followings, followers });
@@ -97,11 +118,27 @@ const ProfilePage = ({ user }: { user: IUser }) => {
         setIsCheckingSolanaAddress(false);
       }
     })();
-  }, [router.asPath]);
+  }, [router.asPath, metamaskAddress, userProfile]);
 
   useEffect(() => {
     getUser();
-  }, [checkingAddress]);
+  }, [checkingAddress, followingMap]);
+
+  let followButton = (
+    <div className={style.followBtn} onClick={() => showLoginPrompt()}>
+      Login{" "}
+    </div>
+  );
+  if (accessToken && !isCheckingSolanaAddress) {
+    followButton = (
+      <CyberConnectFollowBtn
+        checkingAddress={checkingAddress}
+        getUser={getUser}
+      />
+    );
+  } else if (userProfile && isCheckingSolanaAddress && wallet.connected) {
+    followButton = <GumFollowButton toProfile={userProfilePageHandle} />;
+  }
 
   return (
     <div className={style.profileId}>
@@ -188,52 +225,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                     // <span>Cyber Connect</span>
                   )}
                 </div>
-                {!isLogin ||
-                (isCheckingSolanaAddress && !userProfile) ||
-                (!isCheckingSolanaAddress && !accessToken) ? (
-                  <div
-                    className={style.followBtn}
-                    onClick={() => showLoginPrompt()}
-                  >
-                    Follow{" "}
-                  </div>
-                ) : (
-                  <>
-                    {!userProfilePageHandle ||
-                    typeof userProfilePageHandle === "string" ? (
-                      <div
-                        className={style.followBtn}
-                        onClick={() => showLoginPrompt()}
-                      >
-                        Follow{" "}
-                      </div>
-                    ) : (
-                      <>
-                        {userProfile &&
-                        isCheckingSolanaAddress &&
-                        !userProfilePageHandle
-                          .toString()
-                          //@ts-ignore
-                          .includes("daisi") ? (
-                          <GumFollowButton toProfile={userProfilePageHandle} />
-                        ) : (
-                          <div
-                            className={style.followBtn}
-                            onClick={() => showLoginPrompt()}
-                          >
-                            Follow{" "}
-                          </div>
-                        )}
-                      </>
-                    )}
-                    {accessToken && !isCheckingSolanaAddress && (
-                      <CyberConnectFollowBtn
-                        checkingAddress={checkingAddress}
-                        getUser={getUser}
-                      />
-                    )}
-                  </>
-                )}
+                {followButton}
               </div>
               <div className={style.followDataBlock}>
                 <div

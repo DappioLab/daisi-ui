@@ -3,7 +3,7 @@ import style from "@/styles/homePage/index.module.sass";
 import PageTitle from "@/components/common/pageTitle";
 import FeedModal from "@/components/homePage/feedModal";
 import request from "graphql-request";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   endpoint,
   POST_BY_ID_STATIC_FIELDS_QUERY,
@@ -33,6 +33,7 @@ import { fetchFollowingsPosts } from "@/components/cyberConnectPage/helper";
 import { IUser } from "@/pages/profile/[address]";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
+import useGumState, { filterPostList } from "@/components/gumPage/gumState";
 
 const HomePage = () => {
   // const [showModal, setShowModal] = useState(false);
@@ -48,9 +49,18 @@ const HomePage = () => {
       };
     }
   );
+  const {
+    userProfile,
+    allPosts: gumPosts,
+    following,
+    allUser,
+  } = useSelector((state: IRootState) => state.persistedReducer.gum);
   // const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
-
+  const [rssFeed, setRssFeed] = useState<IFeedList[]>([]);
+  useGumState();
+  const [gumFeed, setGumFeed] = useState<IFeedList[]>([]);
+  const [ccFeed, setCcFeed] = useState<IFeedList[]>([]);
   // const getCurrentModalIndex = (index: number) => {
   //   setPo
   // };
@@ -72,33 +82,46 @@ const HomePage = () => {
   const updateList = async () => {
     try {
       dispatch(updateLoadingStatus(true));
-      let allPosts: IFeedList[] = [];
-      let res: IFeedList[] = await getAnonymousList();
-      res = res.map((item: IRssSourceItem) => {
-        const obj: IFeedList = {
-          isUserPost: false,
-          userAddress: null,
-          sourceIcon: item.sourceIcon,
-          sourceId: item.id,
-          itemTitle: item.itemTitle,
-          itemDescription: "",
-          itemImage: "",
-          itemLink: item.itemLink,
-          likes: item.likes,
-          forwards: [],
-          linkCreated: item.linkCreated,
-          id: item.id,
-          type: EFeedType.RSS_ITEM,
-          created: item.created,
-        };
-        return obj;
-      });
+      // console.log("update ");
+      let res: IFeedList[] = [];
 
+      if (rssFeed.length <= 0) {
+        res = await getAnonymousList();
+        res = res.map((item: IRssSourceItem) => {
+          const obj: IFeedList = {
+            isUserPost: false,
+            userAddress: null,
+            sourceIcon: item.sourceIcon,
+            sourceId: item.id,
+            itemTitle: item.itemTitle,
+            itemDescription: "",
+            itemImage: "",
+            itemLink: item.itemLink,
+            likes: item.likes,
+            forwards: [],
+            linkCreated: item.linkCreated,
+            id: item.id,
+            type: EFeedType.RSS_ITEM,
+            created: item.created,
+          };
+          return obj;
+        });
+
+        setRssFeed(res);
+      }
+      dispatch(updateLoadingStatus(false));
+    } catch (err) {
+      console.log(err);
+      dispatch(updateLoadingStatus(false));
+    }
+  };
+  const updateCC = async () => {
+    try {
+      let postUserData = {};
       let parsedFollowingsPosts: IFeedList[] = [];
 
-      let postUserData = {};
-
-      if (address && userData.id && userData.id != "") {
+      if (address && userData.id && userData.id != "" && ccFeed.length <= 0) {
+        dispatch(updateLoadingStatus(true));
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
 
         for (let ccPost of ccFollowingsPosts) {
@@ -136,31 +159,68 @@ const HomePage = () => {
 
           parsedFollowingsPosts.push(post);
         }
+        setCcFeed(parsedFollowingsPosts);
+        setGumFeed([]);
+        dispatch(updateLoadingStatus(false));
       }
-
-      allPosts = [...res, ...parsedFollowingsPosts].sort((a, b) =>
-        Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
-      );
-
-      // let parsedData: any = [];
-
-      // res.map((source) => {
-      //   source.items.map((item) => {
-      //     const obj = { ...item, source: { ...source } };
-      //     parsedData.push(obj);
-      //   });
-      // });
-      // console.log(parsedData, "parsedData");
-
-      // dispatch(updateFeedList(parsedData));
-
-      dispatch(updateFeedList(allPosts));
-      dispatch(updateLoadingStatus(false));
     } catch (err) {
       console.log(err);
+      dispatch(updateLoadingStatus(false));
     }
   };
+  const updateGum = async () => {
+    try {
+      let gumFeeds: IFeedList[] = [];
+      if (
+        userProfile &&
+        gumPosts.length > 0 &&
+        allUser.size > 0 &&
+        gumFeed.length <= 0
+      ) {
+        dispatch(updateLoadingStatus(true));
+        let gumFollowing = following.map((conn) => {
+          return conn.follow;
+        });
+        let posts = filterPostList(gumPosts, [
+          ...gumFollowing,
+          userProfile.profile,
+        ]);
+        for (let post of posts) {
+          let wallet = allUser.get(post.profile.toString()).wallet;
+          let user: IUser = (await API.getUserByAddress(wallet.toString()))
+            .data;
 
+          if (user) {
+            let daisiContent = post.daisiContent;
+            const feed: IFeedList = {
+              isUserPost: true,
+              type: EFeedType.GUM_ITEM,
+              sourceId: "",
+              userAddress: address,
+              id: "",
+              itemTitle: daisiContent.itemTitle,
+              itemDescription: daisiContent.itemDescription,
+              itemLink: daisiContent.itemLink,
+              itemImage: daisiContent.itemImage,
+              created: moment(daisiContent.created).valueOf().toString(),
+              likes: [],
+              forwards: [],
+              sourceIcon: user.profilePicture ? user.profilePicture : "",
+              linkCreated: moment(daisiContent.created).valueOf().toString(),
+              cl_pubkey: post.cl_pubkey,
+            };
+            gumFeeds.push(feed);
+          }
+        }
+        setGumFeed(gumFeeds);
+        setCcFeed([]);
+        dispatch(updateLoadingStatus(false));
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch(updateLoadingStatus(false));
+    }
+  };
   useEffect(() => {
     updateList();
     dispatch(updateFeedModalIndex(null));
@@ -169,8 +229,18 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
-    updateList();
-  }, [address, userData]);
+    updateGum();
+  }, [following]);
+  useEffect(() => {
+    updateCC();
+  }, [address]);
+  useEffect(() => {
+    let allPosts = [...rssFeed, ...ccFeed, ...gumFeed].sort((a, b) =>
+      Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
+    );
+
+    dispatch(updateFeedList(allPosts));
+  }, [rssFeed, gumFeed, ccFeed]);
 
   // useEffect(() => {
   //   const content = feedList.find((feed, index) => {

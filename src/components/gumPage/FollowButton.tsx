@@ -23,9 +23,9 @@ const FollowButton = (prop: followButtonProp) => {
       }
       let followIx = await (
         await sdk?.connection.create(
-          userProfile.profile,
+          new PublicKey(userProfile.profile),
           new PublicKey(profile),
-          userProfile.user,
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
       )?.instructionMethodBuilder.rpc();
@@ -53,9 +53,9 @@ const FollowButton = (prop: followButtonProp) => {
       let unFollowIx = await (
         await sdk?.connection.delete(
           reactionPubkey.cl_pubkey,
-          userProfile.profile,
+          new PublicKey(userProfile.profile),
           new PublicKey(toProfile),
-          userProfile.user,
+          new PublicKey(userProfile.user),
           wallet.publicKey
         )
       )?.rpc();
@@ -68,7 +68,7 @@ const FollowButton = (prop: followButtonProp) => {
     userProfile &&
     userProfile.profile.toString() != toProfile.toString() &&
     !following.find((conn) => {
-      return conn.follow.equals(toProfile);
+      return conn.follow.toString() == toProfile.toString();
     })
   ) {
     followButton = (
@@ -80,7 +80,7 @@ const FollowButton = (prop: followButtonProp) => {
     userProfile &&
     userProfile.profile.toString() != toProfile.toString() &&
     following.find((conn) => {
-      return conn.follow.equals(toProfile);
+      return conn.follow.toString() == toProfile.toString();
     })
   ) {
     followButton = (

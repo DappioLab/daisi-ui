@@ -5,8 +5,9 @@ import {
   ConnectionInterface,
   ReactionInterface,
   ProfileAccount,
-} from "@/components/gumPage/Explore";
+} from "@/components/gumPage/gumState";
 import { IFeedList } from "./dailySlice";
+import { postInterface } from "@/components/gumPage/Posts";
 export interface IGumInitialState {
   userProfile: ProfileAccount | null;
   userAccounts: PublicKey[];
@@ -14,6 +15,10 @@ export interface IGumInitialState {
   followers: PublicKey[];
   reactions: Map<string, ReactionInterface[]>;
   postList: IFeedList[] | null;
+  allPosts: postInterface[];
+  allUser: Map<string, ProfileAccount>;
+  followingMap: Map<string, ProfileAccount[]>;
+  followersMap: Map<string, ProfileAccount[]>;
 }
 
 const initialState: IGumInitialState = {
@@ -21,8 +26,12 @@ const initialState: IGumInitialState = {
   userAccounts: [],
   following: [],
   followers: [],
-  reactions: new Map(),
+  reactions: new Map<string, ReactionInterface[]>(),
   postList: null,
+  allPosts: [],
+  allUser: new Map<string, ProfileAccount>(),
+  followersMap: new Map<string, ProfileAccount[]>(),
+  followingMap: new Map<string, ProfileAccount[]>(),
 };
 
 export const gumSlice = createSlice({
@@ -61,6 +70,27 @@ export const gumSlice = createSlice({
     updatePostList: (state, action) => {
       state.postList = action.payload;
     },
+    updatePosts: (state, action: { payload: postInterface[] }) => {
+      state.allPosts = action.payload;
+    },
+    updateAllUser: (
+      state,
+      action: { payload: Map<string, ProfileAccount> }
+    ) => {
+      state.allUser = action.payload;
+    },
+    updateAllFollow: (
+      state,
+      action: {
+        payload: {
+          following: Map<string, ProfileAccount[]>;
+          followers: Map<string, ProfileAccount[]>;
+        };
+      }
+    ) => {
+      state.followersMap = action.payload.following;
+      state.followingMap = action.payload.followers;
+    },
   },
 });
 
@@ -71,6 +101,9 @@ export const {
   updateFollowers,
   updateReactions,
   updatePostList,
+  updatePosts,
+  updateAllUser,
+  updateAllFollow,
 } = gumSlice.actions;
 
 export default gumSlice.reducer;

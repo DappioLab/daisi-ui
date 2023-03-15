@@ -10,280 +10,30 @@ import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
 import { ipfsClient, mainGateway } from "./storage";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateUserAccounts,
-  updateUserProfile,
-  updateFollowers,
-  updateFollowing,
-  updateReactions,
-} from "@/redux/gumSlice";
+import { PostList } from "./gumState";
 import { IRootState } from "@/redux";
+import { updateLoadingStatus } from "@/redux/globalSlice";
 
-interface PostAccount {
-  cl_pubkey: string;
-  metadatauri: string;
-  profile: string;
-  replyto?: string;
-}
-export interface ConnectionInterface {
-  follow: PublicKey;
-  cl_pubkey: PublicKey;
-}
-export interface ReactionInterface {
-  from: PublicKey;
-  type: ReactionType;
-  cl_pubkey: PublicKey;
-  replyTo?: PublicKey;
-}
-export interface ReplyInterface {
-  from: PublicKey;
-  text: string;
-  cl_pubkey: PublicKey;
-}
-export interface ProfileAccount {
-  profile: PublicKey;
-  user: PublicKey;
-  wallet: PublicKey;
-}
 export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
 const ExplorePosts = () => {
   const wallet = useWallet();
-  const dispatch = useDispatch();
   const sdk = useGumSDK();
-  const { userProfile, following, followers, userAccounts } = useSelector(
-    (state: IRootState) => state.persistedReducer.gum
-  );
-  const [explore, setExplore] = useState<postInterface[]>([]);
+  const { userProfile, following, followers, userAccounts, allPosts } =
+    useSelector((state: IRootState) => state.persistedReducer.gum);
+
   const [postLink, setPostLink] = useState("");
   // const [postImg, setImg] = useState<File | null>(null);
   const [username, setUserName] = useState("");
   const [description, setDescription] = useState("");
   const [profileImg, setProfileImg] = useState<File | null>(null);
   const [profileEdit, setProfileEdit] = useState(false);
+  const dispatch = useDispatch();
   // parts for reply
   // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
   //   new Map()
   // );
 
-  const fetchProfile = async () => {
-    if (wallet.publicKey) {
-      let profileKeys = await sdk?.profile.getProfileAccountsByUser(
-        wallet.publicKey
-      );
-      if (!userProfile && profileKeys && profileKeys.length > 0) {
-        dispatch(
-          updateUserProfile(
-            profileKeys
-              .map((pa) => {
-                return {
-                  profile: pa.publicKey,
-                  user: pa.account.user,
-                  wallet: wallet.publicKey,
-                };
-              })
-              .sort()[0]
-          )
-        );
-      }
-      let userKeys = await sdk?.user.getUserAccountsByUser(wallet.publicKey);
-      if (userKeys && userKeys.length > 0) {
-        dispatch(
-          updateUserAccounts(
-            userKeys.map((account) => {
-              return account.publicKey;
-            })
-          )
-        );
-      }
-    }
-  };
-  const fetchPostData = async () => {
-    try {
-      if (wallet.publicKey) {
-        const allPostAccounts =
-          (await sdk?.post.getAllPosts()) as Array<PostAccount>;
-        // parts for reply
-        // let replyMap = new Map<string, ReplyInterface[]>();
-        const allPostLocal = await sdk.post.getPostAccounts();
-        let userPostAccounts = allPostLocal
-          ? await Promise.all(
-              allPostLocal.map(async (post) => {
-                try {
-                  if (post.account.metadataUri.includes("/ipfs/")) {
-                    let postData = await axios.get(
-                      mainGateway +
-                        post.account.metadataUri.substring(
-                          post.account.metadataUri.indexOf("/ipfs/") + 6
-                        )
-                    );
-                    return {
-                      postData,
-                      metadatauri: post.account.metadataUri,
-                      cl_pubkey: post.publicKey,
-                      profile: post.account.profile as PublicKey,
-                      replyTo: post.account.replyTo
-                        ? (post.account.replyTo as PublicKey)
-                        : null,
-                    };
-                  }
-                  let postData = await axios.get(post.account.metadataUri);
-                  return {
-                    postData,
-                    metadatauri: post.account.metadataUri,
-                    cl_pubkey: post.publicKey,
-                    profile: post?.account.profile as PublicKey,
-                    replyTo: post.account.replyTo
-                      ? (post.account.replyTo as PublicKey)
-                      : null,
-                  };
-                } catch (err) {
-                  console.log(err);
-                }
-              })
-            )
-          : [];
-
-        let allPostsMetadata = await Promise.all(
-          allPostAccounts
-            .filter((post) => {
-              return !userPostAccounts.find((userPost) => {
-                return post.cl_pubkey == userPost?.cl_pubkey.toString();
-              });
-            })
-            .map(async (post) => {
-              try {
-                if (post.metadatauri.includes("/ipfs/")) {
-                  let postData = await axios.get(
-                    mainGateway +
-                      post.metadatauri.substring(
-                        post.metadatauri.indexOf("/ipfs/") + 6
-                      )
-                  );
-                  return {
-                    postData,
-                    metadatauri: post.metadatauri,
-                    cl_pubkey: new PublicKey(post.cl_pubkey),
-                    profile: new PublicKey(post.profile),
-                    replyTo: post.replyto ? new PublicKey(post.replyto) : null,
-                  };
-                }
-
-                let postData = await axios.get(post.metadatauri);
-
-                return {
-                  postData,
-                  metadatauri: post.metadatauri,
-                  cl_pubkey: new PublicKey(post.cl_pubkey),
-                  profile: new PublicKey(post.profile),
-                  replyTo: post.replyto ? new PublicKey(post.replyto) : null,
-                };
-              } catch (err) {}
-            })
-        );
-
-        setExplore(
-          [...userPostAccounts, ...allPostsMetadata]
-            .filter((data) => {
-              let postCotext = data?.postData.data as postInterface;
-              return (
-                data?.postData.status == 200 &&
-                postCotext.content.blocks?.find((block) => {
-                  return (
-                    block.type == "header" &&
-                    block.data.text == CREATED_IN_DAISI_TAG
-                  );
-                })
-              );
-            })
-            .map((data) => {
-              let postCotext = data?.postData.data as postInterface;
-              return {
-                ...postCotext,
-                metadatauri: data?.metadatauri,
-                cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
-                profile: data ? data.profile : PublicKey.default,
-              };
-            })
-        );
-        // parts for reply
-        // [...userPostAccounts, ...allPostsMetadata]
-        //   .filter((data) => {
-        //     return data.replyTo && data.postData.data.content.content;
-        //   })
-        //   .forEach((data) => {
-        //     replyMap.set(data.replyTo.toString(), [
-        //       {
-        //         from: data.profile,
-        //         text: data.postData.data.content.content,
-        //         cl_pubkey: data.cl_pubkey,
-        //       },
-        //       ...(replyMap.has(data.replyTo.toString())
-        //         ? replyMap.get(data.replyTo.toString())
-        //         : []),
-        //     ]);
-        //   });
-
-        // setReply(replyMap);
-      }
-    } catch (err) {
-      console.log("error", err);
-    }
-  };
-  const fetchConnections = async () => {
-    try {
-      if (wallet.publicKey && userProfile) {
-        let following = await sdk?.connection.getALlConnectionAccounts(
-          userProfile.profile
-        );
-        let followers = await sdk?.connection.getALlConnectionAccounts(
-          undefined,
-          userProfile.profile
-        );
-
-        dispatch(
-          updateFollowing(
-            (following ? following : []).map((conn) => {
-              return {
-                follow: conn.account.toProfile,
-                cl_pubkey: conn.publicKey,
-              };
-            })
-          )
-        );
-        dispatch(
-          updateFollowers(
-            (followers ? followers : []).map((conn) => {
-              return conn.account.fromProfile;
-            })
-          )
-        );
-      }
-    } catch (err) {
-      console.log("error", err);
-    }
-  };
-  const fetchReaction = async () => {
-    let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
-    // let reactions = await sdk.reaction.getAllReactions();
-    let map = new Map<
-      string,
-      { from: PublicKey; type: ReactionType; cl_pubkey: PublicKey }[]
-    >();
-    reactionAccounts.forEach((account) => {
-      map.set(account.account.toPost.toString(), [
-        {
-          from: account.account.fromProfile,
-          type: account.account.reactionType,
-          cl_pubkey: account.publicKey,
-        },
-        ...(map.has(account.account.toPost.toString())
-          ? map.get(account.account.toPost.toString())!
-          : []),
-      ]);
-    });
-    dispatch(updateReactions(map));
-  };
   const createGumPost = async (postLink: string) => {
     let postId = "";
     let ipfsLink = "";
@@ -320,8 +70,8 @@ const ExplorePosts = () => {
         if (userProfile) {
           let postIx = await sdk?.post.create(
             ipfsLink,
-            userProfile.profile,
-            userProfile.user,
+            new PublicKey(userProfile.profile),
+            new PublicKey(userProfile.user),
             wallet.publicKey
           );
 
@@ -361,8 +111,8 @@ const ExplorePosts = () => {
         let addProfileTx = await (
           await sdk.profileMetadata.create(
             mainGateway + uploadMetadata.path,
-            userProfile.profile,
-            userProfile.user,
+            new PublicKey(userProfile.profile),
+            new PublicKey(userProfile.user),
             wallet.publicKey
           )
         ).instructionMethodBuilder.rpc();
@@ -385,13 +135,10 @@ const ExplorePosts = () => {
       //Update user profile
     }
   };
-  useEffect(() => {
-    fetchProfile();
-    fetchPostData();
-    fetchConnections();
-    fetchReaction();
-  }, [wallet.connected, userProfile]);
 
+  useEffect(() => {
+    dispatch(updateLoadingStatus(false));
+  }, [allPosts]);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
@@ -420,7 +167,6 @@ const ExplorePosts = () => {
           )
         )?.instructionMethodBuilder.rpc();
         console.log(result);
-        await fetchProfile();
       } else {
         console.log("creating user");
 
@@ -429,7 +175,6 @@ const ExplorePosts = () => {
         let result = await user?.instructionMethodBuilder.rpc();
 
         console.log(result);
-        await fetchProfile();
       }
     } catch (err) {
       console.log(err);
@@ -545,13 +290,7 @@ const ExplorePosts = () => {
         {profileEdit && editProfile}
       </div>
       <div>{form}</div>
-      {explore?.map((post: postInterface) => {
-        return (
-          <div key={post.cl_pubkey.toString()} className="">
-            <Post post={post} setData={setExplore} />
-          </div>
-        );
-      })}
+      <PostList></PostList>
     </div>
   );
 };
