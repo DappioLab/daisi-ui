@@ -1,6 +1,7 @@
 export { createIpfsClient, createCyberConnectClient } from "./clientFactory";
 export { follow, fetchFollowings, fetchFollowers } from "./follow";
 export { like } from "./like";
+export { comment } from "./comment";
 export {
   createPost,
   fetchPosts,

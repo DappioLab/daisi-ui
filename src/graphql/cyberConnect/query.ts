@@ -103,6 +103,26 @@ export const POST_BY_ADDRESS_QUERY = gql`
                           arweaveTxHash
                         }
                       }
+                      comments {
+                        edges {
+                          node {
+                            ... on Comment {
+                              contentID
+                              title
+                              body
+                              digest
+                              authorHandle
+                              authorAddress
+                              arweaveTxHash
+                              createdAt
+                              updatedAt
+                              commentCount
+                              likeCount
+                              dislikeCount
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
