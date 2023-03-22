@@ -17,6 +17,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import FeedModal from "../homePage/feedModal";
 import { EFeedType } from "../homePage/horizontalFeed";
 import { IFeedList } from "@/redux/dailySlice";
+import EventNotification from "./eventNotification";
 // import { updateModalData } from "@/redux/dailySlice";
 
 interface IGlobalProps {
@@ -133,6 +134,7 @@ const Global = (props: IGlobalProps) => {
       <div className={showAuthModal ? style.show : style.hidden}>
         <AuthModal />
       </div>
+      <EventNotification />
       {isLoading && (
         <div className={style.loadingMask}>
           <img className={style.loadingIcon} src="/loading.png" alt="" />

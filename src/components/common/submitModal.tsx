@@ -1,5 +1,6 @@
 import { IRootState } from "@/redux";
 import {
+  updateEventNotificationQueue,
   updateLoadingStatus,
   updateShowSubmitModal,
   updateSubmitModalData,
@@ -43,7 +44,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
-  const { userData } = useSelector(
+  const { userData, eventNotificationQueue } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
   const [showGeneratingLoading, setShowGeneratingLoading] = useState(false);
@@ -121,7 +122,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
         parentDigest: "",
       };
       let uploadMetadata = await ipfsClient.add(JSON.stringify(data));
-      console.log(uploadMetadata, "uploadMetadata");
 
       ipfsLink = mainGateway + uploadMetadata.path;
       if (solanaWallet.publicKey) {
@@ -134,8 +134,11 @@ const SubmitModal = (props: ISubmitModalProps) => {
           );
 
           if (postIx) {
-            let result = await postIx.instructionMethodBuilder.rpc();
-            console.log(result);
+            await postIx.instructionMethodBuilder.rpc();
+
+            dispatch(updateShowSubmitModal(false));
+            dispatch(updateLoadingStatus(false));
+            updateEventQueue("Creating post");
             postId = postIx.postPDA.toString();
           }
         }
@@ -169,6 +172,9 @@ const SubmitModal = (props: ISubmitModalProps) => {
       await checkNetwork(provider);
       const cyberConnectClient = createCyberConnectClient(provider);
 
+      dispatch(updateShowSubmitModal(false));
+      dispatch(updateLoadingStatus(false));
+      updateEventQueue("Creating post");
       const result = await createCyberConnectPost(
         data.itemTitle,
         data.itemDescription,
@@ -190,7 +196,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
     }
   };
 
-  const createPost = () => {
+  const createPost = async () => {
     let type: EPostType | null = null;
     if (accessToken && !solanaWallet.connected) {
       type = EPostType.CYBER_CONNECT;
@@ -207,22 +213,36 @@ const SubmitModal = (props: ISubmitModalProps) => {
 
     dispatch(updateLoadingStatus(true));
 
+    let result = null;
+
     switch (type) {
       case EPostType.CYBER_CONNECT:
-        createCCPost();
+        result = await createCCPost();
         break;
       case EPostType.GUM:
-        createGumPost();
+        result = await createGumPost();
         break;
       default:
         break;
     }
 
-    setTimeout(() => {
-      dispatch(updateShowSubmitModal(false));
-      dispatch(updateLoadingStatus(false));
-      router.push(`/profile?address=${userData.address}`);
-    }, 1500);
+    if (result.success) {
+      updateEventQueue(
+        "Post created successfully, will redirect to profile page in 5 seconds."
+      );
+      setTimeout(() => {
+        router.push(`/profile?address=${userData.address}`);
+      }, 5000);
+    } else {
+      updateEventQueue(
+        "Post created failed or not responding within 30 seconds due to the network issue, please check again"
+      );
+    }
+  };
+
+  const updateEventQueue = (event: string) => {
+    const updatedQueue = [event, ...eventNotificationQueue];
+    dispatch(updateEventNotificationQueue(updatedQueue));
   };
 
   const genDot = (num: number) => {

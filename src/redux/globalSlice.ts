@@ -30,6 +30,7 @@ export interface IGlobalInitialState {
   feedModalIndex: number | null;
   feedModalData: IFeedList | null;
   feedModalType: EFeedModalType | null;
+  eventNotificationQueue: string[];
 }
 
 const initialState: IGlobalInitialState = {
@@ -60,6 +61,28 @@ const initialState: IGlobalInitialState = {
   feedModalIndex: null,
   feedModalData: null,
   feedModalType: null,
+  eventNotificationQueue: [
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.",
+    // "Post created successfully, will redirect to profile page in 5 seconds.0",
+    // "Post created successfully, will redirect to profile page in 5 seconds.9",
+    // "Post created successfully, will redirect to profile page in 5 seconds.8",
+    // "Post created successfully, will redirect to profile page in 5 seconds.7",
+    // "Post created successfully, will redirect to profile page in 5 seconds.6",
+    // "Post created successfully, will redirect to profile page in 5 seconds.5",
+    // "Post created successfully, will redirect to profile page in 5 seconds.4",
+    // "Post created successfully, will redirect to profile page in 5 seconds.3",
+    // "Post created successfully, will redirect to profile page in 5 seconds.2",
+    // "Post created successfully, will redirect to profile page in 5 seconds.1",
+  ],
 };
 
 export const globalSlice = createSlice({
@@ -108,6 +131,9 @@ export const globalSlice = createSlice({
     updateFeedModalType: (state, action) => {
       state.feedModalType = action.payload;
     },
+    updateEventNotificationQueue: (state, action) => {
+      state.eventNotificationQueue = action.payload;
+    },
   },
 });
 
@@ -126,6 +152,7 @@ export const {
   updateFeedModalIndex,
   updateFeedModalData,
   updateFeedModalType,
+  updateEventNotificationQueue,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;
