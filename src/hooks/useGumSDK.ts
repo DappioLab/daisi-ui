@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import { Cluster, ConfirmOptions, Connection } from "@solana/web3.js";
 import { GraphQLClient } from "graphql-request";
 
-import { SDK as LocalSDK, GRAPHQL_ENDPOINTS } from "../gpl-core/src";
+import { SDK as LocalSDK } from "../gpl-core/src";
+import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
 export const useGumSDK = (
   connection2 = connection,
   opts: ConfirmOptions = { preflightCommitment: "confirmed" },

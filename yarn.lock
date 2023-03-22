@@ -859,10 +859,21 @@
     "@types/node" "^16.18.12"
     typescript "^4.9.5"
 
-"@gumhq/sdk@^1.0.10", "@gumhq/sdk@^1.0.12":
+"@gumhq/sdk@^1.0.12":
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/@gumhq/sdk/-/sdk-1.0.12.tgz#965496246437609f0f6fd48000790a087de8f824"
   integrity sha512-vq2KpMslLYtnHCHyFa3x8sqEW04wR1mJ1Oi7z2h3f110P0ukIkHdNdhkiFGSFdluy2aIGWU9/5vxjEDcPDVXyA==
+  dependencies:
+    "@project-serum/anchor" "^0.26.0"
+    axios "^1.2.6"
+    graphql "^16.6.0"
+    graphql-request "^5.1.0"
+    randombytes "^2.1.0"
+
+"@gumhq/sdk@^1.0.14":
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@gumhq/sdk/-/sdk-1.0.14.tgz#a30c8b7b089d2e6f5adbaae900ee74ebf38aefcc"
+  integrity sha512-+6ISxS57jqggMnsMKdHXIviTAfEm2l4yXN5keA0ZJoHihu++Uo8lpAizVwH9rF+AtiN7/eq4qvyQxIsd0bml5g==
   dependencies:
     "@project-serum/anchor" "^0.26.0"
     axios "^1.2.6"

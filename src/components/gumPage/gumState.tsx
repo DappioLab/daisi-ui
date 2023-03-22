@@ -16,6 +16,7 @@ import {
   updatePosts,
   updateAllUser,
   updateAllFollow,
+  updateReplies,
 } from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
 
@@ -89,10 +90,11 @@ const useGumState = () => {
   };
   const fetchPostData = async () => {
     try {
-      const allPostAccounts =
-        (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+      // const allPostAccounts =
+      //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
+      const allPostAccounts = [];
       // parts for reply
-      // let replyMap = new Map<string, ReplyInterface[]>();
+      let replyMap = new Map<string, ReplyInterface[]>();
       const allPostLocal = await sdk.post.getPostAccounts();
 
       let userPostAccounts = allPostLocal
@@ -170,6 +172,23 @@ const useGumState = () => {
             } catch (err) {}
           })
       );
+      [...userPostAccounts, ...allPostsMetadata]
+        .filter((data) => {
+          return data.replyTo && data.postData.data.content.content;
+        })
+        .forEach((data) => {
+          replyMap.set(data.replyTo.toString(), [
+            {
+              from: data.profile,
+              text: data.postData.data.content.content,
+              cl_pubkey: data.cl_pubkey,
+            },
+            ...(replyMap.has(data.replyTo.toString())
+              ? replyMap.get(data.replyTo.toString())
+              : []),
+          ]);
+        });
+      dispatch(updateReplies(replyMap));
       dispatch(
         updatePosts(
           [...userPostAccounts, ...allPostsMetadata]
@@ -192,34 +211,19 @@ const useGumState = () => {
             })
             .map((data) => {
               let postCotext = data?.postData.data as postInterface;
+              let postPubkey = data ? data.cl_pubkey : PublicKey.default;
               return {
                 ...postCotext,
                 metadatauri: data?.metadatauri,
-                cl_pubkey: data ? data.cl_pubkey : PublicKey.default,
+                cl_pubkey: postPubkey,
                 profile: data ? data.profile : PublicKey.default,
+                replies: replyMap.has(postPubkey.toString())
+                  ? replyMap.get(postPubkey.toString())
+                  : [],
               };
             })
         )
       );
-      // parts for reply
-      // [...userPostAccounts, ...allPostsMetadata]
-      //   .filter((data) => {
-      //     return data.replyTo && data.postData.data.content.content;
-      //   })
-      //   .forEach((data) => {
-      //     replyMap.set(data.replyTo.toString(), [
-      //       {
-      //         from: data.profile,
-      //         text: data.postData.data.content.content,
-      //         cl_pubkey: data.cl_pubkey,
-      //       },
-      //       ...(replyMap.has(data.replyTo.toString())
-      //         ? replyMap.get(data.replyTo.toString())
-      //         : []),
-      //     ]);
-      //   });
-
-      // setReply(replyMap);
     } catch (err) {
       console.log("error", err);
     }
