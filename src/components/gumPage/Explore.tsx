@@ -10,7 +10,7 @@ import axios from "axios";
 import style from "@/styles/gumPage/explore.module.sass";
 import { ipfsClient, mainGateway } from "./storage";
 import { useDispatch, useSelector } from "react-redux";
-import { PostList } from "./gumState";
+import { PostList, ReplyInterface } from "./gumState";
 import { IRootState } from "@/redux";
 import { updateLoadingStatus } from "@/redux/globalSlice";
 
@@ -29,10 +29,6 @@ const ExplorePosts = () => {
   const [profileImg, setProfileImg] = useState<File | null>(null);
   const [profileEdit, setProfileEdit] = useState(false);
   const dispatch = useDispatch();
-  // parts for reply
-  // const [replies, setReply] = useState<Map<string, ReplyInterface[]>>(
-  //   new Map()
-  // );
 
   const createGumPost = async (postLink: string) => {
     let postId = "";

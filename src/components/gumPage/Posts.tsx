@@ -19,6 +19,9 @@ import { IRootState } from "@/redux/index";
 import FollowButton from "./FollowButton";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import LikeButton from "./LikeButton";
+import Replylist from "./Replylist";
+import DeleteButton from "./DeleteButton";
+import ReplyForm from "./ReplyForm";
 export interface postInterface {
   metadatauri: string;
   cl_pubkey: PublicKey;
@@ -43,11 +46,9 @@ interface postState {
 
 const Post = (post: postState) => {
   const wallet = useWallet();
-  // const [reply, setReply] = useState("");
-  // const [open, setOpen] = useState(false);
-  const { userProfile, following, followers, reactions } = useSelector(
-    (state: IRootState) => state.persistedReducer.gum
-  );
+
+  const { userProfile, following, followers, reactions, replyMap } =
+    useSelector((state: IRootState) => state.persistedReducer.gum);
   const { userData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -63,25 +64,6 @@ const Post = (post: postState) => {
       });
     }
   }
-
-  const handleDelete = async (e: any) => {
-    try {
-      if (!wallet.publicKey) {
-        throw "wallet Not Connected";
-      }
-      let deleteTx = await sdk?.post
-        .delete(
-          post.post.cl_pubkey,
-          new PublicKey(userProfile.profile),
-          new PublicKey(userProfile.user),
-          wallet.publicKey
-        )
-        ?.rpc();
-      window.location.reload();
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const handleDislike = async (e: any) => {
     try {
@@ -119,45 +101,7 @@ const Post = (post: postState) => {
       console.log(err);
     }
   };
-  // const handleReply = async (e: any) => {
-  //   let data: any = {
-  //     content: { content: reply },
-  //     type: "text",
-  //     authorship: {
-  //       signature: "0",
-  //       publicKey: "0",
-  //     },
-  //     contentDigest: "0",
-  //     signatureEncoding: "base64",
-  //     digestEncoding: "hex",
-  //     parentDigest: "",
-  //   };
-  //   let replyUrl = await ipfsClient.add(JSON.stringify(data));
-  //   let replyTx = await (
-  //     await sdk.post.reply(
-  //       post.post.cl_pubkey,
-  //       mainGateway + replyUrl.path,
-  //       userProfile.profile,
-  //       userProfile.user,
-  //       wallet.publicKey
-  //     )
-  //   ).instructionMethodBuilder.rpc();
-  //   console.log(replyTx);
-  // };
 
-  let deleteButton = null;
-  if (
-    userProfile &&
-    userProfile.profile.toString() == post.post.profile.toString()
-  ) {
-    deleteButton = (
-      <div>
-        <button className={""} onClick={handleDelete}>
-          Delete Post
-        </button>
-      </div>
-    );
-  }
   let dislikeButton = null;
   if (userProfile) {
     let disLikeButton = (
@@ -184,22 +128,7 @@ const Post = (post: postState) => {
     }
     dislikeButton = <div> {disLikeButton}</div>;
   }
-  let replyForm = null;
-  // if (open) {
-  //   replyForm = (
-  //     <div>
-  //       <form>
-  //         <textarea
-  //           onChange={(e) => setReply(e.target.value)}
-  //           itemType="text"
-  //           placeholder="Reply"
-  //           className={style.replyform}
-  //         ></textarea>
-  //       </form>
-  //       <button onClick={handleReply}>Submit</button>
-  //     </div>
-  //   );
-  // }
+
   return (
     <div className={style.feed}>
       <div className={style.title}>
@@ -219,30 +148,19 @@ const Post = (post: postState) => {
       </div>
       <LikeButton toPost={post.post.cl_pubkey.toString()}></LikeButton>
       {dislikeButton}
-      {
-        // parts for reply
-        /* 
-      {post.replies && <p className={style.text}> Replies </p>}
-      {post.replies &&
-        post.replies.map((reply) => {
-          return (
-            <div key={reply.cl_pubkey.toString()} className={style.reply}>
-              {reply.text}
-            </div>
-          );
-        })} */
-      }
-      {/* <div>
-        <button
-          onClick={() => {
-            setOpen(open ? false : true);
-          }}
-        >
-          Reply
-        </button>
-        {replyForm}
-      </div> */}
-      {deleteButton}
+      {replyMap.has(post.post.cl_pubkey.toString()) &&
+        replyMap.get(post.post.cl_pubkey.toString()).length && (
+          <p className={style.text}> Replies </p>
+        )}
+      <Replylist
+        replies={replyMap.get(post.post.cl_pubkey.toString())}
+        postPubkey={post.post.cl_pubkey.toString()}
+      ></Replylist>
+      <ReplyForm
+        from={post.post.profile.toString()}
+        post={post.post.cl_pubkey.toString()}
+        type="Post"
+      ></ReplyForm>
     </div>
   );
 };
