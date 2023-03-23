@@ -86,8 +86,10 @@ const UserListModal = (props: IUserListModalProps) => {
     dispatch(updateLoadingStatus(true));
     let followingUserList: IUser[] = [];
     let followerUserList: IUser[] = [];
+
     const users = (await API.getUsers()).data as IUser[];
     if (!isEvmAddress(props.checkingUser.address)) {
+      // Gum
       let profile = (
         await sdk.profile.getProfilesByUser(
           new PublicKey(props.checkingUser.address)
@@ -130,7 +132,6 @@ const UserListModal = (props: IUserListModalProps) => {
         }
         dispatch(updateLoadingStatus(false));
       }
-      // Gum
     } else {
       // CyberConnect
       for (const address of props.checkingUser.followings) {
@@ -163,117 +164,119 @@ const UserListModal = (props: IUserListModalProps) => {
     setFollowingList(followingUserList);
     dispatch(updateLoadingStatus(false));
   };
-  const getFollowingUserList = async () => {
-    if (!userData) {
-      alert("please login first");
-      return;
-    }
 
-    props.setUserListType(EUserListType.FOLLOWINGS);
-    dispatch(updateLoadingStatus(true));
+  // const getFollowingUserList = async () => {
+  //   if (!userData) {
+  //     alert("please login first");
+  //     return;
+  //   }
 
-    let followingUserList: IUser[] = [];
-    const users = (await API.getUsers()).data as IUser[];
-    if (!isEvmAddress(props.checkingUser.address)) {
-      dispatch(updateLoadingStatus(true));
-      let profile = (
-        await sdk.profile.getProfilesByUser(
-          new PublicKey(props.checkingUser.address)
-        )
-      )[0]?.cl_pubkey.toString();
+  //   props.setUserListType(EUserListType.FOLLOWINGS);
+  //   dispatch(updateLoadingStatus(true));
 
-      if (followingMap.size && profile) {
-        let followingProfile = followingMap.get(profile);
-        if (followingProfile) {
-          followingProfile.forEach((address) => {
-            let user = users.find((user) => {
-              return user.address == address.wallet.toString();
-            });
-            if (user) {
-              followingUserList.push({
-                ...user,
-                address: address.profile.toString(),
-              });
-            }
-          });
-        }
-      }
-      dispatch(updateLoadingStatus(false));
-      // Gum
-    } else {
-      // CyberConnect
-      const users = (await API.getUsers()).data as IUser[];
-      for (const address of props.checkingUser.followings) {
-        const user = users.find((user) => user.address == address);
-        if (user) {
-          const followers = (
-            await fetchFollowers(address, userData.address)
-          ).map((p) => p.owner.address);
-          const followings = (
-            await fetchFollowings(address, userData.address)
-          ).map((p) => p.owner.address);
-          followingUserList.push({ ...user, followers, followings });
-        }
-      }
-    }
-    setUserList(followingUserList);
-    dispatch(updateLoadingStatus(false));
-  };
+  //   let followingUserList: IUser[] = [];
+  //   const users = (await API.getUsers()).data as IUser[];
+  //   if (!isEvmAddress(props.checkingUser.address)) {
+  //     dispatch(updateLoadingStatus(true));
+  //     let profile = (
+  //       await sdk.profile.getProfilesByUser(
+  //         new PublicKey(props.checkingUser.address)
+  //       )
+  //     )[0]?.cl_pubkey.toString();
 
-  const getFollowerUserList = async () => {
-    if (!userData) {
-      alert("please login first");
-      return;
-    }
+  //     if (followingMap.size && profile) {
+  //       let followingProfile = followingMap.get(profile);
+  //       if (followingProfile) {
+  //         followingProfile.forEach((address) => {
+  //           let user = users.find((user) => {
+  //             return user.address == address.wallet.toString();
+  //           });
+  //           if (user) {
+  //             followingUserList.push({
+  //               ...user,
+  //               address: address.profile.toString(),
+  //             });
+  //           }
+  //         });
+  //       }
+  //     }
+  //     dispatch(updateLoadingStatus(false));
+  //     // Gum
+  //   } else {
+  //     // CyberConnect
+  //     const users = (await API.getUsers()).data as IUser[];
+  //     for (const address of props.checkingUser.followings) {
+  //       const user = users.find((user) => user.address == address);
+  //       if (user) {
+  //         const followers = (
+  //           await fetchFollowers(address, userData.address)
+  //         ).map((p) => p.owner.address);
+  //         const followings = (
+  //           await fetchFollowings(address, userData.address)
+  //         ).map((p) => p.owner.address);
+  //         followingUserList.push({ ...user, followers, followings });
+  //       }
+  //     }
+  //   }
+  //   setUserList(followingUserList);
+  //   dispatch(updateLoadingStatus(false));
+  // };
 
-    props.setUserListType(EUserListType.FOLLOWERS);
-    dispatch(updateLoadingStatus(true));
+  // const getFollowerUserList = async () => {
+  //   if (!userData) {
+  //     alert("please login first");
+  //     return;
+  //   }
 
-    let followerUserList: IUser[] = [];
-    const users = (await API.getUsers()).data as IUser[];
-    if (!isEvmAddress(props.checkingUser.address)) {
-      let profile = (
-        await sdk.profile.getProfilesByUser(
-          new PublicKey(props.checkingUser.address)
-        )
-      )[0]?.cl_pubkey.toString();
+  //   props.setUserListType(EUserListType.FOLLOWERS);
+  //   dispatch(updateLoadingStatus(true));
 
-      if (followersMap.size && profile) {
-        let followerProfile = followersMap.get(profile)?.map((profile) => {
-          return profile.wallet.toString();
-        });
-        if (followerProfile) {
-          followerProfile.forEach((address) => {
-            console.log(address);
-            let user = users.find((user) => {
-              return user.address == address;
-            });
-            if (user) {
-              followerUserList.push({ ...user, followers: followerProfile });
-            }
-          });
-        }
-      }
-    } else {
-      // CyberConnect
+  //   let followerUserList: IUser[] = [];
+  //   const users = (await API.getUsers()).data as IUser[];
+  //   if (!isEvmAddress(props.checkingUser.address)) {
+  //     let profile = (
+  //       await sdk.profile.getProfilesByUser(
+  //         new PublicKey(props.checkingUser.address)
+  //       )
+  //     )[0]?.cl_pubkey.toString();
 
-      for (const address of props.checkingUser.followers) {
-        const user = users.find((user) => user.address == address);
-        if (user) {
-          const followers = (
-            await fetchFollowers(address, userData.address)
-          ).map((p) => p.owner.address);
-          const followings = (
-            await fetchFollowings(address, userData.address)
-          ).map((p) => p.owner.address);
-          followerUserList.push({ ...user, followers, followings });
-        }
-      }
-    }
+  //     if (followersMap.size && profile) {
+  //       let followerProfile = followersMap.get(profile)?.map((profile) => {
+  //         return profile.wallet.toString();
+  //       });
+  //       if (followerProfile) {
+  //         followerProfile.forEach((address) => {
+  //           console.log(address);
+  //           let user = users.find((user) => {
+  //             return user.address == address;
+  //           });
+  //           if (user) {
+  //             followerUserList.push({ ...user, followers: followerProfile });
+  //           }
+  //         });
+  //       }
+  //     }
+  //   } else {
+  //     // CyberConnect
 
-    setUserList(followerUserList);
-    dispatch(updateLoadingStatus(false));
-  };
+  //     for (const address of props.checkingUser.followers) {
+  //       const user = users.find((user) => user.address == address);
+  //       if (user) {
+  //         const followers = (
+  //           await fetchFollowers(address, userData.address)
+  //         ).map((p) => p.owner.address);
+  //         const followings = (
+  //           await fetchFollowings(address, userData.address)
+  //         ).map((p) => p.owner.address);
+  //         followerUserList.push({ ...user, followers, followings });
+  //       }
+  //     }
+  //   }
+
+  //   setUserList(followerUserList);
+  //   dispatch(updateLoadingStatus(false));
+  // };
+
   const changeType = async (type: EUserListType) => {
     props.setUserListType(type);
   };
@@ -286,6 +289,7 @@ const UserListModal = (props: IUserListModalProps) => {
       ? setUserList(followingList)
       : setUserList(followerList);
   }, [followingList, followerList, props.userListType]);
+
   return (
     <div className={style.userListModal}>
       <div
@@ -319,26 +323,35 @@ const UserListModal = (props: IUserListModalProps) => {
           {userList.map((user) => {
             return (
               <div className={style.listItem} key={user.address}>
-                <h3>{user.address}</h3>
-                {userData?.address &&
-                userData.address !== user.address &&
-                !userProfile ? (
-                  <div
-                    className={style.followBtn}
-                    onClick={() => updateUserFollowData(user.address)}
-                  >
-                    {user.followers.includes(userData.address)
-                      ? "Following"
-                      : "Follow"}
-                  </div>
-                ) : null}
-                {userProfile && !isEvmAddress(user.address) ? (
+                <div className={style.avatarRow}>
+                  <img
+                    className={style.avatar}
+                    src={user.profilePicture}
+                    alt="avatar"
+                  />
                   <div>
-                    <FollowButton
-                      toProfile={new PublicKey(user.address)}
-                    ></FollowButton>
+                    <h3>{user.address}</h3>
+                    {userData?.address &&
+                    userData.address !== user.address &&
+                    !userProfile ? (
+                      <div
+                        className={style.followBtn}
+                        onClick={() => updateUserFollowData(user.address)}
+                      >
+                        {user.followers.includes(userData.address)
+                          ? "Following"
+                          : "Follow"}
+                      </div>
+                    ) : null}
+                    {userProfile && !isEvmAddress(user.address) ? (
+                      <div>
+                        <FollowButton
+                          toProfile={new PublicKey(user.address)}
+                        ></FollowButton>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
+                </div>
               </div>
             );
           })}

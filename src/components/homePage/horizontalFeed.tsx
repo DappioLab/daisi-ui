@@ -195,11 +195,11 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       ) : null}
       <div className={style.titleBlock}>
         <div className={style.title}>{props.article.itemTitle}</div>
-        {props.type !== EFeedType.RSS_ITEM && (
+        {/* {props.type !== EFeedType.RSS_ITEM && (
           <div className={style.description}>
             {props.article.itemDescription}
           </div>
-        )}
+        )} */}
         <div className={style.space}></div>
         <div className={style.timeBlock}>
           {moment(parseInt(props.article.linkCreated)).format("MMMM DD, YYYY")}
