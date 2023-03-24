@@ -4,16 +4,15 @@ import { ARWEAVE_ENDPOINT } from "../constants";
 
 export const comment = async (
   targetId: string, // Can be postId or commentId
-  title: string,
   description: string,
   address: string,
   cyberConnectClient: CyberConnect,
   image: string = ""
 ) => {
   try {
-    if (!(targetId && title && description && address)) {
+    if (!(targetId && description && address)) {
       alert(
-        `ERROR: Something is missing...\ntargetId: ${targetId}\ntitle: ${title}\ndescription: ${description}\naddress: ${address}`
+        `ERROR: Something is missing...\ntargetId: ${targetId}\ndescription: ${description}\naddress: ${address}`
       );
       return;
     }
@@ -27,7 +26,7 @@ export const comment = async (
     const daisiHandle = handleCreator(address);
 
     const res = await cyberConnectClient.createComment(targetId, {
-      title,
+      title: `${daisiHandle} commented`,
       body: description,
       author: daisiHandle,
     });

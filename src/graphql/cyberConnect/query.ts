@@ -25,6 +25,30 @@ const ESSENCE_FRAGMENT = `
   }
   `;
 
+export const COMMENT_FRAGMENT = `
+fragment commentFields on Comment {
+  contentID
+  title
+  body
+  digest
+  authorHandle
+  authorAddress
+  arweaveTxHash
+  createdAt
+  updatedAt
+  commentCount
+  likeCount
+  dislikeCount
+  likedStatus(me: $myAddress) {
+    liked
+    disliked
+    proof {
+      arweaveTxHash
+    }
+  }
+}
+  `;
+
 const PROFILE_FRAGMENT = `
   fragment Profile on Profile {
     id
@@ -106,54 +130,68 @@ export const POST_BY_ADDRESS_QUERY = gql`
                       comments {
                         edges {
                           node {
-                            ... on Comment {
-                              contentID
-                              title
-                              body
-                              digest
-                              authorHandle
-                              authorAddress
-                              arweaveTxHash
-                              createdAt
-                              updatedAt
-                              commentCount
-                              likeCount
-                              dislikeCount
-                              likedStatus(me: $myAddress) {
-                                liked
-                                disliked
-                                proof {
-                                  arweaveTxHash
-                                }
-                              }
-                              comments {
-                                edges {
-                                  node {
-                                    ... on Comment {
-                                      contentID
-                                      title
-                                      body
-                                      digest
-                                      authorHandle
-                                      authorAddress
-                                      arweaveTxHash
-                                      createdAt
-                                      updatedAt
-                                      commentCount
-                                      likeCount
-                                      dislikeCount
-                                      likedStatus(me: $myAddress) {
-                                        liked
-                                        disliked
-                                        proof {
-                                          arweaveTxHash
-                                        }
-                                      }
-                                      comments {
-                                        edges {
-                                          node {
-                                            ... on Comment {
-                                              contentID
+                            ...commentFields
+                            comments {
+                              edges {
+                                node {
+                                  ...commentFields
+                                  comments {
+                                    edges {
+                                      node {
+                                        ...commentFields
+                                        comments {
+                                          edges {
+                                            node {
+                                              ...commentFields
+                                              comments {
+                                                edges {
+                                                  node {
+                                                    ...commentFields
+                                                    comments {
+                                                      edges {
+                                                        node {
+                                                          ...commentFields
+                                                          comments {
+                                                            edges {
+                                                              node {
+                                                                ...commentFields
+                                                                comments {
+                                                                  edges {
+                                                                    node {
+                                                                      ...commentFields
+                                                                      comments {
+                                                                        edges {
+                                                                          node {
+                                                                            ...commentFields
+                                                                            comments {
+                                                                              edges {
+                                                                                node {
+                                                                                  ...commentFields
+                                                                                  comments {
+                                                                                    edges {
+                                                                                      node {
+                                                                                        ...commentFields
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
                                             }
                                           }
                                         }
@@ -176,6 +214,7 @@ export const POST_BY_ADDRESS_QUERY = gql`
       }
     }
   }
+  ${COMMENT_FRAGMENT}
 `;
 
 export const PROFILES_WITH_POSTS_QUERY = gql`

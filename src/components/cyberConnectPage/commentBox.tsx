@@ -13,7 +13,6 @@ interface CommentBoxProps {
 }
 
 const CommentBox = (props: CommentBoxProps) => {
-  const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
   const handleOnClick = async () => {
@@ -23,14 +22,12 @@ const CommentBox = (props: CommentBoxProps) => {
       const cyberConnectClient = createCyberConnectClient(provider);
       await comment(
         props.contentId,
-        title,
         message,
         props.address,
         cyberConnectClient
       );
       await props.fetchData();
 
-      setTitle("");
       setMessage("");
     } catch (error) {
       console.log(error);
@@ -39,12 +36,6 @@ const CommentBox = (props: CommentBoxProps) => {
 
   return (
     <div>
-      <h3>Title:</h3>
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Comment Title"
-      />
       <h3>Content:</h3>
       <input
         value={message}
