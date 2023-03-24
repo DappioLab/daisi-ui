@@ -30,6 +30,7 @@ const persistConfig = getPersistConfig({
     "global.showAuthModal",
     "global.showSubmitModal",
     "global.eventNotificationQueue",
+    "global.isLoading",
   ],
   rootReducer,
 });

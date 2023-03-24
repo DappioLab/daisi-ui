@@ -1,4 +1,5 @@
 import Post, { postInterface } from "./PostsMigrated";
+// import PostOriginal from "./Posts";
 import React, { useEffect, useState, useMemo } from "react";
 import API from "@/axios/api";
 import { useGumSDK } from "@/hooks/useGumSDK";
@@ -474,6 +475,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
         return (
           <div key={post.cl_pubkey.toString()}>
             <Post post={post} fetchPostData={fetchPostData} postIndex={index} />
+            {/* <PostOriginal post={post} /> */}
           </div>
         );
       })}

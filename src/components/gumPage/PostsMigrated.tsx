@@ -30,6 +30,9 @@ import {
 } from "@/redux/globalSlice";
 import moment from "moment";
 import { useGumSDK } from "@/hooks/useGumSDK";
+import ReplyList from "./ReplyListMigrated";
+
+import ReplyForm from "./ReplyFormMigrated";
 export interface postInterface {
   metadatauri: string;
   daisiContent: {
@@ -59,9 +62,8 @@ const Post = (post: postState) => {
   const dispatch = useDispatch();
   // const [reply, setReply] = useState("");
   // const [open, setOpen] = useState(false);
-  const { userProfile, following, followers, reactions } = useSelector(
-    (state: IRootState) => state.persistedReducer.gum
-  );
+  const { userProfile, following, followers, reactions, replyMap } =
+    useSelector((state: IRootState) => state.persistedReducer.gum);
   const { userData, userProfilePageData, screenWidth } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -433,31 +435,58 @@ const Post = (post: postState) => {
       {daisiContent && (
         <>
           {screenWidth > 900 ? (
-            <div
-              onClick={() => {
-                dispatch(updateFeedModalType(EFeedModalType.PROFILE_GUM));
-                dispatch(updateFeedModalIndex(post.postIndex));
-                dispatch(updateShowFeedModal(true));
-              }}
-            >
-              <HorizontalFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
-                <div className={style.btnBlock}>
-                  {reactionButton ? (
-                    reactionButton
-                  ) : (
-                    <div
-                      style={{ fontSize: "1.6rem" }}
-                      onClick={(e) => {
-                        showLoginPrompt();
-                        e.stopPropagation();
-                      }}
-                    >
-                      <i className="fa fa-heart-o"></i>
-                    </div>
-                  )}
-                </div>
-              </HorizontalFeed>
-            </div>
+            <>
+              <div
+                onClick={() => {
+                  dispatch(updateFeedModalType(EFeedModalType.PROFILE_GUM));
+                  dispatch(updateFeedModalIndex(post.postIndex));
+                  dispatch(updateShowFeedModal(true));
+                }}
+              >
+                <HorizontalFeed
+                  article={daisiContent}
+                  type={EFeedType.GUM_ITEM}
+                >
+                  <div className={style.btnBlock}>
+                    {reactionButton ? (
+                      <div style={{ marginTop: "1rem", display: "flex" }}>
+                        <div style={{ marginRight: "2rem", display: "flex" }}>
+                          {reactionButton}
+                        </div>
+                        <ReplyForm
+                          from={post.post.profile.toString()}
+                          post={post.post.cl_pubkey.toString()}
+                          type="Post"
+                          commentsNumber={
+                            replyMap.get(post.post.cl_pubkey.toString())
+                              ? replyMap.get(post.post.cl_pubkey.toString())
+                                  .length
+                              : 0
+                          }
+                          getListPostKey={() => {}}
+                          postKey={post.post.cl_pubkey.toString()}
+                          showMoreCommentBtn={false}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        style={{ fontSize: "1.6rem" }}
+                        onClick={(e) => {
+                          showLoginPrompt();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <i className="fa fa-heart-o"></i>
+                      </div>
+                    )}
+                  </div>
+                </HorizontalFeed>
+              </div>
+              <ReplyList
+                replies={replyMap.get(post.post.cl_pubkey.toString())}
+                postPubkey={post.post.cl_pubkey.toString()}
+              />
+            </>
           ) : (
             <div
               onClick={() => {
@@ -466,11 +495,28 @@ const Post = (post: postState) => {
                 dispatch(updateShowFeedModal(true));
               }}
             >
-              {" "}
               <GridFeed article={daisiContent} type={EFeedType.GUM_ITEM}>
                 <div className={style.btnBlock}>
                   {reactionButton ? (
-                    reactionButton
+                    <div style={{ marginTop: "1rem", display: "flex" }}>
+                      <div style={{ marginRight: "2rem", display: "flex" }}>
+                        {reactionButton}
+                      </div>
+                      <ReplyForm
+                        from={post.post.profile.toString()}
+                        post={post.post.cl_pubkey.toString()}
+                        type="Post"
+                        commentsNumber={
+                          replyMap.get(post.post.cl_pubkey.toString())
+                            ? replyMap.get(post.post.cl_pubkey.toString())
+                                .length
+                            : 0
+                        }
+                        getListPostKey={() => {}}
+                        postKey={post.post.cl_pubkey.toString()}
+                        showMoreCommentBtn={false}
+                      />
+                    </div>
                   ) : (
                     <div
                       style={{ fontSize: "1.6rem" }}
@@ -484,6 +530,10 @@ const Post = (post: postState) => {
                   )}
                 </div>
               </GridFeed>
+              <ReplyList
+                replies={replyMap.get(post.post.cl_pubkey.toString())}
+                postPubkey={post.post.cl_pubkey.toString()}
+              />
             </div>
           )}
         </>

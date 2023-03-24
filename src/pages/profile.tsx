@@ -58,6 +58,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const [checkingAddress, setCheckingAddress] = useState("");
   const [isCheckingSolanaAddress, setIsCheckingSolanaAddress] = useState(false);
   let sdk = useGumSDK();
+
   const getUser = async () => {
     if (!checkingAddress) {
       return;
@@ -69,10 +70,12 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     let followers: string[] = [];
     if (isCheckingSolanaAddress) {
       let gumAddress = new PublicKey(checkingAddress);
+
       let profile = (
         await sdk.profile.getProfilesByUser(gumAddress)
       )[0].cl_pubkey.toString();
       dispatch(updateUserProfilePageHandle(new PublicKey(profile)));
+
       if (followersMap.size && followersMap.size && profile) {
         let followProfiles = followersMap.get(profile);
         if (followProfiles)
