@@ -119,6 +119,49 @@ export const POST_BY_ADDRESS_QUERY = gql`
                               commentCount
                               likeCount
                               dislikeCount
+                              likedStatus(me: $myAddress) {
+                                liked
+                                disliked
+                                proof {
+                                  arweaveTxHash
+                                }
+                              }
+                              comments {
+                                edges {
+                                  node {
+                                    ... on Comment {
+                                      contentID
+                                      title
+                                      body
+                                      digest
+                                      authorHandle
+                                      authorAddress
+                                      arweaveTxHash
+                                      createdAt
+                                      updatedAt
+                                      commentCount
+                                      likeCount
+                                      dislikeCount
+                                      likedStatus(me: $myAddress) {
+                                        liked
+                                        disliked
+                                        proof {
+                                          arweaveTxHash
+                                        }
+                                      }
+                                      comments {
+                                        edges {
+                                          node {
+                                            ... on Comment {
+                                              contentID
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
                             }
                           }
                         }

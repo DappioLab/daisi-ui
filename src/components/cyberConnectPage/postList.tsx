@@ -70,9 +70,12 @@ const PostList = ({ address }: { address: string }) => {
   const renderPostOrComment = (content: Post, level: number = 0) => {
     return (
       <div key={content.contentID}>
-        <h2 style={{ color: `rgb(0, 0, ${(level * 10) % 255})` }}>
-          {content.title}
-        </h2>
+        {level == 0 ? (
+          <h2>{content.title}</h2>
+        ) : (
+          <h2>{`Comment (${level}) - ` + content.title}</h2>
+        )}
+
         <h2>
           by {content.authorHandle.split(".")[0]}
           {" - "}
@@ -100,7 +103,6 @@ const PostList = ({ address }: { address: string }) => {
           address={myAddress}
           fetchData={fetchData}
         />
-
         {content.comments.length > 0 && (
           <div>
             {content.comments.map((comment) =>
