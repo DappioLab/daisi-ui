@@ -11,6 +11,13 @@ export type ProfileMetadataType = {
   avatar: string;
 };
 
+export interface GraphQLProfileMetadata {
+  metadatauri: string;
+  metadata: string;
+  profile: string;
+  cl_pubkey: string;
+}
+
 export class ProfileMetadata {
   readonly sdk: SDK;
 
@@ -163,27 +170,28 @@ export class ProfileMetadata {
 
   // GraphQL Query methods
 
-  public async getAllProfileMetadata(): Promise<any> {
+  public async getAllProfileMetadata(): Promise<GraphQLProfileMetadata[]> {
     const query = gql`
       query GetAllProfileMetadata {
         gum_0_1_0_decoded_profilemetadata {
           cl_pubkey
           metadatauri
+          metadata
           profile
         }
       }
     `;
-    const data: any = await this.sdk.gqlClient.request(query);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profilemetadata: GraphQLProfileMetadata[];
+    }>(query);
     return data.gum_0_1_0_decoded_profilemetadata;
   }
 
   public async getProfileMetadataByUser(
     userPubKey: anchor.web3.PublicKey
-  ): Promise<any> {
+  ): Promise<GraphQLProfileMetadata[]> {
     const profiles = await this.sdk.profile.getProfilesByUser(userPubKey);
-    const profilePDAs = profiles.map(
-      (p) => p.cl_pubkey
-    ) as anchor.web3.PublicKey[];
+    const profilePDAs = profiles.map((p) => p.cl_pubkey) as string[];
     const query = gql`
       query GetProfileMetadataByUser {
         gum_0_1_0_decoded_profilemetadata(where: {profile: {_in: [${profilePDAs
@@ -191,35 +199,63 @@ export class ProfileMetadata {
           .join(",")}] }}) {
           cl_pubkey
           metadatauri
+          metadata
           profile
         }
       }`;
-    const data: any = await this.sdk.gqlClient.request(query);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profilemetadata: GraphQLProfileMetadata[];
+    }>(query);
     return data.gum_0_1_0_decoded_profilemetadata;
   }
 
   public async getProfileMetadataByUserAndNamespace(
     userPubKey: anchor.web3.PublicKey,
     namespace: Namespace
-  ): Promise<any> {
+  ): Promise<GraphQLProfileMetadata> {
     const profiles = await this.sdk.profile.getProfilesByUserAndNamespace(
       userPubKey,
       namespace
     );
-    const profilePDAs = profiles.map(
-      (p) => p.cl_pubkey
-    ) as anchor.web3.PublicKey[];
+    const profilePDA = profiles.cl_pubkey;
     const query = gql`
-      query GetProfileMetadataByUserAndNamespace {
-        gum_0_1_0_decoded_profilemetadata(where: {profile: {_in: [${profilePDAs
-          .map((pda) => `"${pda}"`)
-          .join(",")}] }}) {
+      query GetProfileMetadataByUserAndNamespace($profilePDA: String) {
+        gum_0_1_0_decoded_profilemetadata(
+          where: { profile: { _eq: $profilePDA } }
+        ) {
           cl_pubkey
           metadatauri
+          metadata
           profile
         }
-      }`;
-    const data: any = await this.sdk.gqlClient.request(query);
-    return data.gum_0_1_0_decoded_profilemetadata;
+      }
+    `;
+    const variables = { profilePDA: profilePDA };
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profilemetadata: GraphQLProfileMetadata[];
+    }>(query, variables);
+    return data.gum_0_1_0_decoded_profilemetadata[0];
+  }
+
+  public async getProfileMetadataByProfile(
+    profileAccount: anchor.web3.PublicKey
+  ): Promise<GraphQLProfileMetadata> {
+    const query = gql`
+      query GetProfileMetadataByProfile($profileAccount: String) {
+        gum_0_1_0_decoded_profilemetadata(
+          where: { profile: { _eq: $profileAccount } }
+        ) {
+          cl_pubkey
+          metadatauri
+          metadata
+          profile
+        }
+      }
+    `;
+    const variables = { profileAccount: profileAccount.toString() };
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profilemetadata: GraphQLProfileMetadata[];
+    }>(query, variables);
+    return data.gum_0_1_0_decoded_profilemetadata[0];
   }
 }

@@ -11,6 +11,13 @@ export type ReactionType =
   | "Sad"
   | "Angry";
 
+export interface GraphQLReaction {
+  fromprofile: string;
+  topost: string;
+  reactiontype: string;
+  cl_pubkey: string;
+}
+
 export class Reaction {
   readonly sdk: SDK;
 
@@ -74,7 +81,7 @@ export class Reaction {
 
   // GraphQL Query methods
 
-  public async getAllReactions() {
+  public async getAllReactions(): Promise<GraphQLReaction[]> {
     const query = gql`
       query GetAllReactions {
         gum_0_1_0_decoded_reaction {
@@ -85,11 +92,15 @@ export class Reaction {
         }
       }
     `;
-    const result: any = await this.sdk.gqlClient.request(query);
+    const result = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_reaction: GraphQLReaction[];
+    }>(query);
     return result.gum_0_1_0_decoded_reaction;
   }
 
-  public async getReactionsByPost(postAccount: anchor.web3.PublicKey) {
+  public async getReactionsByPost(
+    postAccount: anchor.web3.PublicKey
+  ): Promise<GraphQLReaction[]> {
     const query = gql`
       query GetReactionsByPost($postAccount: String!) {
         gum_0_1_0_decoded_reaction(where: { topost: { _eq: $postAccount } }) {
@@ -100,9 +111,9 @@ export class Reaction {
         }
       }
     `;
-    const result: any = await this.sdk.gqlClient.request(query, {
-      postAccount: postAccount.toBase58(),
-    });
+    const result = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_reaction: GraphQLReaction[];
+    }>(query, { postAccount: postAccount.toBase58() });
     return result.gum_0_1_0_decoded_reaction;
   }
 }
