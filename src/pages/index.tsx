@@ -1,8 +1,4 @@
 import style from "@/styles/homePage/index.module.sass";
-// import FeedList from "@/components/homePage/feedList";
-import PageTitle from "@/components/common/pageTitle";
-import FeedModal from "@/components/homePage/feedModal";
-import request from "graphql-request";
 import { useCallback, useEffect, useState } from "react";
 import {
   endpoint,
@@ -39,7 +35,6 @@ import moment from "moment";
 import useGumState, { filterPostList } from "@/components/gumPage/gumState";
 
 const HomePage = () => {
-  // const [showModal, setShowModal] = useState(false);
   const { feedList } = useSelector(
     (state: IRootState) => state.persistedReducer.daily
   );
@@ -58,24 +53,11 @@ const HomePage = () => {
     following,
     allUser,
   } = useSelector((state: IRootState) => state.persistedReducer.gum);
-  // const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
   const [rssFeed, setRssFeed] = useState<IFeedList[]>([]);
   useGumState();
   const [gumFeed, setGumFeed] = useState<IFeedList[]>([]);
   const [ccFeed, setCcFeed] = useState<IFeedList[]>([]);
-  // const getCurrentModalIndex = (index: number) => {
-  //   setPo
-  // };
-
-  // const getPost = async (id: string) => {
-  //   const postData = await request(endpoint, POST_BY_ID_STATIC_FIELDS_QUERY, {
-  //     id,
-  //   });
-
-  //   dispatch(updateModalData(postData));
-  //   setShowModal(true);
-  // };
 
   const getAnonymousList = async () => {
     const res = await API.getRssData();
@@ -84,8 +66,9 @@ const HomePage = () => {
 
   const updateList = async () => {
     try {
+      updateCC();
+      updateGum();
       dispatch(updateLoadingStatus(true));
-      // console.log("update ");
       let res: IFeedList[] = [];
 
       if (rssFeed.length <= 0) {
@@ -118,6 +101,7 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(false));
     }
   };
+
   const updateCC = async () => {
     try {
       let postUserData = {};
@@ -173,6 +157,7 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(false));
     }
   };
+
   const updateGum = async () => {
     try {
       let gumFeeds: IFeedList[] = [];
@@ -202,7 +187,7 @@ const HomePage = () => {
               type: EFeedType.GUM_ITEM,
               sourceId: "",
               userAddress: address,
-              id: "",
+              id: post.cl_pubkey.toString(),
               itemTitle: daisiContent.itemTitle,
               itemDescription: daisiContent.itemDescription,
               itemLink: daisiContent.itemLink,
@@ -213,6 +198,7 @@ const HomePage = () => {
               sourceIcon: user.profilePicture ? user.profilePicture : "",
               linkCreated: moment(daisiContent.created).valueOf().toString(),
               cl_pubkey: post.cl_pubkey,
+              gumPost: post,
             };
             gumFeeds.push(feed);
           }
@@ -235,10 +221,12 @@ const HomePage = () => {
 
   useEffect(() => {
     updateGum();
-  }, [following]);
+  }, [following, rssFeed]);
+
   useEffect(() => {
     updateCC();
   }, [address]);
+
   useEffect(() => {
     let allPosts = [...rssFeed, ...ccFeed, ...gumFeed].sort((a, b) =>
       Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
@@ -247,55 +235,15 @@ const HomePage = () => {
     dispatch(updateFeedList(allPosts));
   }, [rssFeed, gumFeed, ccFeed]);
 
-  // useEffect(() => {
-  //   const content = feedList.find((feed, index) => {
-  //     if (index === postModalIndex) {
-  //       return feed;
-  //     }
-  //   });
-
-  //   dispatch(updateModalData(content));
-  // }, [postModalIndex, feedList]);
-
-  // useEffect(() => {
-  //   if (modalData) {
-  //     setShowModal(true);
-  //   }
-  // }, [modalData]);
-
-  // useEffect(() => {
-  //   if (!showModal) {
-  //     setPostModalIndex(null);
-  //   }
-  // }, [showModal]);
-
   return (
     <div className={`pageContent ${style.homePage}`}>
-      {/* <PageTitle title="Daily" /> */}
       {screenWidth < 960 ? (
-        <GridFeedList
-          // setShowModal={setShowModal}
-          // getPost={getPost}
-          // getCurrentModalIndex={getCurrentModalIndex}
-          // setPostModalIndex={setPostModalIndex}
-          updateList={updateList}
-        />
+        <GridFeedList updateList={updateList} />
       ) : (
-        <HorizontalFeedList
-          // setShowModal={setShowModal}
-          // getPost={getPost}
-          // setPostModalIndex={setPostModalIndex}
-          updateList={updateList}
-        />
+        <div>
+          <HorizontalFeedList updateList={updateList} />
+        </div>
       )}
-      {/* {showModal ? (
-        <FeedModal
-          setShowModal={setShowModal}
-          postModalIndex={postModalIndex}
-          // getPost={getPost}
-          setPostModalIndex={setPostModalIndex}
-        />
-      ) : null} */}
     </div>
   );
 };

@@ -31,6 +31,7 @@ const persistConfig = getPersistConfig({
     "global.showSubmitModal",
     "global.eventNotificationQueue",
     "global.isLoading",
+    "dailySlice.feedList",
   ],
   rootReducer,
 });

@@ -1,21 +1,27 @@
 import style from "@/styles/homePage/horizontalFeedList.module.sass";
 import HorizontalFeed, { EFeedType } from "./horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
-import { Dispatch, SetStateAction, useEffect } from "react";
-import { useInView } from "react-intersection-observer";
 import { IRootState } from "@/redux";
 import {
   EFeedModalType,
+  updateAuthModal,
   updateFeedModalIndex,
   updateFeedModalType,
+  updateLoadingStatus,
   updateShowFeedModal,
 } from "@/redux/globalSlice";
+import { PublicKey } from "@solana/web3.js";
+import { ReactionType } from "@/gpl-core/src/reaction";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useGumSDK } from "@/hooks/useGumSDK";
+import { postInterface } from "../gumPage/Posts";
+import { useEffect, useState } from "react";
+import { updateReactions } from "@/redux/gumSlice";
+import GumLikeButton from "./gumLikeButton";
+import ReplyForm from "../gumPage/ReplyFormMigrated";
+import ReplyList from "../gumPage/ReplyListMigrated";
 
 interface IFeedList {
-  // setShowModal: Dispatch<SetStateAction<boolean>>;
-  // setPostModalIndex: Dispatch<SetStateAction<number | null>>;
-  // getPost: (id: string) => Promise<void>;
-  // getCurrentModalIndex: (index: number) => number;
   updateList: () => void;
 }
 
@@ -23,21 +29,28 @@ const HorizontalFeedList = (props: IFeedList) => {
   const { feedList } = useSelector(
     (state: IRootState) => state.persistedReducer.daily
   );
+  const { replyMap } = useSelector(
+    (state: IRootState) => state.persistedReducer.gum
+  );
   const dispatch = useDispatch();
-  // const { ref, inView } = useInView();
+  const [isShowCommentList, setIsShowCommentList] = useState<
+    Map<string, boolean>
+  >(new Map());
 
-  // useEffect(() => {
-  //   if (inView) {
-  //     props.updateList();
-  //   }
-  // }, [inView]);
+  useEffect(() => {
+    const isShowComment = new Map();
+    feedList.map((item) => {
+      isShowComment.set(item.id, false);
+    });
 
-  // useEffect(() => {
-  //   const currentIndex = props.getCurrentModalIndex();
-  //   if (feedList.length - 10 < currentIndex) {
-  //     getAnonymousList();
-  //   }
-  // }, [currentId]);
+    setIsShowCommentList(() => isShowComment);
+  }, [feedList]);
+
+  const getListPostKey = (key: string) => {
+    const clone = new Map(isShowCommentList);
+    clone.set(key, true);
+    setIsShowCommentList(clone);
+  };
 
   return (
     <div className={style.horizontalFeedList}>
@@ -51,15 +64,50 @@ const HorizontalFeedList = (props: IFeedList) => {
               dispatch(updateShowFeedModal(true));
             }}
           >
-            <HorizontalFeed
-              article={item}
-              // setShowModal={props.setShowModal}
-              type={
-                item.id.length > 24 ? EFeedType.CC_ITEM : EFeedType.RSS_ITEM
-              }
-            >
-              {}
-            </HorizontalFeed>
+            <>
+              <HorizontalFeed article={item} type={item.type}>
+                {item.type === EFeedType.GUM_ITEM && (
+                  <>
+                    <div style={{ marginRight: "2rem" }}>
+                      <GumLikeButton
+                        post={item.gumPost}
+                        updateList={props.updateList}
+                      />
+                    </div>
+                    {replyMap.size > 0 && (
+                      <ReplyForm
+                        from={item.gumPost.profile.toString()}
+                        post={item.gumPost.cl_pubkey.toString()}
+                        type="Post"
+                        commentsNumber={
+                          replyMap.get(item.gumPost.cl_pubkey.toString())
+                            ? replyMap.get(item.gumPost.cl_pubkey.toString())
+                                .length
+                            : 0
+                        }
+                        getListPostKey={getListPostKey}
+                        postKey={item.gumPost.cl_pubkey.toString()}
+                        showMoreCommentBtn={
+                          replyMap.get(item.gumPost.cl_pubkey.toString()) &&
+                          replyMap.get(item.gumPost.cl_pubkey.toString())
+                            .length > 0 &&
+                          !isShowCommentList.get(item.id)
+                        }
+                      />
+                    )}
+                  </>
+                )}
+              </HorizontalFeed>
+              {replyMap.size > 0 &&
+              item.type === EFeedType.GUM_ITEM &&
+              isShowCommentList.size > 0 &&
+              isShowCommentList.get(item.id) ? (
+                <ReplyList
+                  replies={replyMap.get(item.gumPost.cl_pubkey.toString())}
+                  postPubkey={item.gumPost.cl_pubkey.toString()}
+                />
+              ) : null}
+            </>
           </div>
         );
       })}

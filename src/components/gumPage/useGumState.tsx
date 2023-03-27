@@ -173,6 +173,7 @@ const useGumState = () => {
             } catch (err) {}
           })
       );
+
       [...userPostAccounts, ...allPostsMetadata]
         .filter((data) => {
           return data.replyTo && data.postData.data.content.content;

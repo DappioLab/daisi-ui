@@ -132,6 +132,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
       Login{" "}
     </div>
   );
+
   if (accessToken && !isCheckingSolanaAddress) {
     followButton = (
       <CyberConnectFollowBtn
@@ -251,21 +252,6 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               <div className={style.userJoinedDate}>
                 Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
               </div>
-
-              {/* Solana follow btn */}
-              {/* {wallet.connected &&
-              userProfilePageHandle &&
-              userData &&
-              userData.address !== checkingAddress &&
-              isCheckingSolanaAddress ? (
-                <FollowButton toProfile={userProfilePageHandle.toBase58()} />
-              ) : null} */}
-              {/* Metamask follow btn */}
-              {/* {accessToken && metamaskAddress != checkingAddress ? (
-                <div>
-                  <FollowBtn address={checkingAddress} />
-                </div>
-              ) : null} */}
               {showUserList && (
                 <UserListModal
                   checkingUser={fetchedUser}

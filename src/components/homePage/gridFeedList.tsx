@@ -11,6 +11,7 @@ import {
   updateFeedModalType,
   updateShowFeedModal,
 } from "@/redux/globalSlice";
+import GumLikeButton from "./gumLikeButton";
 
 interface IFeedList {
   // setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -24,21 +25,7 @@ const GridFeedList = (props: IFeedList) => {
   const { feedList } = useSelector(
     (state: IRootState) => state.persistedReducer.daily
   );
-  const { ref, inView } = useInView();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (inView) {
-      props.updateList();
-    }
-  }, [inView]);
-
-  // useEffect(() => {
-  //   const currentIndex = props.getCurrentModalIndex();
-  //   if (feedList.length - 10 < currentIndex) {
-  //     getAnonymousList();
-  //   }
-  // }, [currentId]);
 
   return (
     <div className={style.feedList}>
@@ -46,21 +33,21 @@ const GridFeedList = (props: IFeedList) => {
         return (
           <div
             key={`${index}`}
-            ref={ref}
             onClick={() => {
               dispatch(updateFeedModalType(EFeedModalType.DISCOVER_ITEM));
               dispatch(updateFeedModalIndex(index));
               dispatch(updateShowFeedModal(true));
             }}
           >
-            <GridFeed
-              article={item}
-              // setShowModal={props.setShowModal}
-              type={
-                item.id.length > 24 ? EFeedType.CC_ITEM : EFeedType.RSS_ITEM
-              }
-            >
-              {}
+            <GridFeed article={item} type={item.type}>
+              {item.type === EFeedType.GUM_ITEM && (
+                <div className={style.btnBlock}>
+                  <GumLikeButton
+                    post={item.gumPost}
+                    updateList={props.updateList}
+                  />
+                </div>
+              )}
             </GridFeed>
           </div>
         );

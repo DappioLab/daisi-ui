@@ -15,7 +15,6 @@ import {
   fetchFollowings,
   follow,
 } from "../cyberConnectPage/helper";
-import useGumState from "../gumPage/gumState";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";
 import FollowButton from "../gumPage/FollowButton";

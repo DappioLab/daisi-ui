@@ -143,6 +143,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         break;
 
       // case EFeedType.GUM_ITEM:
+      //   alert("x");
       //   break;
 
       case EFeedType.USER_POST:
@@ -172,14 +173,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           }
         }}
       >
-        {/* {props.type === EFeedType.CC_ITEM ? (
-          <img
-            src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
-            alt="icon"
-          />
-        ) : ( */}
         <img src={props.article.sourceIcon} alt="icon" />
-        {/* )} */}
       </div>
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">
@@ -234,7 +228,6 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           src={`https://picsum.photos/200/300?${Math.random()}`}
           alt="icon"
         />
-        {/* <img src={props.article.itemImage} alt="icon" /> */}
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-import { ReplyInterface } from "./gumState";
 import { useState } from "react";
 
 import { ipfsClient, mainGateway } from "./storage";

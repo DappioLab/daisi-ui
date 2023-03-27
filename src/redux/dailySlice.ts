@@ -43,6 +43,7 @@ export interface IFeedList extends IRssSourceItem {
   userAddress: string;
   isLastItem?: boolean;
   cl_pubkey?: PublicKey; // gum need this for update
+  gumPost?: any; // gum need this for update
 }
 
 const initialState: IDailyInitialState = {

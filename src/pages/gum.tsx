@@ -1,4 +1,3 @@
-import PageTitle from "@/components/common/pageTitle";
 import style from "@/styles/gumPage/index.module.sass";
 import dynamic from "next/dynamic";
 import {
@@ -23,7 +22,6 @@ const GumPage = () => {
   useGumState();
   return (
     <div className={style.gumPage}>
-      <PageTitle title="Gum" />
       <div>
         <WalletMultiButtonDynamic />
       </div>
