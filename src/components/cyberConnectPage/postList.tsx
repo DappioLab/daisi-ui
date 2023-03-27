@@ -9,8 +9,9 @@ import {
   createCyberConnectClient,
   checkNetwork,
 } from "./helper";
+import CommentBox from "./commentBox";
 
-export interface Content {
+export interface Post {
   contentID: string;
   authorHandle: string;
   authorAddress: string;
@@ -28,11 +29,7 @@ export interface Content {
     disliked: boolean;
     proof: { arweaveTxHash: string | null };
   };
-}
-
-// This only stored on Arweave, didn't launch an Onchain event
-export interface Post extends Content {
-  comments: Content[];
+  comments: Post[];
 }
 
 const PostList = ({ address }: { address: string }) => {
@@ -70,37 +67,57 @@ const PostList = ({ address }: { address: string }) => {
     fetchData();
   }, [myAddress, address, lastPostsUpdateTime]);
 
+  const renderPostOrComment = (content: Post, level: number = 0) => {
+    return (
+      <div key={content.contentID}>
+        {level == 0 ? (
+          <h2>{content.title}</h2>
+        ) : (
+          <h2>{`Comment (${level}) - ` + content.title}</h2>
+        )}
+
+        <h2>
+          by {content.authorHandle.split(".")[0]}
+          {" - "}
+          {moment(content.createdAt).format("MMMM DD,YYYY")}
+        </h2>
+        <h3>{content.body}</h3>
+        {content.likeCount}
+        <button
+          onClick={() => {
+            handleOnClick(content.contentID, true);
+          }}
+        >
+          {content.likedStatus.liked ? "Liked" : "Like"}
+        </button>
+        {content.dislikeCount}
+        <button
+          onClick={() => {
+            handleOnClick(content.contentID, false);
+          }}
+        >
+          {content.likedStatus.disliked ? "Disliked" : "Dislike"}
+        </button>
+        <CommentBox
+          contentId={content.contentID}
+          address={myAddress}
+          fetchData={fetchData}
+        />
+        {content.comments.length > 0 && (
+          <div>
+            {content.comments.map((comment) =>
+              renderPostOrComment(comment, level + 1)
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div>
       {postList.map((post) => {
-        return (
-          <div key={post.contentID}>
-            <h2>{post.title}</h2>{" "}
-            <h2>
-              by {post.authorHandle.split(".")[0]}
-              {" - "}
-              {moment(post.createdAt).format("MMMM DD,YYYY")}
-            </h2>
-            <h3>{post.body}</h3>
-            {post.likeCount}
-            <button
-              onClick={() => {
-                handleOnClick(post.contentID, true);
-              }}
-            >
-              {post.likedStatus.liked ? "Liked" : "Like"}
-            </button>
-            {post.dislikeCount}
-            <button
-              onClick={() => {
-                handleOnClick(post.contentID, false);
-              }}
-            >
-              {post.likedStatus.disliked ? "Disliked" : "Dislike"}
-            </button>
-            <hr />
-          </div>
-        );
+        return renderPostOrComment(post);
       })}
     </div>
   );

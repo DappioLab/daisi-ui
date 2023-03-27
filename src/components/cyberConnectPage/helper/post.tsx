@@ -73,7 +73,10 @@ export const fetchPostById = async (
     });
 
     //@ts-ignore
-    return res.content;
+    let post = res.content;
+    post = parseComments(post);
+
+    return post;
   } catch (err) {
     console.log(err);
   }
@@ -97,6 +100,7 @@ export const fetchPosts = async (
       .filter((n: any) => n.posts.edges.length > 0); // get profiles who have at least 1 post
 
     let posts = parsePostsByProfile(profiles);
+    posts = posts.map((post) => parseComments(post));
 
     // filter Daisi created Handle only
     if (daisiOnly) {
@@ -132,6 +136,7 @@ export const fetchFollowingsPosts = async (
       .filter((n: any) => n.posts.edges.length > 0); // get profiles who have at least 1 post
 
     posts = parsePostsByProfile(profiles);
+    posts = posts.map((post) => parseComments(post));
 
     // filter Daisi created Handle only
     if (daisiOnly) {
@@ -148,4 +153,15 @@ export const parsePostsByProfile = (profile: any): Post[] => {
   return profile
     .map((n: any) => n.posts.edges.map((e: any) => e.node)) // get posts object
     .reduce((prev: any, curr: any) => prev.concat(curr), []); // flatten
+};
+
+export const parseComments = (post: any): Post => {
+  if (!post) {
+    return;
+  }
+  if (post.comments) {
+    post.comments = post.comments.edges.map((e) => e.node);
+    post.comments = post.comments.map((comment) => parseComments(comment));
+  }
+  return post;
 };
