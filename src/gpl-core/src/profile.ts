@@ -5,9 +5,9 @@ import * as anchor from "@project-serum/anchor";
 export type Namespace = "Professional" | "Personal" | "Gaming" | "Degen";
 
 export interface GumDecodedProfile {
-  username: anchor.web3.PublicKey;
+  username: string;
   namespace: string;
-  cl_pubkey: anchor.web3.PublicKey;
+  cl_pubkey: string;
 }
 
 export class Profile {
@@ -151,19 +151,10 @@ export class Profile {
         }
       }`;
     const variables = { namespace: namespaceString };
-
     const data = await this.sdk.gqlClient.request<{
       gum_0_1_0_decoded_profile: GumDecodedProfile[];
     }>(query, variables);
-    return {
-      username: new anchor.web3.PublicKey(
-        data.gum_0_1_0_decoded_profile[0].username
-      ),
-      namespace: data.gum_0_1_0_decoded_profile[0].namespace,
-      cl_pubkey: new anchor.web3.PublicKey(
-        data.gum_0_1_0_decoded_profile[0].cl_pubkey
-      ),
-    };
+    return data.gum_0_1_0_decoded_profile[0];
   }
 
   public async getAllProfiles(): Promise<GumDecodedProfile[]> {
@@ -176,7 +167,9 @@ export class Profile {
         }
       }
     `;
-    const data: any = await this.sdk.gqlClient.request(query);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profile: GumDecodedProfile[];
+    }>(query);
     return data.gum_0_1_0_decoded_profile;
   }
 
@@ -184,9 +177,7 @@ export class Profile {
     userPubkey: anchor.web3.PublicKey
   ): Promise<GumDecodedProfile[]> {
     const users = await this.sdk.user.getUserAccountsByAuthority(userPubkey);
-    const userPDAs = users.map(
-      (user) => user.cl_pubkey
-    ) as anchor.web3.PublicKey[];
+    const userPDAs = users.map((user) => user.cl_pubkey.toString()) as string[];
     const query = gql`
       query UserProfiles {
         gum_0_1_0_decoded_profile(
@@ -200,7 +191,9 @@ export class Profile {
         }
       }
       `;
-    const data: any = await this.sdk.gqlClient.request(query);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profile: GumDecodedProfile[];
+    }>(query);
     return data.gum_0_1_0_decoded_profile;
   }
 
@@ -217,20 +210,18 @@ export class Profile {
         }
       }
     `;
-    const data: any = await this.sdk.gqlClient.request(query, {
-      namespace: namespaceString,
-    });
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profile: GumDecodedProfile[];
+    }>(query, { namespace: namespaceString });
     return data.gum_0_1_0_decoded_profile;
   }
 
   public async getProfilesByUserAndNamespace(
     userPubkey: anchor.web3.PublicKey,
     namespace: Namespace
-  ): Promise<GumDecodedProfile[]> {
+  ): Promise<GumDecodedProfile> {
     const users = await this.sdk.user.getUserAccountsByAuthority(userPubkey);
-    const userPDAs = users.map(
-      (user) => user.cl_pubkey
-    ) as anchor.web3.PublicKey[];
+    const userPDAs = users.map((user) => user.cl_pubkey.toString()) as string[];
     const namespaceString = JSON.stringify({ [namespace.toLowerCase()]: {} });
     const query = gql`
       query ProfileByUserAndNamespace ($namespace: String) {
@@ -246,9 +237,9 @@ export class Profile {
         }
       }
     `;
-    const data: any = await this.sdk.gqlClient.request(query, {
-      namespace: namespaceString,
-    });
-    return data.gum_0_1_0_decoded_profile;
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_profile: GumDecodedProfile[];
+    }>(query, { namespace: namespaceString });
+    return data.gum_0_1_0_decoded_profile[0];
   }
 }
