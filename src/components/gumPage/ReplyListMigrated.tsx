@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ReplyInterface } from "./gumState";
 import { ipfsClient, mainGateway } from "./storage";
 import { useGumSDK } from "@/hooks/useGumSDK";

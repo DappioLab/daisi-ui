@@ -25,6 +25,7 @@ import ReplyForm from "./ReplyFormMigrated";
 import ReplyList from "./ReplyListMigrated";
 import GridFeed from "../homePage/gridFeed";
 import { BlockInterface } from "./BlockMigrated";
+import { useRouter } from "next/router";
 
 export const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
@@ -70,7 +71,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       ),
     []
   );
-
+  const router = useRouter();
   let sdk = useGumSDK(
     connection,
     { preflightCommitment: "confirmed" },
@@ -194,9 +195,10 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       console.log("error", err);
     }
   };
+
   useEffect(() => {
     fetchPostData();
-  }, [wallet.connected, userProfile]);
+  }, [wallet.connected, userProfile, props.checkingAddress]);
 
   const [list, setList] = useState([]);
   const [isShowCommentList, setIsShowCommentList] = useState<
@@ -233,7 +235,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       setIsShowCommentList(() => isShowComment);
     }
     setList(() => list);
-  }, [explore]);
+  }, [explore, userProfilePageData]);
 
   const getListPostKey = (key: string) => {
     const clone = new Map(isShowCommentList);
@@ -245,7 +247,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
     <div>
       {list?.map((item: IFeedList, index: number) => {
         return (
-          <div className={style.feed}>
+          <div className={style.feed} key={item.id}>
             <>
               {screenWidth > 900 ? (
                 <>

@@ -124,7 +124,7 @@ const ReplyForm = (props: IReplyFormProps) => {
           <div
             style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
           >
-            <div>Comment</div>
+            {/* <div>Comment</div> */}
             <i
               style={{
                 fontSize: "1.6rem",
@@ -151,7 +151,8 @@ const ReplyForm = (props: IReplyFormProps) => {
             More ({props.commentsNumber})
           </div>
         ) : null}
-        {userProfile && userProfile.profile.toString() == props.from && (
+        {/* ********* Delete post ******** */}
+        {/* {userProfile && userProfile.profile.toString() == props.from && (
           <div
             style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
             onClick={(e) => {
@@ -169,9 +170,8 @@ const ReplyForm = (props: IReplyFormProps) => {
               className="fa fa-trash-o"
               aria-hidden="true"
             ></i>
-            {/* {"Delete " + prop.type} */}
           </div>
-        )}
+        )} */}
       </div>
       {open && (
         <div
@@ -179,8 +179,9 @@ const ReplyForm = (props: IReplyFormProps) => {
             fontSize: "1.6rem",
             fontWeight: 500,
             marginTop: "1.5rem",
-            display: "flex",
-            alignItems: "flex-end",
+            // display: "flex",
+            // flexDirection: "column",
+            // alignItems: "flex-end",
           }}
         >
           <textarea
@@ -188,7 +189,7 @@ const ReplyForm = (props: IReplyFormProps) => {
               border: "solid 1px #eee",
               marginRight: "1rem",
               padding: "1rem",
-              width: "30rem",
+              // width: "30rem",
             }}
             onClick={(e) => e.stopPropagation()}
             onChange={(e) => {

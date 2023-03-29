@@ -262,6 +262,7 @@ const useGumState = () => {
       console.log("error", err);
     }
   };
+
   const fetchAllConnection = async () => {
     if (allUser.size) {
       let connections = await sdk.connection.getALlConnectionAccounts();
@@ -337,15 +338,18 @@ const useGumState = () => {
     );
     dispatch(updateAllUser(map));
   };
+
   useEffect(() => {
     fetchProfile();
     fetchConnections();
   }, [wallet.connected, userProfile]);
+
   useEffect(() => {
     fetchPostData();
     fetchReaction();
     fetchUsers();
   }, []);
+
   useEffect(() => {
     fetchAllConnection();
   }, [allUser]);

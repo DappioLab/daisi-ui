@@ -34,10 +34,14 @@ import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
 import useGumState, { filterPostList } from "@/components/gumPage/gumState";
 
+export enum EDisplayMode {
+  GRID = 0,
+  HORIZONTAL = 1,
+}
+
 const HomePage = () => {
-  const { feedList } = useSelector(
-    (state: IRootState) => state.persistedReducer.daily
-  );
+  const [displayMode, setDisplayMode] = useState(EDisplayMode.HORIZONTAL);
+
   const { screenWidth, userData, address } = useSelector(
     (state: IRootState) => {
       return {
@@ -237,7 +241,11 @@ const HomePage = () => {
 
   return (
     <div className={`pageContent ${style.homePage}`}>
-      {screenWidth < 960 ? (
+      <button onClick={() => setDisplayMode(EDisplayMode.GRID)}>Grid</button>
+      <button onClick={() => setDisplayMode(EDisplayMode.HORIZONTAL)}>
+        Ho
+      </button>
+      {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
         <GridFeedList updateList={updateList} />
       ) : (
         <div>

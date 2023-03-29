@@ -18,6 +18,7 @@ import {
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";
 import FollowButton from "../gumPage/FollowButton";
+import { useRouter } from "next/router";
 
 export interface IUserListModalProps {
   checkingUser: IUser;
@@ -42,6 +43,7 @@ const UserListModal = (props: IUserListModalProps) => {
   const [followingList, setFollowingList] = useState<IUser[]>([]);
   const [followerList, setFollowerList] = useState<IUser[]>([]);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const updateUserFollowData = async (address: string) => {
     if (!userData) {
@@ -77,6 +79,7 @@ const UserListModal = (props: IUserListModalProps) => {
     // }
   };
   const sdk = useGumSDK();
+
   const getLists = async () => {
     if (!userData) {
       alert("please login first");
@@ -105,7 +108,7 @@ const UserListModal = (props: IUserListModalProps) => {
               if (user) {
                 followerUserList.push({
                   ...user,
-                  address: address.profile.toString(),
+                  profileHandle: address.profile.toString(),
                 });
               }
             });
@@ -123,7 +126,7 @@ const UserListModal = (props: IUserListModalProps) => {
               if (user) {
                 followingUserList.push({
                   ...user,
-                  address: address.profile.toString(),
+                  profileHandle: address.profile.toString(),
                 });
               }
             });
@@ -163,118 +166,6 @@ const UserListModal = (props: IUserListModalProps) => {
     setFollowingList(followingUserList);
     dispatch(updateLoadingStatus(false));
   };
-
-  // const getFollowingUserList = async () => {
-  //   if (!userData) {
-  //     alert("please login first");
-  //     return;
-  //   }
-
-  //   props.setUserListType(EUserListType.FOLLOWINGS);
-  //   dispatch(updateLoadingStatus(true));
-
-  //   let followingUserList: IUser[] = [];
-  //   const users = (await API.getUsers()).data as IUser[];
-  //   if (!isEvmAddress(props.checkingUser.address)) {
-  //     dispatch(updateLoadingStatus(true));
-  //     let profile = (
-  //       await sdk.profile.getProfilesByUser(
-  //         new PublicKey(props.checkingUser.address)
-  //       )
-  //     )[0]?.cl_pubkey.toString();
-
-  //     if (followingMap.size && profile) {
-  //       let followingProfile = followingMap.get(profile);
-  //       if (followingProfile) {
-  //         followingProfile.forEach((address) => {
-  //           let user = users.find((user) => {
-  //             return user.address == address.wallet.toString();
-  //           });
-  //           if (user) {
-  //             followingUserList.push({
-  //               ...user,
-  //               address: address.profile.toString(),
-  //             });
-  //           }
-  //         });
-  //       }
-  //     }
-  //     dispatch(updateLoadingStatus(false));
-  //     // Gum
-  //   } else {
-  //     // CyberConnect
-  //     const users = (await API.getUsers()).data as IUser[];
-  //     for (const address of props.checkingUser.followings) {
-  //       const user = users.find((user) => user.address == address);
-  //       if (user) {
-  //         const followers = (
-  //           await fetchFollowers(address, userData.address)
-  //         ).map((p) => p.owner.address);
-  //         const followings = (
-  //           await fetchFollowings(address, userData.address)
-  //         ).map((p) => p.owner.address);
-  //         followingUserList.push({ ...user, followers, followings });
-  //       }
-  //     }
-  //   }
-  //   setUserList(followingUserList);
-  //   dispatch(updateLoadingStatus(false));
-  // };
-
-  // const getFollowerUserList = async () => {
-  //   if (!userData) {
-  //     alert("please login first");
-  //     return;
-  //   }
-
-  //   props.setUserListType(EUserListType.FOLLOWERS);
-  //   dispatch(updateLoadingStatus(true));
-
-  //   let followerUserList: IUser[] = [];
-  //   const users = (await API.getUsers()).data as IUser[];
-  //   if (!isEvmAddress(props.checkingUser.address)) {
-  //     let profile = (
-  //       await sdk.profile.getProfilesByUser(
-  //         new PublicKey(props.checkingUser.address)
-  //       )
-  //     )[0]?.cl_pubkey.toString();
-
-  //     if (followersMap.size && profile) {
-  //       let followerProfile = followersMap.get(profile)?.map((profile) => {
-  //         return profile.wallet.toString();
-  //       });
-  //       if (followerProfile) {
-  //         followerProfile.forEach((address) => {
-  //           console.log(address);
-  //           let user = users.find((user) => {
-  //             return user.address == address;
-  //           });
-  //           if (user) {
-  //             followerUserList.push({ ...user, followers: followerProfile });
-  //           }
-  //         });
-  //       }
-  //     }
-  //   } else {
-  //     // CyberConnect
-
-  //     for (const address of props.checkingUser.followers) {
-  //       const user = users.find((user) => user.address == address);
-  //       if (user) {
-  //         const followers = (
-  //           await fetchFollowers(address, userData.address)
-  //         ).map((p) => p.owner.address);
-  //         const followings = (
-  //           await fetchFollowings(address, userData.address)
-  //         ).map((p) => p.owner.address);
-  //         followerUserList.push({ ...user, followers, followings });
-  //       }
-  //     }
-  //   }
-
-  //   setUserList(followerUserList);
-  //   dispatch(updateLoadingStatus(false));
-  // };
 
   const changeType = async (type: EUserListType) => {
     props.setUserListType(type);
@@ -324,6 +215,10 @@ const UserListModal = (props: IUserListModalProps) => {
               <div className={style.listItem} key={user.address}>
                 <div className={style.avatarRow}>
                   <img
+                    onClick={() => {
+                      router.push(`/profile/?address=${user.address}`);
+                      props.setShowUserList(false);
+                    }}
                     className={style.avatar}
                     src={user.profilePicture}
                     alt="avatar"
@@ -345,8 +240,8 @@ const UserListModal = (props: IUserListModalProps) => {
                     {userProfile && !isEvmAddress(user.address) ? (
                       <div>
                         <FollowButton
-                          toProfile={new PublicKey(user.address)}
-                        ></FollowButton>
+                          toProfile={new PublicKey(user.profileHandle)}
+                        />
                       </div>
                     ) : null}
                   </div>

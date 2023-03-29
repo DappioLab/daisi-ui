@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SDK } from "@/gpl-core/src";
 import { useGumSDK } from "@/hooks/useGumSDK";
+import useGumState from "./useGumState";
 interface followButtonProp {
   toProfile: PublicKey;
 }
@@ -16,6 +17,7 @@ const FollowButton = (prop: followButtonProp) => {
   const sdk = useGumSDK();
   // const toProfile = new PublicKey(prop.toProfile);
   const toProfile = prop.toProfile;
+
   const createGunFollow = async (profile: string) => {
     try {
       if (!wallet.publicKey) {
@@ -63,6 +65,7 @@ const FollowButton = (prop: followButtonProp) => {
       console.log(err);
     }
   };
+
   let followButton = null;
   if (
     userProfile &&
