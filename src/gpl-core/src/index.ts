@@ -16,27 +16,7 @@ import gpl_core_idl from "./idl/gpl_core.json";
 import { GraphQLClient } from "graphql-request";
 import { PostMetadata } from "./postmetadata";
 
-export {
-  GPLCORE_PROGRAMS,
-  GRAPHQL_ENDPOINTS,
-  Connection,
-  GraphQLConnection,
-  Post,
-  GraphQLPost,
-  GraphQLFeed,
-  Profile,
-  GumDecodedProfile,
-  Namespace,
-  Reaction,
-  ReactionType,
-  GraphQLReaction,
-  User,
-  GumDecodedUser,
-  ProfileMetadata,
-  ProfileMetadataType,
-  GraphQLProfileMetadata,
-  PostMetadata,
-};
+export { GPLCORE_PROGRAMS, GRAPHQL_ENDPOINTS };
 
 export class SDK {
   readonly program: anchor.Program;
