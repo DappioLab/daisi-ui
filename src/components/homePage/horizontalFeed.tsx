@@ -199,29 +199,32 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           {moment(parseInt(props.article.linkCreated)).format("MMMM DD, YYYY")}
         </div>
         <div className={style.socialActionBlock}>{props.children}</div>
-        {(props.type === EFeedType.RSS_ITEM ||
-          props.type === EFeedType.CC_ITEM) && (
-          <div
-            className={style.socialActionBlock}
-            onClick={(e) => {
-              e.stopPropagation();
-              updateLike();
-            }}
-          >
-            {userData && props.article.likes.includes(userData.id) ? (
-              <div style={{ fontSize: "1.6rem" }}>
-                <i className="fa fa-heart " aria-hidden="true"></i>
+        {
+          // (
+          props.type === EFeedType.RSS_ITEM && (
+            // || props.type === EFeedType.CC_ITEM) &&
+            <div
+              className={style.socialActionBlock}
+              onClick={(e) => {
+                e.stopPropagation();
+                updateLike();
+              }}
+            >
+              {userData && props.article.likes.includes(userData.id) ? (
+                <div style={{ fontSize: "1.6rem" }}>
+                  <i className="fa fa-heart " aria-hidden="true"></i>
+                </div>
+              ) : (
+                <div style={{ fontSize: "1.6rem" }}>
+                  <i className="fa fa-heart-o"></i>
+                </div>
+              )}
+              <div className={style.actionNumber}>
+                {props.article.likes.length}
               </div>
-            ) : (
-              <div style={{ fontSize: "1.6rem" }}>
-                <i className="fa fa-heart-o"></i>
-              </div>
-            )}
-            <div className={style.actionNumber}>
-              {props.article.likes.length}
             </div>
-          </div>
-        )}
+          )
+        }
       </div>
       <div className={style.articleImage}>
         <img

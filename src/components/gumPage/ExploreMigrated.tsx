@@ -71,7 +71,7 @@ const ExplorePosts = (props: IExplorePostsProps) => {
       ),
     []
   );
-  const router = useRouter();
+
   let sdk = useGumSDK(
     connection,
     { preflightCommitment: "confirmed" },

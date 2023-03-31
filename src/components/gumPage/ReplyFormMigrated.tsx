@@ -179,9 +179,9 @@ const ReplyForm = (props: IReplyFormProps) => {
             fontSize: "1.6rem",
             fontWeight: 500,
             marginTop: "1.5rem",
-            // display: "flex",
+            display: "flex",
             // flexDirection: "column",
-            // alignItems: "flex-end",
+            alignItems: "flex-end",
           }}
         >
           <textarea

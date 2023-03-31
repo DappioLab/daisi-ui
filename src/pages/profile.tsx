@@ -15,6 +15,7 @@ import HorizontalFeed, {
 } from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
 import ExplorePosts from "@/components/gumPage/ExploreMigrated";
+// import PostList from "@/components/cyberConnectPage/postListMigrated";
 import PostList from "@/components/cyberConnectPage/postListMigrated";
 import CyberConnectFollowBtn from "@/components/cyberConnectPage/followBtn";
 import { postInterface } from "@/utils/gum";

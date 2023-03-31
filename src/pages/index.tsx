@@ -111,7 +111,7 @@ const HomePage = () => {
       let postUserData = {};
       let parsedFollowingsPosts: IFeedList[] = [];
 
-      if (address && userData.id && userData.id != "" && ccFeed.length <= 0) {
+      if (address && userData.id && userData.id != "") {
         dispatch(updateLoadingStatus(true));
         const ccUserPosts = await fetchPosts(address, address);
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
@@ -148,11 +148,12 @@ const HomePage = () => {
             id: ccPost.contentID,
             type: EFeedType.CC_ITEM,
             created: new Date(ccPost.createdAt).getTime().toString(),
+            ccPost: ccPost,
           };
 
           parsedFollowingsPosts.push(post);
         }
-        setCcFeed(parsedFollowingsPosts);
+        setCcFeed(JSON.parse(JSON.stringify(parsedFollowingsPosts)));
         setGumFeed([]);
         dispatch(updateLoadingStatus(false));
       }
@@ -241,15 +242,56 @@ const HomePage = () => {
 
   return (
     <div className={`pageContent ${style.homePage}`}>
-      <button onClick={() => setDisplayMode(EDisplayMode.GRID)}>Grid</button>
-      <button onClick={() => setDisplayMode(EDisplayMode.HORIZONTAL)}>
-        Ho
-      </button>
+      {screenWidth >= 960 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            maxWidth: "60%",
+            margin: "auto",
+            marginBottom: "3rem",
+          }}
+        >
+          <div
+            style={{
+              width: "7rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-around",
+              border: "solid .1rem #eee",
+              borderRadius: "2rem",
+            }}
+          >
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setDisplayMode(EDisplayMode.GRID)}
+            >
+              {displayMode === EDisplayMode.GRID ? (
+                <img src="/img_grid_light_mode_on.svg" alt="" />
+              ) : (
+                <img src="/img_grid_light_mode_off.svg" alt="" />
+              )}
+            </div>
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setDisplayMode(EDisplayMode.HORIZONTAL)}
+            >
+              {displayMode === EDisplayMode.HORIZONTAL ? (
+                <img src="/img_list_light_mode_on.svg" alt="" />
+              ) : (
+                <img src="/img_list_light_mode_off.svg" alt="" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
-        <GridFeedList updateList={updateList} />
+        <GridFeedList updateList={updateList} updateCC={updateCC} />
       ) : (
         <div>
-          <HorizontalFeedList updateList={updateList} />
+          <HorizontalFeedList updateList={updateList} updateCC={updateCC} />
         </div>
       )}
     </div>
