@@ -40,11 +40,13 @@ export class User {
 
   /**
    * Gets or creates a user account for a given owner.
-   * 
+   *
    * To use this method, you must first initialize an instance of the SDK and pass a GraphQL client to the constructor.
    * The client will be used to fetch profile information.
    */
-  public async getOrCreate(owner: anchor.web3.PublicKey): Promise<anchor.web3.PublicKey> {
+  public async getOrCreate(
+    owner: anchor.web3.PublicKey
+  ): Promise<anchor.web3.PublicKey> {
     try {
       const user = await this.getUser(owner);
       if (user?.authority && user?.cl_pubkey && user?.randomhash) {
@@ -82,13 +84,11 @@ export class User {
     owner: anchor.web3.PublicKey
   ) {
     const { program } = this.sdk;
-    return program.methods
-      .updateUser()
-      .accounts({
-        user: userAccount,
-        newAuthority: newAuthority,
-        authority: owner,
-      });
+    return program.methods.updateUser().accounts({
+      user: userAccount,
+      newAuthority: newAuthority,
+      authority: owner,
+    });
   }
 
   public delete(
@@ -96,19 +96,17 @@ export class User {
     owner: anchor.web3.PublicKey
   ) {
     const { program } = this.sdk;
-    return program.methods
-      .deleteUser()
-      .accounts({
-        user: userAccount,
-        authority: owner,
-      });
+    return program.methods.deleteUser().accounts({
+      user: userAccount,
+      authority: owner,
+    });
   }
 
   // GraphQL API methods
 
   public async getUser(owner: anchor.web3.PublicKey): Promise<GumDecodedUser> {
     const query = gql`
-      query GetUser ($owner: String!) {
+      query GetUser($owner: String!) {
         gum_0_1_0_decoded_user(where: { authority: { _eq: $owner } }) {
           authority
           cl_pubkey
@@ -119,7 +117,9 @@ export class User {
     const variables = {
       owner: owner.toBase58(),
     };
-    const data = await this.sdk.gqlClient.request<{ gum_0_1_0_decoded_user: GumDecodedUser[] }>(query, variables);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_user: GumDecodedUser[];
+    }>(query, variables);
     return data.gum_0_1_0_decoded_user[0];
   }
 
@@ -133,11 +133,15 @@ export class User {
         }
       }
     `;
-    const data = await this.sdk.gqlClient.request<{ gum_0_1_0_decoded_user: GumDecodedUser[] }>(query);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_user: GumDecodedUser[];
+    }>(query);
     return data.gum_0_1_0_decoded_user;
   }
 
-  public async getUserAccountsByAuthority(userPubkey: anchor.web3.PublicKey): Promise<GumDecodedUser[]> {
+  public async getUserAccountsByAuthority(
+    userPubkey: anchor.web3.PublicKey
+  ): Promise<GumDecodedUser[]> {
     const query = gql`
       query UserAccounts {
         gum_0_1_0_decoded_user(where: { authority: { _eq: "${userPubkey}" } }) {
@@ -147,7 +151,9 @@ export class User {
         }
       }
     `;
-    const data = await this.sdk.gqlClient.request<{ gum_0_1_0_decoded_user: GumDecodedUser[] }>(query);
+    const data = await this.sdk.gqlClient.request<{
+      gum_0_1_0_decoded_user: GumDecodedUser[];
+    }>(query);
     return data.gum_0_1_0_decoded_user;
   }
 }
