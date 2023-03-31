@@ -324,7 +324,11 @@ const FeedModal = () => {
               {/* <span> -{feedModalData.post.readTime} read time</span> */}
             </div>
             <img
-              src={`https://picsum.photos/200/300?${Math.random()}`}
+              src={
+                feedModalData.itemImage && feedModalData.itemImage != ""
+                  ? feedModalData.itemImage
+                  : `https://picsum.photos/200/300?${Math.random()}`
+              }
               // src={feedModalData.itemImage}
               alt="cover"
               className={style.coverImage}

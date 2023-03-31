@@ -60,22 +60,10 @@ const SubmitModal = (props: ISubmitModalProps) => {
     title: "",
     description: "",
     link: "",
+    cover: "",
   });
 
-  const connection = useMemo(
-    () =>
-      new Connection(
-        "https://lingering-holy-wind.solana-devnet.discover.quiknode.pro/169c1aa008961ed4ec13c040acd5037e8ead18b1/",
-        "confirmed"
-      ),
-    []
-  );
-  const sdk = useGumSDK(
-    connection,
-    { preflightCommitment: "confirmed" },
-    "devnet",
-    GRAPHQL_ENDPOINTS.devnet
-  );
+  const sdk = useGumSDK();
   const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
   const closeModal = () => {
@@ -98,7 +86,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
           itemTitle: form.title,
           itemDescription: form.description,
           itemLink: form.link,
-          itemImage: "https://picsum.photos/200/300",
+          itemImage: form.cover,
           // "https://www.online-image-editor.com/styles/2019/images/power_girl_editor.png",
           created: new Date(),
         },
@@ -164,7 +152,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
         itemTitle: form.title,
         itemDescription: form.description,
         itemLink: form.link,
-        itemImage: "https://picsum.photos/200/300",
+        itemImage: form.cover,
         created: new Date(),
       };
 
@@ -281,6 +269,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
         setForm((old) => {
           old.description = res.data.Summary;
           old.title = res.data.title;
+          old.cover = res.data.cover;
           return JSON.parse(JSON.stringify(old));
         });
         setShowGeneratingLoading(false);
