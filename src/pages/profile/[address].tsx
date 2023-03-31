@@ -22,6 +22,7 @@ export interface IUser {
   createdAt: string;
   followings: string[];
   followers: string[];
+  profileHandle?: string; // Gum
 }
 
 const Feed = ({ user }: { user: IUser }) => {

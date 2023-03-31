@@ -15,8 +15,10 @@ const DeleteButton = (prop: deleteButtonProp) => {
   const { userProfile } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
+
   const sdk = useGumSDK();
-  const handleDelete = async (e: any) => {
+
+  const handleDelete = async () => {
     try {
       if (!wallet.publicKey) {
         throw "wallet Not Connected";
@@ -38,9 +40,20 @@ const DeleteButton = (prop: deleteButtonProp) => {
   if (userProfile && userProfile.profile.toString() == prop.from) {
     deleteButton = (
       <div>
-        <button className={""} onClick={handleDelete}>
-          {"Delete " + prop.type}
-        </button>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
+        >
+          <i
+            style={{ fontSize: "1.6rem", fontWeight: 500 }}
+            className="fa fa-trash-o"
+            aria-hidden="true"
+          ></i>
+
+          {/* {"Delete " + prop.type} */}
+        </div>
       </div>
     );
   }

@@ -24,7 +24,15 @@ const rootReducer = combineReducers({
 const persistConfig = getPersistConfig({
   key: "root",
   storage,
-  blacklist: ["gum", "global.showFeedModal", "global.eventNotificationQueue"],
+  blacklist: [
+    "gum",
+    "global.showFeedModal",
+    "global.showAuthModal",
+    "global.showSubmitModal",
+    "global.eventNotificationQueue",
+    "global.isLoading",
+    "dailySlice.feedList",
+  ],
   rootReducer,
 });
 

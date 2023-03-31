@@ -1,8 +1,4 @@
 import style from "@/styles/homePage/index.module.sass";
-// import FeedList from "@/components/homePage/feedList";
-import PageTitle from "@/components/common/pageTitle";
-import FeedModal from "@/components/homePage/feedModal";
-import request from "graphql-request";
 import { useCallback, useEffect, useState } from "react";
 import {
   endpoint,
@@ -38,11 +34,14 @@ import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
 import useGumState, { filterPostList } from "@/components/gumPage/gumState";
 
+export enum EDisplayMode {
+  GRID = 0,
+  HORIZONTAL = 1,
+}
+
 const HomePage = () => {
-  // const [showModal, setShowModal] = useState(false);
-  const { feedList } = useSelector(
-    (state: IRootState) => state.persistedReducer.daily
-  );
+  const [displayMode, setDisplayMode] = useState(EDisplayMode.HORIZONTAL);
+
   const { screenWidth, userData, address } = useSelector(
     (state: IRootState) => {
       return {
@@ -58,24 +57,11 @@ const HomePage = () => {
     following,
     allUser,
   } = useSelector((state: IRootState) => state.persistedReducer.gum);
-  // const [postModalIndex, setPostModalIndex] = useState<number | null>(null);
   const dispatch = useDispatch();
   const [rssFeed, setRssFeed] = useState<IFeedList[]>([]);
   useGumState();
   const [gumFeed, setGumFeed] = useState<IFeedList[]>([]);
   const [ccFeed, setCcFeed] = useState<IFeedList[]>([]);
-  // const getCurrentModalIndex = (index: number) => {
-  //   setPo
-  // };
-
-  // const getPost = async (id: string) => {
-  //   const postData = await request(endpoint, POST_BY_ID_STATIC_FIELDS_QUERY, {
-  //     id,
-  //   });
-
-  //   dispatch(updateModalData(postData));
-  //   setShowModal(true);
-  // };
 
   const getAnonymousList = async () => {
     const res = await API.getRssData();
@@ -84,8 +70,9 @@ const HomePage = () => {
 
   const updateList = async () => {
     try {
+      updateCC();
+      updateGum();
       dispatch(updateLoadingStatus(true));
-      // console.log("update ");
       let res: IFeedList[] = [];
 
       if (rssFeed.length <= 0) {
@@ -118,12 +105,13 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(false));
     }
   };
+
   const updateCC = async () => {
     try {
       let postUserData = {};
       let parsedFollowingsPosts: IFeedList[] = [];
 
-      if (address && userData.id && userData.id != "" && ccFeed.length <= 0) {
+      if (address && userData.id && userData.id != "") {
         dispatch(updateLoadingStatus(true));
         const ccUserPosts = await fetchPosts(address, address);
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
@@ -160,11 +148,12 @@ const HomePage = () => {
             id: ccPost.contentID,
             type: EFeedType.CC_ITEM,
             created: new Date(ccPost.createdAt).getTime().toString(),
+            ccPost: ccPost,
           };
 
           parsedFollowingsPosts.push(post);
         }
-        setCcFeed(parsedFollowingsPosts);
+        setCcFeed(JSON.parse(JSON.stringify(parsedFollowingsPosts)));
         setGumFeed([]);
         dispatch(updateLoadingStatus(false));
       }
@@ -173,6 +162,7 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(false));
     }
   };
+
   const updateGum = async () => {
     try {
       let gumFeeds: IFeedList[] = [];
@@ -202,7 +192,7 @@ const HomePage = () => {
               type: EFeedType.GUM_ITEM,
               sourceId: "",
               userAddress: address,
-              id: "",
+              id: post.cl_pubkey.toString(),
               itemTitle: daisiContent.itemTitle,
               itemDescription: daisiContent.itemDescription,
               itemLink: daisiContent.itemLink,
@@ -213,6 +203,7 @@ const HomePage = () => {
               sourceIcon: user.profilePicture ? user.profilePicture : "",
               linkCreated: moment(daisiContent.created).valueOf().toString(),
               cl_pubkey: post.cl_pubkey,
+              gumPost: post,
             };
             gumFeeds.push(feed);
           }
@@ -235,10 +226,12 @@ const HomePage = () => {
 
   useEffect(() => {
     updateGum();
-  }, [following]);
+  }, [following, rssFeed]);
+
   useEffect(() => {
     updateCC();
   }, [address]);
+
   useEffect(() => {
     let allPosts = [...rssFeed, ...ccFeed, ...gumFeed].sort((a, b) =>
       Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
@@ -247,55 +240,60 @@ const HomePage = () => {
     dispatch(updateFeedList(allPosts));
   }, [rssFeed, gumFeed, ccFeed]);
 
-  // useEffect(() => {
-  //   const content = feedList.find((feed, index) => {
-  //     if (index === postModalIndex) {
-  //       return feed;
-  //     }
-  //   });
-
-  //   dispatch(updateModalData(content));
-  // }, [postModalIndex, feedList]);
-
-  // useEffect(() => {
-  //   if (modalData) {
-  //     setShowModal(true);
-  //   }
-  // }, [modalData]);
-
-  // useEffect(() => {
-  //   if (!showModal) {
-  //     setPostModalIndex(null);
-  //   }
-  // }, [showModal]);
-
   return (
     <div className={`pageContent ${style.homePage}`}>
-      {/* <PageTitle title="Daily" /> */}
-      {screenWidth < 960 ? (
-        <GridFeedList
-          // setShowModal={setShowModal}
-          // getPost={getPost}
-          // getCurrentModalIndex={getCurrentModalIndex}
-          // setPostModalIndex={setPostModalIndex}
-          updateList={updateList}
-        />
-      ) : (
-        <HorizontalFeedList
-          // setShowModal={setShowModal}
-          // getPost={getPost}
-          // setPostModalIndex={setPostModalIndex}
-          updateList={updateList}
-        />
+      {screenWidth >= 960 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            maxWidth: "60%",
+            margin: "auto",
+            marginBottom: "3rem",
+          }}
+        >
+          <div
+            style={{
+              width: "7rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-around",
+              border: "solid .1rem #eee",
+              borderRadius: "2rem",
+            }}
+          >
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setDisplayMode(EDisplayMode.GRID)}
+            >
+              {displayMode === EDisplayMode.GRID ? (
+                <img src="/img_grid_light_mode_on.svg" alt="" />
+              ) : (
+                <img src="/img_grid_light_mode_off.svg" alt="" />
+              )}
+            </div>
+            <div
+              style={{ cursor: "pointer" }}
+              onClick={() => setDisplayMode(EDisplayMode.HORIZONTAL)}
+            >
+              {displayMode === EDisplayMode.HORIZONTAL ? (
+                <img src="/img_list_light_mode_on.svg" alt="" />
+              ) : (
+                <img src="/img_list_light_mode_off.svg" alt="" />
+              )}
+            </div>
+          </div>
+        </div>
       )}
-      {/* {showModal ? (
-        <FeedModal
-          setShowModal={setShowModal}
-          postModalIndex={postModalIndex}
-          // getPost={getPost}
-          setPostModalIndex={setPostModalIndex}
-        />
-      ) : null} */}
+
+      {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
+        <GridFeedList updateList={updateList} updateCC={updateCC} />
+      ) : (
+        <div>
+          <HorizontalFeedList updateList={updateList} updateCC={updateCC} />
+        </div>
+      )}
     </div>
   );
 };

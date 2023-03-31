@@ -302,8 +302,7 @@ const GridFeed = (props: IGridFeedProps) => {
         />
       </div>
       <div className={style.socialActionBlock}>{props.children}</div>
-      {(props.type === EFeedType.RSS_ITEM ||
-        props.type === EFeedType.CC_ITEM) && (
+      {props.type === EFeedType.RSS_ITEM && (
         <div
           className={style.socialActionBlock}
           onClick={(e) => {

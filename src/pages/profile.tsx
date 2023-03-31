@@ -15,6 +15,7 @@ import HorizontalFeed, {
 } from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
 import ExplorePosts from "@/components/gumPage/ExploreMigrated";
+// import PostList from "@/components/cyberConnectPage/postListMigrated";
 import PostList from "@/components/cyberConnectPage/postListMigrated";
 import CyberConnectFollowBtn from "@/components/cyberConnectPage/followBtn";
 import { postInterface } from "@/utils/gum";
@@ -58,6 +59,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const [checkingAddress, setCheckingAddress] = useState("");
   const [isCheckingSolanaAddress, setIsCheckingSolanaAddress] = useState(false);
   let sdk = useGumSDK();
+
   const getUser = async () => {
     if (!checkingAddress) {
       return;
@@ -69,10 +71,12 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     let followers: string[] = [];
     if (isCheckingSolanaAddress) {
       let gumAddress = new PublicKey(checkingAddress);
+
       let profile = (
         await sdk.profile.getProfilesByUser(gumAddress)
       )[0].cl_pubkey.toString();
       dispatch(updateUserProfilePageHandle(new PublicKey(profile)));
+
       if (followersMap.size && followersMap.size && profile) {
         let followProfiles = followersMap.get(profile);
         if (followProfiles)
@@ -129,6 +133,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
       Login{" "}
     </div>
   );
+
   if (accessToken && !isCheckingSolanaAddress) {
     followButton = (
       <CyberConnectFollowBtn
@@ -248,21 +253,6 @@ const ProfilePage = ({ user }: { user: IUser }) => {
               <div className={style.userJoinedDate}>
                 Joined {moment(fetchedUser.createdAt).format("MMMM DD, YYYY")}
               </div>
-
-              {/* Solana follow btn */}
-              {/* {wallet.connected &&
-              userProfilePageHandle &&
-              userData &&
-              userData.address !== checkingAddress &&
-              isCheckingSolanaAddress ? (
-                <FollowButton toProfile={userProfilePageHandle.toBase58()} />
-              ) : null} */}
-              {/* Metamask follow btn */}
-              {/* {accessToken && metamaskAddress != checkingAddress ? (
-                <div>
-                  <FollowBtn address={checkingAddress} />
-                </div>
-              ) : null} */}
               {showUserList && (
                 <UserListModal
                   checkingUser={fetchedUser}

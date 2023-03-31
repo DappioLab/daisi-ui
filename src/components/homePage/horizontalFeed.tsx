@@ -143,6 +143,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         break;
 
       // case EFeedType.GUM_ITEM:
+      //   alert("x");
       //   break;
 
       case EFeedType.USER_POST:
@@ -172,14 +173,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
           }
         }}
       >
-        {/* {props.type === EFeedType.CC_ITEM ? (
-          <img
-            src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
-            alt="icon"
-          />
-        ) : ( */}
         <img src={props.article.sourceIcon} alt="icon" />
-        {/* )} */}
       </div>
       {showLinkButton ? (
         <a href={props.article.itemLink} target="_blank">
@@ -195,46 +189,48 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
       ) : null}
       <div className={style.titleBlock}>
         <div className={style.title}>{props.article.itemTitle}</div>
-        {props.type !== EFeedType.RSS_ITEM && (
+        {/* {props.type !== EFeedType.RSS_ITEM && (
           <div className={style.description}>
             {props.article.itemDescription}
           </div>
-        )}
+        )} */}
         <div className={style.space}></div>
         <div className={style.timeBlock}>
           {moment(parseInt(props.article.linkCreated)).format("MMMM DD, YYYY")}
         </div>
         <div className={style.socialActionBlock}>{props.children}</div>
-        {(props.type === EFeedType.RSS_ITEM ||
-          props.type === EFeedType.CC_ITEM) && (
-          <div
-            className={style.socialActionBlock}
-            onClick={(e) => {
-              e.stopPropagation();
-              updateLike();
-            }}
-          >
-            {userData && props.article.likes.includes(userData.id) ? (
-              <div style={{ fontSize: "1.6rem" }}>
-                <i className="fa fa-heart " aria-hidden="true"></i>
+        {
+          // (
+          props.type === EFeedType.RSS_ITEM && (
+            // || props.type === EFeedType.CC_ITEM) &&
+            <div
+              className={style.socialActionBlock}
+              onClick={(e) => {
+                e.stopPropagation();
+                updateLike();
+              }}
+            >
+              {userData && props.article.likes.includes(userData.id) ? (
+                <div style={{ fontSize: "1.6rem" }}>
+                  <i className="fa fa-heart " aria-hidden="true"></i>
+                </div>
+              ) : (
+                <div style={{ fontSize: "1.6rem" }}>
+                  <i className="fa fa-heart-o"></i>
+                </div>
+              )}
+              <div className={style.actionNumber}>
+                {props.article.likes.length}
               </div>
-            ) : (
-              <div style={{ fontSize: "1.6rem" }}>
-                <i className="fa fa-heart-o"></i>
-              </div>
-            )}
-            <div className={style.actionNumber}>
-              {props.article.likes.length}
             </div>
-          </div>
-        )}
+          )
+        }
       </div>
       <div className={style.articleImage}>
         <img
           src={`https://picsum.photos/200/300?${Math.random()}`}
           alt="icon"
         />
-        {/* <img src={props.article.itemImage} alt="icon" /> */}
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   ProfileAccount,
   ReactionInterface,
   ReplyInterface,
-} from "./gumState";
+} from "./useGumState";
 import style from "@/styles/gumPage/post.module.sass";
 import { PublicKey } from "@solana/web3.js";
 
