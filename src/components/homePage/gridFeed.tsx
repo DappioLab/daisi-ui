@@ -297,7 +297,11 @@ const GridFeed = (props: IGridFeedProps) => {
       </div>
       <div className={style.articleImage}>
         <img
-          src={`https://picsum.photos/200/300?${Math.random()}`}
+          src={
+            props.article.itemImage && props.article.itemImage != ""
+              ? props.article.itemImage
+              : `https://picsum.photos/200/300?${Math.random()}`
+          }
           alt="icon"
         />
       </div>
