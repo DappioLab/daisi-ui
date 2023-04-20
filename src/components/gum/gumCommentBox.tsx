@@ -9,13 +9,7 @@ import { PublicKey } from "@solana/web3.js";
 import style from "@/styles/gumPage/post.module.sass";
 
 interface IReplyFormProps {
-  // from: string;
   post: string;
-  // type: string;
-  // commentsNumber: number;
-  // showMoreCommentBtn: boolean;
-  // postKey: string;
-  // getListPostKey: (key: string) => void;
 }
 
 const GumCommentBox = (props: IReplyFormProps) => {
