@@ -18,7 +18,7 @@ import {
   fetchPostById,
   connectWallet,
   createCyberConnectClient,
-} from "../cyberConnectPage/helper";
+} from "@/utils/cyberConnect";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SDK } from "./../../gpl-core/src";

@@ -1,6 +1,6 @@
 import style from "@/styles/common/userProfileEdit.module.sass";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { IUser } from "@/pages/profile/[address]";
+import { IUser } from "@/pages/profile";
 import {
   getStorage,
   ref,
@@ -24,7 +24,7 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
   const { userData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
-  const [imgUploadProgress, setImgUploadProgress] = useState(0);
+  const [_, setImgUploadProgress] = useState(0);
   const [img, setImg] = useState<File | null>(null);
   const [form, setForm] = useState<IUser>({
     address: props.user.address,

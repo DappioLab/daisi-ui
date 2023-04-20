@@ -1,9 +1,5 @@
 import style from "@/styles/homePage/index.module.sass";
 import { useCallback, useEffect, useState } from "react";
-import {
-  endpoint,
-  POST_BY_ID_STATIC_FIELDS_QUERY,
-} from "@/graphql/daily/query";
 import { useDispatch, useSelector } from "react-redux";
 import {
   IApiRssListResponse,
@@ -25,18 +21,22 @@ import {
   updateLoadingStatus,
   updateShowFeedModal,
 } from "@/redux/globalSlice";
-import {
-  fetchFollowingsPosts,
-  fetchPosts,
-} from "@/components/cyberConnectPage/helper";
-import { IUser } from "@/pages/profile/[address]";
+import { fetchFollowingsPosts, fetchPosts } from "@/utils/cyberConnect";
+import { IUser } from "@/pages/profile";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
-import useGumState, { filterPostList } from "@/components/gumPage/gumState";
+import useGumState, { filterPostList } from "@/components/gum/useGumState";
+import { setCommentMap } from "@/redux/cyberConnectSlice";
+import { Post } from "@/components/cyberConnect/cyberConnectPostList";
 
 export enum EDisplayMode {
   GRID = 0,
   HORIZONTAL = 1,
+}
+
+export interface IPostProps {
+  item: any;
+  updateList: () => void;
 }
 
 const HomePage = () => {
@@ -164,14 +164,20 @@ const HomePage = () => {
   };
 
   const updateGum = async () => {
+    console.log(1);
+
     try {
       let gumFeeds: IFeedList[] = [];
+      console.log(2);
+
       if (
         userProfile &&
         gumPosts.length > 0 &&
         allUser.size > 0 &&
         gumFeed.length <= 0
       ) {
+        console.log(3);
+
         dispatch(updateLoadingStatus(true));
         let gumFollowing = following.map((conn) => {
           return conn.follow;
@@ -217,6 +223,7 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(false));
     }
   };
+
   useEffect(() => {
     updateList();
     dispatch(updateFeedModalIndex(null));
@@ -226,7 +233,7 @@ const HomePage = () => {
 
   useEffect(() => {
     updateGum();
-  }, [following, rssFeed]);
+  }, [following, userProfile, gumPosts, allUser, gumFeed]);
 
   useEffect(() => {
     updateCC();
@@ -239,6 +246,30 @@ const HomePage = () => {
 
     dispatch(updateFeedList(allPosts));
   }, [rssFeed, gumFeed, ccFeed]);
+
+  useEffect(() => {
+    let parsedMap = new Map<string, Post>();
+
+    const recursive = (comments: any) => {
+      comments.map((item) => {
+        if (item.comments && item.comments.length > 0) {
+          parsedMap.set(item.contentID, item.comments);
+
+          recursive(item.comments);
+        }
+      });
+    };
+
+    const parseComments = () => {
+      const allPosts = ccFeed.map((item) => item.ccPost);
+
+      recursive(allPosts);
+
+      const objFromMap = Object.fromEntries(parsedMap);
+      dispatch(setCommentMap(objFromMap));
+    };
+    parseComments();
+  }, [ccFeed]);
 
   return (
     <div className={`pageContent ${style.homePage}`}>
@@ -286,12 +317,11 @@ const HomePage = () => {
           </div>
         </div>
       )}
-
       {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
-        <GridFeedList updateList={updateList} updateCC={updateCC} />
+        <GridFeedList updateList={updateList} />
       ) : (
         <div>
-          <HorizontalFeedList updateList={updateList} updateCC={updateCC} />
+          <HorizontalFeedList updateList={updateList} />
         </div>
       )}
     </div>

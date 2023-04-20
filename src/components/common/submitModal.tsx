@@ -8,7 +8,7 @@ import {
 import style from "@/styles/common/submitModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useDispatch, useSelector } from "react-redux";
-import { ipfsClient, mainGateway } from "@/components/gumPage/storage";
+import { ipfsClient, mainGateway } from "@/components/gum/gumStorage";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { useEffect, useMemo, useState } from "react";
 import { Connection } from "@solana/web3.js";
@@ -19,7 +19,7 @@ import {
   connectWallet,
   createCyberConnectClient,
   createPost as createCyberConnectPost,
-} from "@/components/cyberConnectPage/helper";
+} from "@/utils/cyberConnect";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
 import API from "@/axios/api";
 export interface ISubmitModal {

@@ -1,6 +1,6 @@
 import API from "@/axios/api";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { IUser } from "@/pages/profile/[address]";
+import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
 import {
   updateAuthModal,

@@ -31,6 +31,8 @@ const persistConfig = getPersistConfig({
     "global.showSubmitModal",
     "global.eventNotificationQueue",
     "global.isLoading",
+    "global.currentCheckingCommentParentId",
+    "global.showCommentListModal",
     "dailySlice.feedList",
   ],
   rootReducer,

@@ -7,31 +7,39 @@ import { IApiRssListResponse, IParsedRssData } from "@/redux/dailySlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IUser } from "./profile/[address]";
 import style from "@/styles/profile/id.module.sass";
 import moment from "moment";
 import HorizontalFeed, {
   EFeedType,
 } from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
-import ExplorePosts from "@/components/gumPage/ExploreMigrated";
+import ExplorePosts from "@/components/gum/gumPostList";
 // import PostList from "@/components/cyberConnectPage/postListMigrated";
-import PostList from "@/components/cyberConnectPage/postListMigrated";
-import CyberConnectFollowBtn from "@/components/cyberConnectPage/followBtn";
+import PostList from "@/components/cyberConnect/cyberConnectPostList";
+import CyberConnectFollowBtn from "@/components/cyberConnect/cyberConnectFollowBtn";
 import { postInterface } from "@/utils/gum";
 import UserProfileEdit from "@/components/common/userProfileEdit";
-import GumFollowButton from "@/components/gumPage/FollowButton";
+import GumFollowButton from "@/components/gum/gumFollowBtn";
 import { PublicKey } from "@solana/web3.js";
 import {
   updateAuthModal,
   updateUserProfilePageData,
   updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
-import {
-  fetchFollowers,
-  fetchFollowings,
-} from "@/components/cyberConnectPage/helper";
+import { fetchFollowers, fetchFollowings } from "@/utils/cyberConnect";
 import { useGumSDK } from "@/hooks/useGumSDK";
+
+export interface IUser {
+  id: string;
+  username: string;
+  description: string;
+  profilePicture: string;
+  address: string;
+  createdAt: string;
+  followings: string[];
+  followers: string[];
+  profileHandle?: string; // Gum
+}
 
 const ProfilePage = ({ user }: { user: IUser }) => {
   const {

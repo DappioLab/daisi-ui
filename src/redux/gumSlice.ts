@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
-import { SDK } from "../gpl-core/src";
 import {
   ConnectionInterface,
   ReactionInterface,
   ProfileAccount,
   ReplyInterface,
-} from "@/components/gumPage/gumState";
+} from "@/components/gum/useGumState";
 import { IFeedList } from "./dailySlice";
-import { postInterface } from "@/components/gumPage/Posts";
+import { postInterface } from "@/components/gum/gumPostList";
+
 export interface IGumInitialState {
   userProfile: ProfileAccount | null;
   userAccounts: PublicKey[];
@@ -20,7 +20,7 @@ export interface IGumInitialState {
   allUser: Map<string, ProfileAccount>;
   followingMap: Map<string, ProfileAccount[]>;
   followersMap: Map<string, ProfileAccount[]>;
-  replyMap: Map<string, ReplyInterface[]>;
+  commentMap: Map<string, ReplyInterface[]>;
 }
 
 const initialState: IGumInitialState = {
@@ -34,52 +34,36 @@ const initialState: IGumInitialState = {
   allUser: new Map<string, ProfileAccount>(),
   followersMap: new Map<string, ProfileAccount[]>(),
   followingMap: new Map<string, ProfileAccount[]>(),
-  replyMap: new Map<string, ReplyInterface[]>(),
+  commentMap: new Map<string, ReplyInterface[]>(),
 };
 
 export const gumSlice = createSlice({
   name: "gumSlice",
   initialState,
   reducers: {
-    updateUserProfile: (
-      state,
-      action: {
-        payload: ProfileAccount;
-      }
-    ) => {
+    updateUserProfile: (state, action) => {
       state.userProfile = action.payload;
     },
-    updateUserAccounts: (
-      state,
-      action: {
-        payload: PublicKey[];
-      }
-    ) => {
+    updateUserAccounts: (state, action) => {
       state.userAccounts = action.payload;
     },
 
-    updateFollowing: (state, action: { payload: ConnectionInterface[] }) => {
+    updateFollowing: (state, action) => {
       state.following = action.payload;
     },
-    updateFollowers: (state, action: { payload: PublicKey[] }) => {
+    updateFollowers: (state, action) => {
       state.followers = action.payload;
     },
-    updateReactions: (
-      state,
-      action: { payload: Map<string, ReactionInterface[]> }
-    ) => {
+    updateReactions: (state, action) => {
       state.reactions = action.payload;
     },
     updatePostList: (state, action) => {
       state.postList = action.payload;
     },
-    updatePosts: (state, action: { payload: postInterface[] }) => {
+    updatePosts: (state, action) => {
       state.allPosts = action.payload;
     },
-    updateAllUser: (
-      state,
-      action: { payload: Map<string, ProfileAccount> }
-    ) => {
+    updateAllUser: (state, action) => {
       state.allUser = action.payload;
     },
     updateAllFollow: (
@@ -94,13 +78,8 @@ export const gumSlice = createSlice({
       state.followersMap = action.payload.following;
       state.followingMap = action.payload.followers;
     },
-    updateReplies: (
-      state,
-      action: {
-        payload: Map<string, ReplyInterface[]>;
-      }
-    ) => {
-      state.replyMap = action.payload;
+    updateCommentMap: (state, action) => {
+      state.commentMap = action.payload;
     },
   },
 });
@@ -115,7 +94,7 @@ export const {
   updatePosts,
   updateAllUser,
   updateAllFollow,
-  updateReplies,
+  updateCommentMap,
 } = gumSlice.actions;
 
 export default gumSlice.reducer;

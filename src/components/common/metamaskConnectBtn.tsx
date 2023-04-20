@@ -24,7 +24,7 @@ import {
   checkNetwork,
   connectWallet,
   checkRelayActionStatus,
-} from "../cyberConnectPage/helper";
+} from "@/utils/cyberConnect";
 
 const MetamaskConnectBtn = () => {
   const solanaWallet = useWallet();
