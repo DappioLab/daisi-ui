@@ -7,7 +7,7 @@ import {
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GridFeed from "../homePage/gridFeed";
-import GumLikeButton from "../homePage/gumLikeButton";
+import GumLikeButton from "./gumLikeButton";
 import { EFeedType } from "../homePage/horizontalFeed";
 import GumCommentBox from "./gumCommentBox";
 

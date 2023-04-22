@@ -18,6 +18,7 @@ export const createIpfsClient = () => {
 
 export const createCyberConnectClient = (provider: any) => {
   return new CyberConnect({
+    appId: "cyberconnect",
     namespace: "CyberConnect",
     env: "STAGING",
     provider: provider,

@@ -7,7 +7,7 @@ import {
 } from "@/redux/globalSlice";
 import { useEffect, useState } from "react";
 import { IFeedList } from "@/redux/dailySlice";
-import GumLikeButton from "../homePage/gumLikeButton";
+import GumLikeButton from "./gumLikeButton";
 import GumCommentBox from "./gumCommentBox";
 
 export interface IGumHorizontalPost {

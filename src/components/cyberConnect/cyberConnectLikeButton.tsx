@@ -35,7 +35,8 @@ const LikeButton = (props: ILikeButtonProps) => {
       {props.post.likedStatus.liked ? (
         <div
           style={{ fontSize: "1.6rem" }}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             handleOnClick(props.post.contentID, false);
           }}
         >

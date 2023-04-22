@@ -1,4 +1,4 @@
-import HorizontalFeed, { EFeedType } from "./horizontalFeed";
+import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import { updateAuthModal, updateLoadingStatus } from "@/redux/globalSlice";
@@ -6,7 +6,7 @@ import { PublicKey } from "@solana/web3.js";
 import { ReactionType } from "@/gpl-core/src/reaction";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { postInterface } from "../gum/useGum";
+import { postInterface } from "./useGum";
 import { updateReactions } from "@/redux/gumSlice";
 
 const GumLikeButton = (post: {
