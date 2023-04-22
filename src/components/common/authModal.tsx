@@ -1,12 +1,9 @@
 import API from "@/axios/api";
+import btnStyle from "@/styles/common/metamaskConnectBtn.module.sass";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
-import {
-  updateAuthModal,
-  updateLoadingStatus,
-  updateUserData,
-} from "@/redux/globalSlice";
+import { updateAuthModal, updateUserData } from "@/redux/globalSlice";
 import style from "@/styles/common/authModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
@@ -264,8 +261,34 @@ const AuthModal = (props: IAuthModalProps) => {
               * Please switch to Solana devnet
             </div>
           </div>
-          <button onClick={() => connectDataVerse()}>
-            {identity ? identity : "Connect Dataverse"}
+          <button
+            style={{ marginTop: "2rem" }}
+            className={btnStyle.metamaskConnectBtn}
+            onClick={() => {
+              if (!identity) {
+                connectDataVerse();
+              }
+            }}
+          >
+            {identity ? (
+              <>
+                <img
+                  style={{ width: "3rem", height: "3rem" }}
+                  src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
+                  alt=""
+                />
+                <span>{identity.slice(0, 4) + "..." + identity.slice(-4)}</span>
+              </>
+            ) : (
+              <>
+                <img
+                  style={{ width: "3rem", height: "3rem" }}
+                  src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
+                  alt=""
+                />
+                <span>Metamask</span>
+              </>
+            )}
           </button>
         </div>
       </div>
