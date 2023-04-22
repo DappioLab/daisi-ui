@@ -1,4 +1,4 @@
-import { postInterface } from "./gumPostList";
+import { postInterface } from "./useGum";
 import React, { useEffect, useState, useMemo } from "react";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";

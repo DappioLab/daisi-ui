@@ -146,6 +146,12 @@ const Global = (props: IGlobalProps) => {
 
     switch (commentListType) {
       case EFeedType.CC_ITEM:
+        console.log(cyberConnectCommentMap, "cyberConnectCommentMap");
+        console.log(
+          currentCheckingCommentParentId,
+          "currentCheckingCommentParentId"
+        );
+
         data =
           cyberConnectCommentMap[
             currentCheckingCommentParentId[
@@ -167,7 +173,7 @@ const Global = (props: IGlobalProps) => {
           return;
         }
 
-        console.log(data, "data");
+        console.log(data, "####");
 
         data = data.map((item) => {
           console.log(
@@ -181,13 +187,13 @@ const Global = (props: IGlobalProps) => {
             comments: gumCommentMap.get(item.cl_pubkey.toString())
               ? gumCommentMap.get(item.cl_pubkey.toString())
               : [],
-            contentID: item.cl_pubkey.toString(),
+            contentId: item.cl_pubkey.toString(),
           };
         });
         break;
     }
 
-    console.log(data, "////");
+    console.log(data, "outside");
 
     setList(data);
   }, [currentCheckingCommentParentId]);

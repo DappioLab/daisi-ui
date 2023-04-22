@@ -22,10 +22,8 @@ import moment from "moment";
 import useGumState from "./useGumState";
 import GumLikeButton from "../homePage/gumLikeButton";
 import ReplyForm from "./gumCommentForm";
-import ReplyList from "./gumCommentList";
+import ReplyList from "./gumCommentList-deprecated";
 import GridFeed from "../homePage/gridFeed";
-// import { BlockInterface } fro./BlockMigrated-deprecatedted";
-import { useRouter } from "next/router";
 
 export interface BlockInterface {
   id: string;

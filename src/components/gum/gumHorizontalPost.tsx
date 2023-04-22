@@ -1,38 +1,17 @@
-import style from "@/styles/homePage/horizontalFeedList.module.sass";
 import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import {
-  EFeedModalType,
-  updateAuthModal,
   updateCommentListType,
   updateCurrentCheckingCommentParentId,
-  updateFeedModalIndex,
-  updateFeedModalType,
-  updateLoadingStatus,
-  updateShowFeedModal,
 } from "@/redux/globalSlice";
-import { PublicKey } from "@solana/web3.js";
-import { ReactionType } from "@/gpl-core/src/reaction";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useGumSDK } from "@/hooks/useGumSDK";
-// import { postInterface } from "../gumPage/Posts";
 import { useEffect, useState } from "react";
-import { updateReactions } from "@/redux/gumSlice";
-import GumLikeButton from "../homePage/gumLikeButton";
-import ReplyForm from "../gum/gumCommentForm";
-import ReplyList from "../gum/gumCommentList";
-import LikeButton from "../cyberConnect/cyberConnectLikeButton";
-import PostList from "../cyberConnect/cyberConnectPostList";
-import moment from "moment";
-import { toChecksumAddress } from "ethereum-checksum-address";
-import { Post } from "../cyberConnect/cyberConnectPostList";
 import { IFeedList } from "@/redux/dailySlice";
+import GumLikeButton from "../homePage/gumLikeButton";
 import GumCommentBox from "./gumCommentBox";
 
 export interface IGumHorizontalPost {
   item: IFeedList;
-  // level: number;
   updateList: () => void;
 }
 
@@ -48,8 +27,9 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
     Map<string, boolean>
   >(new Map());
 
-  const { userData, userProfilePageData, currentCheckingCommentParentId } =
-    useSelector((state: IRootState) => state.persistedReducer.global);
+  const { currentCheckingCommentParentId } = useSelector(
+    (state: IRootState) => state.persistedReducer.global
+  );
 
   const [isShowCommentInputBlock, setIsShowCommentInputBlock] = useState<
     Map<string, boolean>

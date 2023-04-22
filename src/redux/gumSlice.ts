@@ -7,7 +7,7 @@ import {
   ReplyInterface,
 } from "@/components/gum/useGumState";
 import { IFeedList } from "./dailySlice";
-import { postInterface } from "@/components/gum/gumPostList";
+import { postInterface } from "@/components/gum/useGum";
 
 export interface IGumInitialState {
   userProfile: ProfileAccount | null;

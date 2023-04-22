@@ -1,21 +1,17 @@
 import { useState } from "react";
-
 import { ipfsClient, mainGateway } from "./gumStorage";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { IRootState } from "@/redux/index";
 import { useSelector } from "react-redux";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import style from "@/styles/gumPage/post.module.sass";
 
 interface IReplyFormProps {
   from: string;
   post: string;
   type: string;
   commentsNumber: number;
-  // showMoreCommentBtn: boolean;
   postKey: string;
-  // getListPostKey: (key: string) => void;
 }
 
 const ReplyForm = (props: IReplyFormProps) => {

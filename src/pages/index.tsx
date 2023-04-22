@@ -1,5 +1,6 @@
 import style from "@/styles/homePage/index.module.sass";
 import { useCallback, useEffect, useState } from "react";
+import { setPostList } from "@/redux/cyberConnectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
   IApiRssListResponse,
@@ -63,47 +64,9 @@ const HomePage = () => {
   const [gumFeed, setGumFeed] = useState<IFeedList[]>([]);
   const [ccFeed, setCcFeed] = useState<IFeedList[]>([]);
 
-  const getAnonymousList = async () => {
+  const getRssList = async () => {
     const res = await API.getRssData();
     return res.data;
-  };
-
-  const updateList = async () => {
-    try {
-      updateCC();
-      updateGum();
-      dispatch(updateLoadingStatus(true));
-      let res: IFeedList[] = [];
-
-      if (rssFeed.length <= 0) {
-        res = await getAnonymousList();
-        res = res.map((item: IRssSourceItem) => {
-          const obj: IFeedList = {
-            isUserPost: false,
-            userAddress: null,
-            sourceIcon: item.sourceIcon,
-            sourceId: item.id,
-            itemTitle: item.itemTitle,
-            itemDescription: "",
-            itemImage: "",
-            itemLink: item.itemLink,
-            likes: item.likes,
-            forwards: [],
-            linkCreated: item.linkCreated,
-            id: item.id,
-            type: EFeedType.RSS_ITEM,
-            created: item.created,
-          };
-          return obj;
-        });
-
-        setRssFeed(res);
-      }
-      dispatch(updateLoadingStatus(false));
-    } catch (err) {
-      console.log(err);
-      dispatch(updateLoadingStatus(false));
-    }
   };
 
   const updateCC = async () => {
@@ -224,6 +187,44 @@ const HomePage = () => {
     }
   };
 
+  const updateList = async () => {
+    try {
+      updateCC();
+      updateGum();
+      dispatch(updateLoadingStatus(true));
+      let res: IFeedList[] = [];
+
+      if (rssFeed.length <= 0) {
+        res = await getRssList();
+        res = res.map((item: IRssSourceItem) => {
+          const obj: IFeedList = {
+            isUserPost: false,
+            userAddress: null,
+            sourceIcon: item.sourceIcon,
+            sourceId: item.id,
+            itemTitle: item.itemTitle,
+            itemDescription: "",
+            itemImage: "",
+            itemLink: item.itemLink,
+            likes: item.likes,
+            forwards: [],
+            linkCreated: item.linkCreated,
+            id: item.id,
+            type: EFeedType.RSS_ITEM,
+            created: item.created,
+          };
+          return obj;
+        });
+
+        setRssFeed(res);
+      }
+      dispatch(updateLoadingStatus(false));
+    } catch (err) {
+      console.log(err);
+      dispatch(updateLoadingStatus(false));
+    }
+  };
+
   useEffect(() => {
     updateList();
     dispatch(updateFeedModalIndex(null));
@@ -270,6 +271,10 @@ const HomePage = () => {
     };
     parseComments();
   }, [ccFeed]);
+
+  const { feedList } = useSelector(
+    (state: IRootState) => state.persistedReducer.daily
+  );
 
   return (
     <div className={`pageContent ${style.homePage}`}>
@@ -318,10 +323,10 @@ const HomePage = () => {
         </div>
       )}
       {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
-        <GridFeedList updateList={updateList} />
+        <GridFeedList updateList={updateList} list={feedList} />
       ) : (
         <div>
-          <HorizontalFeedList updateList={updateList} />
+          <HorizontalFeedList updateList={updateList} list={feedList} />
         </div>
       )}
     </div>

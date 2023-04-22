@@ -3,21 +3,14 @@ import UserListModal, {
   EUserListType,
 } from "@/components/common/userListModal";
 import { IRootState } from "@/redux";
-import { IApiRssListResponse, IParsedRssData } from "@/redux/dailySlice";
+import { IFeedList } from "@/redux/dailySlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import style from "@/styles/profile/id.module.sass";
 import moment from "moment";
-import HorizontalFeed, {
-  EFeedType,
-} from "@/components/homePage/horizontalFeed";
 import { useWallet } from "@solana/wallet-adapter-react";
-import ExplorePosts from "@/components/gum/gumPostList";
-// import PostList from "@/components/cyberConnectPage/postListMigrated";
-import PostList from "@/components/cyberConnect/cyberConnectPostList";
 import CyberConnectFollowBtn from "@/components/cyberConnect/cyberConnectFollowBtn";
-import { postInterface } from "@/utils/gum";
 import UserProfileEdit from "@/components/common/userProfileEdit";
 import GumFollowButton from "@/components/gum/gumFollowBtn";
 import { PublicKey } from "@solana/web3.js";
@@ -28,6 +21,9 @@ import {
 } from "@/redux/globalSlice";
 import { fetchFollowers, fetchFollowings } from "@/utils/cyberConnect";
 import { useGumSDK } from "@/hooks/useGumSDK";
+import useGum from "@/components/gum/useGum";
+import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
+import useCyberConnect from "@/components/cyberConnect/useCyberConnect";
 
 export interface IUser {
   id: string;
@@ -49,17 +45,21 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     userProfilePageData,
     currentAddress,
   } = useSelector((state: IRootState) => state.persistedReducer.global);
-  const { userProfile, followersMap, followingMap } = useSelector(
-    (state: IRootState) => state.persistedReducer.gum
-  );
+  const {
+    userProfile,
+    followersMap,
+    followingMap,
+    postList: gumPostList,
+  } = useSelector((state: IRootState) => state.persistedReducer.gum);
 
   const [showUserList, setShowUserList] = useState(false);
   const [userListType, setUserListType] = useState<EUserListType | null>(null);
-  // const [userPosts, setUserPosts] = useState<IParsedRssData[]>([]);
   const [fetchedUser, setFetchedUser] = useState<IUser | null>(null);
-  const { address: metamaskAddress, accessToken } = useSelector(
-    (state: IRootState) => state.persistedReducer.cyberConnect
-  );
+  const {
+    address: metamaskAddress,
+    accessToken,
+    postList: cyberConnectList,
+  } = useSelector((state: IRootState) => state.persistedReducer.cyberConnect);
   const wallet = useWallet();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -67,6 +67,28 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const [checkingAddress, setCheckingAddress] = useState("");
   const [isCheckingSolanaAddress, setIsCheckingSolanaAddress] = useState(false);
   let sdk = useGumSDK();
+
+  const { address: myAddress } = useSelector(
+    (state: IRootState) => state.persistedReducer.cyberConnect
+  );
+  const [postList, setPostList] = useState<IFeedList[]>([]);
+
+  const { fetchPostData, parseComments } = useCyberConnect();
+  const { fetchPostData: fetchGumPostData } = useGum();
+
+  useEffect(() => {
+    if (isCheckingSolanaAddress) {
+      fetchGumPostData(checkingAddress);
+    } else {
+      (async () => {
+        const list = await fetchPostData(checkingAddress);
+        if (list) {
+          setPostList(list);
+          parseComments(list);
+        }
+      })();
+    }
+  }, [checkingAddress, myAddress, cyberConnectList]);
 
   const getUser = async () => {
     if (!checkingAddress) {
@@ -273,9 +295,13 @@ const ProfilePage = ({ user }: { user: IUser }) => {
             </div>
           </div>
           {isCheckingSolanaAddress ? (
-            <ExplorePosts checkingAddress={checkingAddress} />
+            <>
+              {gumPostList && gumPostList.length > 0 && (
+                <HorizontalFeedList updateList={() => {}} list={gumPostList} />
+              )}
+            </>
           ) : (
-            <PostList address={checkingAddress} />
+            <HorizontalFeedList updateList={() => {}} list={postList} />
           )}
         </>
       ) : null}

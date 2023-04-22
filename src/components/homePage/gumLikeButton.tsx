@@ -6,7 +6,7 @@ import { PublicKey } from "@solana/web3.js";
 import { ReactionType } from "@/gpl-core/src/reaction";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { postInterface } from "../gum/gumPostList";
+import { postInterface } from "../gum/useGum";
 import { updateReactions } from "@/redux/gumSlice";
 
 const GumLikeButton = (post: {

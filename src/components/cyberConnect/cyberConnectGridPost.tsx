@@ -1,29 +1,13 @@
-import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
+import { EFeedType } from "../homePage/horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import {
-  EFeedModalType,
-  updateAuthModal,
   updateCommentListType,
   updateCurrentCheckingCommentParentId,
-  updateFeedModalIndex,
-  updateFeedModalType,
-  updateLoadingStatus,
-  updateShowFeedModal,
 } from "@/redux/globalSlice";
-import { PublicKey } from "@solana/web3.js";
-import { ReactionType } from "@/gpl-core/src/reaction";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useGumSDK } from "@/hooks/useGumSDK";
-// import { postInterface } from "../gumPage/Posts";
-import { useEffect, useState } from "react";
-import { updateReactions } from "@/redux/gumSlice";
-import ReplyForm from "../gum/gumCommentForm";
-import ReplyList from "../gum/gumCommentList";
-import PostList from "../cyberConnect/cyberConnectPostList";
+import { useState } from "react";
 import moment from "moment";
 import { toChecksumAddress } from "ethereum-checksum-address";
-import { Post } from "../cyberConnect/cyberConnectPostList";
 
 import { IPostProps } from "@/pages";
 import GridFeed from "../homePage/gridFeed";
@@ -52,7 +36,7 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
   >(new Map());
 
   const obj = {
-    id: props.item.contentID,
+    id: props.item.id,
     itemTitle: props.item.body,
     itemDescription: props.item.body.split("\n\n")[0],
     itemLink: props.item.body.split("\n\n").reverse()[0],
@@ -100,7 +84,7 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
           }}
           onClick={(e) => {
             e.stopPropagation();
-            toggleCommentInputBlock(props.item.contentID);
+            toggleCommentInputBlock(props.item.id);
           }}
         >
           <i
@@ -112,9 +96,9 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
             className="fa fa-pencil"
             aria-hidden="true"
           ></i>
-          {isShowCommentInputBlock.get(props.item.contentID) && (
+          {isShowCommentInputBlock.get(props.item.id) && (
             <CommentBox
-              contentId={props.item.contentID}
+              contentId={props.item.id}
               address={myAddress}
               fetchData={props.updateList}
             />
@@ -133,14 +117,14 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
                 JSON.stringify(currentCheckingCommentParentId)
               );
 
-              if (arr.includes(props.item.contentID)) {
+              if (arr.includes(props.item.id)) {
                 return;
               }
-              arr.push(props.item.contentID);
+              arr.push(props.item.id);
 
               dispatch(updateCommentListType(EFeedType.CC_ITEM));
               dispatch(updateCurrentCheckingCommentParentId(arr));
-              toggleCommentList(props.item.contentID);
+              toggleCommentList(props.item.id);
             }}
           >
             <i

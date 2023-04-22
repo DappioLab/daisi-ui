@@ -52,7 +52,7 @@ const CommentListModal = (props: ICommentListModalProps) => {
               <div className={style.content}>{item.body}</div>
               {
                 <CommentBox
-                  contentId={item.contentID}
+                  contentId={item.id}
                   address={address}
                   fetchData={async () => {}}
                 />

@@ -2,34 +2,17 @@ import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import {
-  EFeedModalType,
-  updateAuthModal,
   updateCommentListType,
   updateCurrentCheckingCommentParentId,
-  updateFeedModalIndex,
-  updateFeedModalType,
-  updateLoadingStatus,
-  updateShowFeedModal,
 } from "@/redux/globalSlice";
-import { PublicKey } from "@solana/web3.js";
-import { ReactionType } from "@/gpl-core/src/reaction";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useGumSDK } from "@/hooks/useGumSDK";
-// import { postInterface } from "../gumPage/Posts";
-import { useEffect, useState } from "react";
-import { updateReactions } from "@/redux/gumSlice";
-import ReplyForm from "../gum/gumCommentForm";
-import ReplyList from "../gum/gumCommentList";
+import { useState } from "react";
 import LikeButton from "../cyberConnect/cyberConnectLikeButton";
 import CommentBox from "../cyberConnect/cyberConnectCommentBox";
-import PostList from "../cyberConnect/cyberConnectPostList";
 import moment from "moment";
 import { toChecksumAddress } from "ethereum-checksum-address";
-import { Post } from "../cyberConnect/cyberConnectPostList";
+import { IPostProps } from "@/pages";
 
-export interface ICyberConnectHorizontalPost {
-  item: Post;
-  // level: number;
+export interface ICyberConnectHorizontalPost extends IPostProps {
   updateList: () => void;
 }
 
@@ -137,6 +120,8 @@ const CyberConnectHorizontalPost = (props: ICyberConnectHorizontalPost) => {
               if (arr.includes(props.item.contentID)) {
                 return;
               }
+              console.log(props.item, "props.item.contentID");
+
               arr.push(props.item.contentID);
 
               dispatch(updateCommentListType(EFeedType.CC_ITEM));

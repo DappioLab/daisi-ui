@@ -8,41 +8,21 @@ import {
 } from "@/utils/cyberConnect";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ILikeButtonProps {
   post: Post;
   updateCC: () => void;
-  // address: string;
 }
 
 const LikeButton = (props: ILikeButtonProps) => {
-  // const { address: myAddress, lastPostsUpdateTime } = useSelector(
-  //   (state: IRootState) => state.persistedReducer.cyberConnect
-  // );
-  const [postList, setPostList] = useState<Post[]>([]);
-
   const handleOnClick = async (contentID: string, isLike: boolean) => {
     const provider = await connectWallet();
     await checkNetwork(provider);
     const cyberConnectClient = createCyberConnectClient(provider);
     await like(contentID, cyberConnectClient, isLike);
     props.updateCC();
-    // await fetchData();
   };
-
-  // const fetchData = async () => {
-  //   try {
-  //     if (!(props.address && myAddress)) {
-  //       return;
-  //     }
-
-  //     const posts = await fetchPosts(props.address, myAddress);
-  //     setPostList(posts);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   return (
     <div

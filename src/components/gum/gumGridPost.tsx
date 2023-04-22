@@ -10,13 +10,11 @@ import GridFeed from "../homePage/gridFeed";
 import GumLikeButton from "../homePage/gumLikeButton";
 import { EFeedType } from "../homePage/horizontalFeed";
 import GumCommentBox from "./gumCommentBox";
-import ReplyForm from "./gumCommentForm";
-import useGum from "./useGum";
 
 interface IGumGridPostProps extends IPostProps {}
 
 const GumGridPost = (props: IGumGridPostProps) => {
-  const { userData, currentCheckingCommentParentId } = useSelector(
+  const { currentCheckingCommentParentId } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
   const { commentMap } = useSelector(
