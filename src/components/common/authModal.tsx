@@ -211,20 +211,20 @@ const AuthModal = (props: IAuthModalProps) => {
   const [identity, setIdentity] = useState(null);
 
   const connectDataVerse = async () => {
+    console.log("Wallet");
     const did = await runtimeConnector.connectWallet({
       name: METAMASK,
       type: CRYPTO_WALLET_TYPE,
     });
+    console.log(did, "did");
 
-    await runtimeConnector.switchNetwork(80001);
-    console.log(1);
-    console.log(ModelNames, "ModelNames");
+    // await runtimeConnector.switchNetwork(80001);
+    await runtimeConnector.switchNetwork(97);
     const identity = await runtimeConnector.connectIdentity({
       wallet: { name: METAMASK, type: CRYPTO_WALLET_TYPE },
-      appName: Apps.Dataverse,
-      modelNames: [ModelNames.contentFolders],
+      appName: "dapq001",
+      modelNames: ["dapp001_post"],
     });
-    console.log(2);
     console.log(identity);
     setIdentity(identity);
   };
@@ -286,7 +286,7 @@ const AuthModal = (props: IAuthModalProps) => {
                   src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
                   alt=""
                 />
-                <span>Metamask</span>
+                <span>Dataverse</span>
               </>
             )}
           </button>

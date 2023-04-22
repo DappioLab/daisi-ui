@@ -1,7 +1,7 @@
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
 // import AuthModal from "./authModal";
-import SubmitModal from "./submitModal";
+// import SubmitModal from "./submitModal";
 import style from "@/styles/common/global.module.sass";
 import {
   EFeedModalType,
@@ -21,6 +21,7 @@ import CommentListModal from "./commentListModal";
 import { Post } from "../cyberConnect/cyberConnectPostList";
 import dynamic from "next/dynamic";
 const AuthModal = dynamic(() => import("./authModal"), { ssr: false });
+const SubmitModal = dynamic(() => import("./submitModal"), { ssr: false });
 
 interface IGlobalProps {
   children: ReactNode;

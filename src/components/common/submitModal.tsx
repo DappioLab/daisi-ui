@@ -27,6 +27,16 @@ export interface ISubmitModal {
   description: string;
   link: "";
 }
+import {
+  RuntimeConnector,
+  Apps,
+  ModelNames,
+  FileType,
+  MirrorFile,
+  Extension,
+} from "@dataverse/runtime-connector";
+
+const runtimeConnector = new RuntimeConnector(Extension);
 
 export interface ISubmitModalProps {}
 
@@ -184,6 +194,40 @@ const SubmitModal = (props: ISubmitModalProps) => {
     }
   };
 
+  // Dataverse create stream
+  const createStream = async () => {
+    const did = await runtimeConnector.getCurrentDID();
+    // form data
+    let data = {
+      itemTitle: form.title,
+      itemDescription: form.description,
+      itemLink: form.link,
+      itemImage: form.cover,
+      created: new Date(),
+    };
+
+    try {
+      const currentTime = new Date();
+
+      const { streamContent, streamId, newMirror, existingMirror } =
+        await runtimeConnector.createStream({
+          did,
+          appName: "dapq001",
+          modelName: "dapp001_post",
+          streamContent: {
+            appVersion: "0.1.0",
+            text: "This is from Daisi",
+            createdAt: currentTime,
+            updatedAt: currentTime,
+          },
+          fileType: FileType.Public,
+        });
+      console.log(streamContent);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const createPost = async () => {
     let type: EPostType | null = null;
     if (accessToken && !solanaWallet.connected) {
@@ -206,6 +250,8 @@ const SubmitModal = (props: ISubmitModalProps) => {
     switch (type) {
       case EPostType.CYBER_CONNECT:
         result = await createCCPost();
+        await createStream();
+
         break;
       case EPostType.GUM:
         result = await createGumPost();

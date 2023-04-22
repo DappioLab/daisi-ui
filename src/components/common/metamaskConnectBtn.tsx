@@ -52,6 +52,8 @@ const MetamaskConnectBtn = () => {
       const profile = await getProfileByAddress(address);
       dispatch(updateCurrentAddress(address));
 
+      console.log(profile, "profile");
+
       if (!profile) {
         const ipfsClient = createIpfsClient();
         const { relayActionId } = await createProfile(
