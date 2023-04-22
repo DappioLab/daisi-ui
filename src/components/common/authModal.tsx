@@ -73,7 +73,6 @@ const AuthModal = (props: IAuthModalProps) => {
       let result = await user?.instructionMethodBuilder.rpc();
 
       await fetchProfile();
-      console.log(result);
     } catch (err) {}
     // await fetchProfile();
   };
@@ -93,7 +92,6 @@ const AuthModal = (props: IAuthModalProps) => {
             solanaWallet.publicKey
           )
         )?.instructionMethodBuilder.rpc();
-        console.log(result);
         await fetchProfile();
       }
       await fetchProfile();
@@ -217,7 +215,7 @@ const AuthModal = (props: IAuthModalProps) => {
     });
 
     // await runtimeConnector.switchNetwork(80001);
-    await runtimeConnector.switchNetwork(97);
+    await runtimeConnector.switchNetwork(137);
     const identity = await runtimeConnector.connectIdentity({
       wallet: { name: METAMASK, type: CRYPTO_WALLET_TYPE },
       appName: "dapq001",

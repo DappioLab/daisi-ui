@@ -93,7 +93,6 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     } else {
       (async () => {
         const list = await fetchPostData(checkingAddress);
-        console.log(list, "list ===");
 
         if (list) {
           setInnerPostList(list);

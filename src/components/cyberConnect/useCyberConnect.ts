@@ -78,8 +78,6 @@ const useCyberConnect = () => {
   }, []);
 
   const parseComments = useCallback((posts) => {
-    console.log(posts, "###");
-
     const allPosts = posts.map((item) => item.ccPost);
 
     recursive(allPosts);

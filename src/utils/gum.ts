@@ -80,8 +80,6 @@ export const fetchPostData = async (wallet: WalletContextState, sdk: SDK) => {
           )
         : [];
 
-      console.log(allPostAccounts, "allPostAccounts");
-
       let allPostsMetadata = await Promise.all(
         allPostAccounts
           .filter((post) => {

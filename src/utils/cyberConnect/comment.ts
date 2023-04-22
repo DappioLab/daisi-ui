@@ -30,7 +30,6 @@ export const comment = async (
       body: description,
       author: daisiHandle,
     });
-    console.log("create post cc res:", res);
 
     return {
       status: "SUCCESS",

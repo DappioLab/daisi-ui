@@ -44,7 +44,6 @@ export const createPost = async (
       body: `${description}\n\n${summitLink}`,
       author: handle,
     });
-    console.log("create post cc res:", res);
 
     return {
       status: "SUCCESS",

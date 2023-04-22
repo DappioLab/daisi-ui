@@ -19,10 +19,8 @@ const likeDislikeBtn = ({
 
       if (isLike) {
         const res = await cyberConnectClient.like(contendId);
-        console.log("like btn response:", res);
       } else {
         const res = await cyberConnectClient.dislike(contendId);
-        console.log("dislike btn response:", res);
       }
     } catch (err) {
       console.log(err);

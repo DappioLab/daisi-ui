@@ -128,11 +128,8 @@ const HomePage = () => {
   };
 
   const updateGum = async () => {
-    console.log(1);
-
     try {
       let gumFeeds: IFeedList[] = [];
-      console.log(2);
 
       if (
         userProfile &&
@@ -140,8 +137,6 @@ const HomePage = () => {
         allUser.size > 0 &&
         gumFeed.length <= 0
       ) {
-        console.log(3);
-
         dispatch(updateLoadingStatus(true));
         let gumFollowing = following.map((conn) => {
           return conn.follow;

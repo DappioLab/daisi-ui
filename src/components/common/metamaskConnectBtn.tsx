@@ -52,8 +52,6 @@ const MetamaskConnectBtn = () => {
       const profile = await getProfileByAddress(address);
       dispatch(updateCurrentAddress(address));
 
-      console.log(profile, "profile");
-
       if (!profile) {
         const ipfsClient = createIpfsClient();
         const { relayActionId } = await createProfile(
@@ -64,9 +62,7 @@ const MetamaskConnectBtn = () => {
         );
 
         // TODO: Add auto detect relay action status and error handling if failed
-        console.log("relayActionId:", relayActionId);
         const res = await checkRelayActionStatus(relayActionId);
-        console.log("create profile result:", res);
       } else {
         dispatch(setProfile(profile));
       }
