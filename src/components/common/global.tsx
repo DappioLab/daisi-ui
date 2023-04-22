@@ -1,31 +1,32 @@
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
-import AuthModal from "./authModal";
+// import AuthModal from "./authModal";
 import SubmitModal from "./submitModal";
 import style from "@/styles/common/global.module.sass";
 import {
   EFeedModalType,
+  updateCurrentCheckingCommentParentId,
   updateFeedModalData,
   updateFeedModalIndex,
   updateFeedModalType,
-  updateLoginStatus,
   updateScreenWidth,
-  updateUserData,
+  updateShowCommentListModal,
 } from "@/redux/globalSlice";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import FeedModal from "../homePage/feedModal";
 import { EFeedType } from "../homePage/horizontalFeed";
-import { IFeedList } from "@/redux/dailySlice";
 import EventNotification from "./eventNotification";
-// import { updateModalData } from "@/redux/dailySlice";
+import CommentListModal from "./commentListModal";
+import { Post } from "../cyberConnect/cyberConnectPostList";
+import dynamic from "next/dynamic";
+const AuthModal = dynamic(() => import("./authModal"), { ssr: false });
 
 interface IGlobalProps {
   children: ReactNode;
 }
 
 const Global = (props: IGlobalProps) => {
-  const solanaWallet = useWallet();
   const dispatch = useDispatch();
   const {
     showAuthModal,
@@ -34,19 +35,21 @@ const Global = (props: IGlobalProps) => {
     showSubmitModal,
     showFeedModal,
     feedModalIndex,
-    feedModalData,
     feedModalType,
+    showCommentListModal,
+    currentCheckingCommentParentId,
+    commentListType,
   } = useSelector((state: IRootState) => state.persistedReducer.global);
 
   const { feedList } = useSelector(
     (state: IRootState) => state.persistedReducer.daily
   );
 
-  const { postList } = useSelector(
+  const { postList, commentMap: cyberConnectCommentMap } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
 
-  const { postList: gumList } = useSelector(
+  const { postList: gumList, commentMap: gumCommentMap } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
 
@@ -126,6 +129,74 @@ const Global = (props: IGlobalProps) => {
     }
   }, [showFeedModal]);
 
+  const [list, setList] = useState<Post[]>([]);
+
+  useEffect(() => {
+    if (currentCheckingCommentParentId.length === 0) {
+      return;
+    } else {
+      dispatch(updateShowCommentListModal(true));
+    }
+
+    let data = null;
+
+    switch (commentListType) {
+      case EFeedType.CC_ITEM:
+        console.log(cyberConnectCommentMap, "cyberConnectCommentMap");
+        console.log(
+          currentCheckingCommentParentId,
+          "currentCheckingCommentParentId"
+        );
+
+        data =
+          cyberConnectCommentMap[
+            currentCheckingCommentParentId[
+              currentCheckingCommentParentId.length - 1
+            ]
+          ];
+        if (!data) {
+          return;
+        }
+        break;
+      case EFeedType.GUM_ITEM:
+        data = gumCommentMap.get(
+          currentCheckingCommentParentId[
+            currentCheckingCommentParentId.length - 1
+          ]
+        );
+
+        if (!data) {
+          return;
+        }
+
+        console.log(data, "####");
+
+        data = data.map((item) => {
+          console.log(
+            gumCommentMap.get(item.cl_pubkey.toString()),
+            "gumCommentMap.get(item.cl_pubkey)"
+          );
+
+          return {
+            body: item.text,
+            // comments: [],
+            comments: gumCommentMap.get(item.cl_pubkey.toString())
+              ? gumCommentMap.get(item.cl_pubkey.toString())
+              : [],
+            contentId: item.cl_pubkey.toString(),
+          };
+        });
+        break;
+    }
+    setList(data);
+  }, [currentCheckingCommentParentId]);
+
+  useEffect(() => {
+    if (!showCommentListModal) {
+      dispatch(updateCurrentCheckingCommentParentId([]));
+    }
+  }, [showCommentListModal]);
+
   return (
     <div className={style.global}>
       {showSubmitModal && <SubmitModal />}
@@ -135,6 +206,8 @@ const Global = (props: IGlobalProps) => {
         <AuthModal />
       </div>
       <EventNotification />
+      {showCommentListModal && <CommentListModal list={list} />}
+
       {isLoading && (
         <div className={style.loadingMask}>
           <img className={style.loadingIcon} src="/loading.png" alt="" />

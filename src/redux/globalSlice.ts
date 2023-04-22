@@ -4,7 +4,7 @@ import {
   ISubmitModalProps,
 } from "@/components/common/submitModal";
 import { EFeedType } from "@/components/homePage/horizontalFeed";
-import { IUser } from "@/pages/profile/[address]";
+import { IUser } from "@/pages/profile";
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
 import { IFeedList, IRssSourceItem } from "./dailySlice";
@@ -31,6 +31,9 @@ export interface IGlobalInitialState {
   feedModalData: IFeedList | null;
   feedModalType: EFeedModalType | null;
   eventNotificationQueue: string[];
+  commentListType: EFeedType;
+  currentCheckingCommentParentId: string[];
+  showCommentListModal: boolean;
 }
 
 const initialState: IGlobalInitialState = {
@@ -62,6 +65,9 @@ const initialState: IGlobalInitialState = {
   feedModalData: null,
   feedModalType: null,
   eventNotificationQueue: [],
+  commentListType: null,
+  currentCheckingCommentParentId: [],
+  showCommentListModal: false,
 };
 
 export const globalSlice = createSlice({
@@ -113,6 +119,15 @@ export const globalSlice = createSlice({
     updateEventNotificationQueue: (state, action) => {
       state.eventNotificationQueue = action.payload;
     },
+    updateCurrentCheckingCommentParentId: (state, action) => {
+      state.currentCheckingCommentParentId = action.payload;
+    },
+    updateShowCommentListModal: (state, action) => {
+      state.showCommentListModal = action.payload;
+    },
+    updateCommentListType: (state, action) => {
+      state.commentListType = action.payload;
+    },
   },
 });
 
@@ -132,6 +147,9 @@ export const {
   updateFeedModalData,
   updateFeedModalType,
   updateEventNotificationQueue,
+  updateCurrentCheckingCommentParentId,
+  updateShowCommentListModal,
+  updateCommentListType,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

@@ -26,11 +26,8 @@ import {
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
-import { useDispatch, useSelector } from "react-redux";
-
 import React, { useMemo } from "react";
 import Global from "@/components/common/global";
-import { updateScreenWidth } from "@/redux/globalSlice";
 import HeadMetadata from "@/components/common/headMetadata";
 import TagManager from "react-gtm-module";
 

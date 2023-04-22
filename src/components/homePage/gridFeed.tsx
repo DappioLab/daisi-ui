@@ -16,28 +16,18 @@ import {
   connectWallet,
   createCyberConnectClient,
   checkNetwork,
-} from "../cyberConnectPage/helper";
+} from "@/utils/cyberConnect";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { EFeedType } from "./horizontalFeed";
 import { updateAuthModal, updateLoadingStatus } from "@/redux/globalSlice";
 import { useRouter } from "next/router";
 
-// export enum EFeedType {
-//   USER_POST = "USER POST",
-//   RSS_ITEM = "RSS ITEM",
-//   CC_ITEM = "CC ITEM",
-//   GUM_ITEM = "GUM ITEM",
-// }
-
 interface IGridFeedProps extends IFeedProps {
-  type: EFeedType;
   children: ReactNode;
 }
 
 export interface IFeedProps {
-  article: IFeedList;
-  // setShowModal: Dispatch<SetStateAction<boolean>>;
-  // getPost: (id: string) => Promise<void>;
+  item: IFeedList;
 }
 
 const GridFeed = (props: IGridFeedProps) => {
@@ -63,192 +53,99 @@ const GridFeed = (props: IGridFeedProps) => {
     }
 
     dispatch(updateLoadingStatus(true));
-    switch (props.type) {
-      case EFeedType.RSS_ITEM:
-        const updatedItem = await API.updateRssItemLike(
-          props.article.id,
-          userData.id
-        );
+    // switch (props.type) {
+    //   case EFeedType.RSS_ITEM:
+    //     const updatedItem = await API.updateRssItemLike(
+    //       props.item.id,
+    //       userData.id
+    //     );
 
-        if (updatedItem) {
-          const updatedList = feedList.map((item) => {
-            if (item.id === updatedItem.data._id) {
-              const obj = JSON.parse(JSON.stringify(item));
-              obj.likes = updatedItem.data.likes;
-              return obj;
-            }
-            return item;
-          });
-          dispatch(updateFeedList(updatedList));
-        }
-        break;
+    //     if (updatedItem) {
+    //       const updatedList = feedList.map((item) => {
+    //         if (item.id === updatedItem.data._id) {
+    //           const obj = JSON.parse(JSON.stringify(item));
+    //           obj.likes = updatedItem.data.likes;
+    //           return obj;
+    //         }
+    //         return item;
+    //       });
+    //       dispatch(updateFeedList(updatedList));
+    //     }
+    //     break;
 
-      case EFeedType.CC_ITEM:
-        try {
-          if (!address) {
-            dispatch(updateAuthModal(true));
-            return;
-          }
-          if (!props.article.id) {
-            dispatch(updateAuthModal(true));
-            return;
-          }
-          const isLiked = props.article.likes.includes(userData.id);
+    //   case EFeedType.CC_ITEM:
+    //     try {
+    //       if (!address) {
+    //         dispatch(updateAuthModal(true));
+    //         return;
+    //       }
+    //       if (!props.item.id) {
+    //         dispatch(updateAuthModal(true));
+    //         return;
+    //       }
+    //       const isLiked = props.item.likes.includes(userData.id);
 
-          const provider = await connectWallet();
-          await checkNetwork(provider);
-          const cyberConnectClient = createCyberConnectClient(provider);
-          await like(props.article.id, cyberConnectClient, !isLiked);
+    //       const provider = await connectWallet();
+    //       await checkNetwork(provider);
+    //       const cyberConnectClient = createCyberConnectClient(provider);
+    //       await like(props.item.id, cyberConnectClient, !isLiked);
 
-          const updatedPost = await fetchPostById(props.article.id, address);
+    //       const updatedPost = await fetchPostById(props.item.id, address);
 
-          if (updatedPost) {
-            const post: IFeedList = {
-              type: EFeedType.CC_ITEM,
-              created: new Date(updatedPost.createdAt).getTime().toString(),
-              isUserPost: true,
-              userAddress: props.article.userAddress,
-              sourceIcon: props.article.sourceIcon,
-              sourceId: updatedPost.contentID,
-              itemTitle: updatedPost.title,
-              itemDescription: updatedPost.body.split("\n\n")[0],
-              itemImage: "",
-              itemLink: updatedPost.body.split("\n\n").reverse()[0],
-              likes: updatedPost.likedStatus.liked
-                ? new Array(updatedPost.likeCount).fill(userData.id)
-                : new Array(updatedPost.likeCount).fill("123"),
-              forwards: [],
-              linkCreated: new Date(updatedPost.createdAt).getTime().toString(),
-              id: updatedPost.contentID,
-            };
+    //       if (updatedPost) {
+    //         const post: IFeedList = {
+    //           type: EFeedType.CC_ITEM,
+    //           created: new Date(updatedPost.createdAt).getTime().toString(),
+    //           isUserPost: true,
+    //           userAddress: props.item.userAddress,
+    //           sourceIcon: props.item.sourceIcon,
+    //           sourceId: updatedPost.contentID,
+    //           itemTitle: updatedPost.title,
+    //           itemDescription: updatedPost.body.split("\n\n")[0],
+    //           itemImage: "",
+    //           itemLink: updatedPost.body.split("\n\n").reverse()[0],
+    //           likes: updatedPost.likedStatus.liked
+    //             ? new Array(updatedPost.likeCount).fill(userData.id)
+    //             : new Array(updatedPost.likeCount).fill("123"),
+    //           forwards: [],
+    //           linkCreated: new Date(updatedPost.createdAt).getTime().toString(),
+    //           id: updatedPost.contentID,
+    //         };
 
-            const updatedList = feedList.map((feed) => {
-              if (feed.id === updatedPost.contentID) {
-                return post;
-              }
-              return feed;
-            });
-            const updatedCCPosts = postList.map((p) => {
-              if (p.id === updatedPost.contentID) {
-                return post;
-              }
-              return p;
-            });
-            dispatch(setPostList(updatedCCPosts));
-            dispatch(updateFeedList(updatedList));
-          }
-        } catch (err) {
-          console.log(err);
-        }
-        break;
+    //         const updatedList = feedList.map((feed) => {
+    //           if (feed.id === updatedPost.contentID) {
+    //             return post;
+    //           }
+    //           return feed;
+    //         });
+    //         const updatedCCPosts = postList.map((p) => {
+    //           if (p.id === updatedPost.contentID) {
+    //             return post;
+    //           }
+    //           return p;
+    //         });
+    //         dispatch(setPostList(updatedCCPosts));
+    //         dispatch(updateFeedList(updatedList));
+    //       }
+    //     } catch (err) {
+    //       console.log(err);
+    //     }
+    //     break;
 
-      // case EFeedType.GUM_ITEM:
-      //   break;
+    //   // case EFeedType.GUM_ITEM:
+    //   //   break;
 
-      case EFeedType.USER_POST:
-        // Deprecate
-        await API.updateUserPostLike(props.article.id, userData.id);
-        window.location.reload();
-        break;
+    //   case EFeedType.USER_POST:
+    //     // Deprecate
+    //     await API.updateUserPostLike(props.item.id, userData.id);
+    //     window.location.reload();
+    //     break;
 
-      default:
-        throw "ERROR: unknown feed type";
-    }
+    //   default:
+    //     throw "ERROR: unknown feed type";
+    // }
     dispatch(updateLoadingStatus(false));
   };
-  // const updateLike = async () => {
-  //   if (!userData?.id || !isLogin) {
-  //     alert("Please login");
-  //     return;
-  //   }
-
-  //   switch (props.type) {
-  //     case EFeedType.RSS_ITEM:
-  //       const updatedItem = await API.updateRssItemLike(
-  //         props.article.id,
-  //         userData.id
-  //       );
-
-  //       if (updatedItem) {
-  //         const updatedList = feedList.map((item) => {
-  //           if (item.id === updatedItem.data._id) {
-  //             const obj = JSON.parse(JSON.stringify(item));
-  //             obj.likes = updatedItem.data.likes;
-  //             return obj;
-  //           }
-  //           return item;
-  //         });
-  //         dispatch(updateFeedList(updatedList));
-  //       }
-  //       break;
-
-  //     case EFeedType.CC_ITEM:
-  //       try {
-  //         if (!address) {
-  //           dispatch(updateAuthModal(true));
-  //           return;
-  //         }
-  //         if (!props.article.id) {
-  //           dispatch(updateAuthModal(true));
-  //           return;
-  //         }
-
-  //         const isLiked = props.article.likes.includes(userData.id);
-  //         const provider = await connectWallet();
-  //         const cyberConnectClient = createCyberConnectClient(provider);
-  //         await like(props.article.id, cyberConnectClient, !isLiked);
-
-  //         const updatedPost = await fetchPostById(props.article.id, address);
-  //         console.log(updatedPost, "updatedPost");
-  //         if (updatedPost) {
-  //           const post: any = {
-  //             sourceIcon: "",
-  //             sourceId: updatedPost.contentID,
-  //             itemTitle: updatedPost.title,
-  //             itemDescription: updatedPost.body.split("\n\n")[0],
-  //             itemImage: "",
-  //             itemLink: updatedPost.body.split("\n\n").reverse()[0],
-  //             likes: updatedPost.likedStatus.liked
-  //               ? new Array(updatedPost.likeCount).fill(userData.id)
-  //               : new Array(updatedPost.likeCount).fill("123"),
-  //             forwards: [],
-  //             linkCreated: new Date(updatedPost.createdAt).getTime().toString(),
-  //             id: updatedPost.contentID,
-  //           };
-
-  //           const updatedList = feedList.map((feed) => {
-  //             if (feed.id === updatedPost.contentID) {
-  //               return post;
-  //             }
-  //             return feed;
-  //           });
-  //           const updatedCCPosts = postList.map((p) => {
-  //             if (p.id === updatedPost.contentID) {
-  //               return post;
-  //             }
-  //             return p;
-  //           });
-  //           dispatch(setPostList(updatedCCPosts));
-  //           dispatch(updateFeedList(updatedList));
-  //         }
-  //       } catch (err) {
-  //         console.log(err);
-  //       }
-  //       break;
-
-  //     case EFeedType.GUM_ITEM:
-  //       break;
-
-  //     case EFeedType.USER_POST:
-  //       // Deprecate
-  //       await API.updateUserPostLike(props.article.id, userData.id);
-  //       window.location.reload();
-  //       break;
-
-  //     default:
-  //       throw "ERROR: unknown feed type";
-  //   }
-  // };
 
   return (
     <div
@@ -259,9 +156,9 @@ const GridFeed = (props: IGridFeedProps) => {
       <div
         className={style.articleIcon}
         onClick={(e) => {
-          if (props.article.userAddress) {
+          if (props.item.userAddress) {
             e.stopPropagation();
-            router.push(`/profile?address=${props.article.userAddress}`);
+            router.push(`/profile?address=${props.item.userAddress}`);
           }
         }}
       >
@@ -271,14 +168,14 @@ const GridFeed = (props: IGridFeedProps) => {
             alt="icon"
           />
         ) : ( */}
-        <img src={props.article.sourceIcon} alt="icon" />
+        <img src={props.item.sourceIcon} alt="icon" />
         {/* )} */}
       </div>
       {/* <div className={style.articleIcon}>
-        <img src={props.article.sourceIcon} alt="icon" />
+        <img src={props.item.sourceIcon} alt="icon" />
       </div> */}
       {showLinkButton ? (
-        <a href={props.article.itemLink} target="_blank">
+        <a href={props.item.itemLink} target="_blank">
           <div
             className={style.linkButton}
             onClick={(e) => {
@@ -290,23 +187,23 @@ const GridFeed = (props: IGridFeedProps) => {
         </a>
       ) : null}
 
-      <div className={style.title}>{props.article.itemTitle}</div>
+      <div className={style.title}>{props.item.itemTitle}</div>
       <div className={style.space}></div>
       <div className={style.timeBlock}>
-        {moment(parseInt(props.article.linkCreated)).format("MMMM DD, YYYY")}{" "}
+        {moment(parseInt(props.item.linkCreated)).format("MMMM DD, YYYY")}{" "}
       </div>
       <div className={style.articleImage}>
         <img
           src={
-            props.article.itemImage && props.article.itemImage != ""
-              ? props.article.itemImage
+            props.item.itemImage && props.item.itemImage != ""
+              ? props.item.itemImage
               : `https://picsum.photos/200/300?${Math.random()}`
           }
           alt="icon"
         />
       </div>
       <div className={style.socialActionBlock}>{props.children}</div>
-      {props.type === EFeedType.RSS_ITEM && (
+      {/* {props.type === EFeedType.RSS_ITEM && (
         <div
           className={style.socialActionBlock}
           onClick={(e) => {
@@ -314,7 +211,7 @@ const GridFeed = (props: IGridFeedProps) => {
             updateLike();
           }}
         >
-          {userData && props.article.likes.includes(userData.id) ? (
+          {userData && props.item.likes.includes(userData.id) ? (
             <div style={{ fontSize: "1.6rem" }}>
               <i className="fa fa-heart " aria-hidden="true"></i>
             </div>
@@ -323,9 +220,9 @@ const GridFeed = (props: IGridFeedProps) => {
               <i className="fa fa-heart-o"></i>
             </div>
           )}
-          <div className={style.actionNumber}>{props.article.likes.length}</div>
+          <div className={style.actionNumber}>{props.item.likes.length}</div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

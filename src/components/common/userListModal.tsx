@@ -1,6 +1,6 @@
 import API from "@/axios/api";
 import axios from "axios";
-import { IUser } from "@/pages/profile/[address]";
+import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,10 +14,10 @@ import {
   fetchFollowers,
   fetchFollowings,
   follow,
-} from "../cyberConnectPage/helper";
+} from "@/utils/cyberConnect";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";
-import FollowButton from "../gumPage/FollowButton";
+import FollowButton from "../gum/gumFollowBtn";
 import { useRouter } from "next/router";
 
 export interface IUserListModalProps {

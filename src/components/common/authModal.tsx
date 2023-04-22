@@ -1,12 +1,9 @@
 import API from "@/axios/api";
+import btnStyle from "@/styles/common/metamaskConnectBtn.module.sass";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { IUser } from "@/pages/profile/[address]";
+import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
-import {
-  updateAuthModal,
-  updateLoadingStatus,
-  updateUserData,
-} from "@/redux/globalSlice";
+import { updateAuthModal, updateUserData } from "@/redux/globalSlice";
 import style from "@/styles/common/authModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
@@ -15,7 +12,18 @@ import { useDispatch, useSelector } from "react-redux";
 import MetamaskConnectBtn from "./metamaskConnectBtn";
 import SolanaConnectBtn from "./solanaConnectBtn";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
-import { updateUserAccounts, updateUserProfile } from "@/redux/gumSlice";
+import { updateUserProfile } from "@/redux/gumSlice";
+import {
+  RuntimeConnector,
+  Extension,
+  Browser,
+  Apps,
+  ModelNames,
+  METAMASK,
+  CRYPTO_WALLET_TYPE,
+} from "@dataverse/runtime-connector";
+
+const runtimeConnector = new RuntimeConnector(Extension);
 
 export interface IAuthModal {
   showAuthModal: boolean;
@@ -28,7 +36,9 @@ export interface IAuthData {
   profilePicture: string;
 }
 
-const AuthModal = () => {
+export interface IAuthModalProps {}
+
+const AuthModal = (props: IAuthModalProps) => {
   const { currentAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -198,13 +208,26 @@ const AuthModal = () => {
     }
   }, [userAccounts, userProfile]);
 
-  // useEffect(() => {
-  //   // if (userAccounts.length === 0) {
-  //   //   createUserAccount();
-  //   // } else {
-  //   handleCreateProfile();
-  //   // }
-  // }, [solanaWallet, userAccounts]);
+  const [identity, setIdentity] = useState(null);
+
+  const connectDataVerse = async () => {
+    const did = await runtimeConnector.connectWallet({
+      name: METAMASK,
+      type: CRYPTO_WALLET_TYPE,
+    });
+
+    await runtimeConnector.switchNetwork(80001);
+    console.log(1);
+    console.log(ModelNames, "ModelNames");
+    const identity = await runtimeConnector.connectIdentity({
+      wallet: { name: METAMASK, type: CRYPTO_WALLET_TYPE },
+      appName: Apps.Dataverse,
+      modelNames: [ModelNames.contentFolders],
+    });
+    console.log(2);
+    console.log(identity);
+    setIdentity(identity);
+  };
 
   return (
     <div className={style.authModal}>
@@ -238,6 +261,35 @@ const AuthModal = () => {
               * Please switch to Solana devnet
             </div>
           </div>
+          <button
+            style={{ marginTop: "2rem" }}
+            className={btnStyle.metamaskConnectBtn}
+            onClick={() => {
+              if (!identity) {
+                connectDataVerse();
+              }
+            }}
+          >
+            {identity ? (
+              <>
+                <img
+                  style={{ width: "3rem", height: "3rem" }}
+                  src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
+                  alt=""
+                />
+                <span>{identity.slice(0, 4) + "..." + identity.slice(-4)}</span>
+              </>
+            ) : (
+              <>
+                <img
+                  style={{ width: "3rem", height: "3rem" }}
+                  src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
+                  alt=""
+                />
+                <span>Metamask</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
