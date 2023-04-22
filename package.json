@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@cyberlab/cyberconnect-v2": "^0.0.1-alpha.17",
+    "@dataverse/runtime-connector": "^1.0.31",
     "@ethersproject/providers": "^5.7.2",
     "@gumhq/react-sdk": "^1.0.6",
     "@gumhq/sdk": "^1.0.14",

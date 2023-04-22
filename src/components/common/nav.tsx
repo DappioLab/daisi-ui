@@ -15,7 +15,6 @@ const Nav = () => {
   const { userData, isLogin } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
-  const solanaWallet = useWallet();
   const router = useRouter();
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);

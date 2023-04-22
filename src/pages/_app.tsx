@@ -26,7 +26,6 @@ import {
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
-
 import React, { useMemo } from "react";
 import Global from "@/components/common/global";
 import HeadMetadata from "@/components/common/headMetadata";

@@ -15,7 +15,18 @@ import { useDispatch, useSelector } from "react-redux";
 import MetamaskConnectBtn from "./metamaskConnectBtn";
 import SolanaConnectBtn from "./solanaConnectBtn";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
-import { updateUserAccounts, updateUserProfile } from "@/redux/gumSlice";
+import { updateUserProfile } from "@/redux/gumSlice";
+import {
+  RuntimeConnector,
+  Extension,
+  Browser,
+  Apps,
+  ModelNames,
+  METAMASK,
+  CRYPTO_WALLET_TYPE,
+} from "@dataverse/runtime-connector";
+
+const runtimeConnector = new RuntimeConnector(Extension);
 
 export interface IAuthModal {
   showAuthModal: boolean;
@@ -28,7 +39,9 @@ export interface IAuthData {
   profilePicture: string;
 }
 
-const AuthModal = () => {
+export interface IAuthModalProps {}
+
+const AuthModal = (props: IAuthModalProps) => {
   const { currentAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -198,13 +211,26 @@ const AuthModal = () => {
     }
   }, [userAccounts, userProfile]);
 
-  // useEffect(() => {
-  //   // if (userAccounts.length === 0) {
-  //   //   createUserAccount();
-  //   // } else {
-  //   handleCreateProfile();
-  //   // }
-  // }, [solanaWallet, userAccounts]);
+  const [identity, setIdentity] = useState(null);
+
+  const connectDataVerse = async () => {
+    const did = await runtimeConnector.connectWallet({
+      name: METAMASK,
+      type: CRYPTO_WALLET_TYPE,
+    });
+
+    await runtimeConnector.switchNetwork(80001);
+    console.log(1);
+    console.log(ModelNames, "ModelNames");
+    const identity = await runtimeConnector.connectIdentity({
+      wallet: { name: METAMASK, type: CRYPTO_WALLET_TYPE },
+      appName: Apps.Dataverse,
+      modelNames: [ModelNames.contentFolders],
+    });
+    console.log(2);
+    console.log(identity);
+    setIdentity(identity);
+  };
 
   return (
     <div className={style.authModal}>
@@ -238,6 +264,9 @@ const AuthModal = () => {
               * Please switch to Solana devnet
             </div>
           </div>
+          <button onClick={() => connectDataVerse()}>
+            {identity ? identity : "Connect Dataverse"}
+          </button>
         </div>
       </div>
     </div>

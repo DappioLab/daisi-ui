@@ -1,6 +1,6 @@
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
-import AuthModal from "./authModal";
+// import AuthModal from "./authModal";
 import SubmitModal from "./submitModal";
 import style from "@/styles/common/global.module.sass";
 import {
@@ -9,27 +9,24 @@ import {
   updateFeedModalData,
   updateFeedModalIndex,
   updateFeedModalType,
-  updateLoginStatus,
   updateScreenWidth,
   updateShowCommentListModal,
-  updateUserData,
 } from "@/redux/globalSlice";
 import { ReactNode, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import FeedModal from "../homePage/feedModal";
 import { EFeedType } from "../homePage/horizontalFeed";
-import { IFeedList } from "@/redux/dailySlice";
 import EventNotification from "./eventNotification";
 import CommentListModal from "./commentListModal";
 import { Post } from "../cyberConnect/cyberConnectPostList";
-// import { updateModalData } from "@/redux/dailySlice";
+import dynamic from "next/dynamic";
+const AuthModal = dynamic(() => import("./authModal"), { ssr: false });
 
 interface IGlobalProps {
   children: ReactNode;
 }
 
 const Global = (props: IGlobalProps) => {
-  const solanaWallet = useWallet();
   const dispatch = useDispatch();
   const {
     showAuthModal,
@@ -38,7 +35,6 @@ const Global = (props: IGlobalProps) => {
     showSubmitModal,
     showFeedModal,
     feedModalIndex,
-    feedModalData,
     feedModalType,
     showCommentListModal,
     currentCheckingCommentParentId,
@@ -192,9 +188,6 @@ const Global = (props: IGlobalProps) => {
         });
         break;
     }
-
-    console.log(data, "outside");
-
     setList(data);
   }, [currentCheckingCommentParentId]);
 
