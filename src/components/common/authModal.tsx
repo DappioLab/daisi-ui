@@ -216,18 +216,19 @@ const AuthModal = (props: IAuthModalProps) => {
       type: CRYPTO_WALLET_TYPE,
     });
 
-    await runtimeConnector.switchNetwork(80001);
-    console.log(1);
-    console.log(ModelNames, "ModelNames");
+    // await runtimeConnector.switchNetwork(80001);
+    await runtimeConnector.switchNetwork(97);
     const identity = await runtimeConnector.connectIdentity({
       wallet: { name: METAMASK, type: CRYPTO_WALLET_TYPE },
-      appName: Apps.Dataverse,
-      modelNames: [ModelNames.contentFolders],
+      appName: "dapq001",
+      modelNames: ["dapp001_post"],
     });
-    console.log(2);
-    console.log(identity);
     setIdentity(identity);
   };
+
+  useEffect(() => {
+    connectDataVerse();
+  }, []);
 
   return (
     <div className={style.authModal}>
@@ -253,6 +254,13 @@ const AuthModal = (props: IAuthModalProps) => {
             <div style={{ marginTop: ".5rem" }}>
               * Please switch to BSC testnet{" "}
             </div>
+            {identity ? (
+              <div style={{ marginTop: ".5rem" }}>
+                * Dataverse now is connected
+              </div>
+            ) : (
+              <div style={{ marginTop: ".5rem" }}>* Dataverse supported</div>
+            )}
           </div>
           <br />
           <div>
@@ -261,7 +269,7 @@ const AuthModal = (props: IAuthModalProps) => {
               * Please switch to Solana devnet
             </div>
           </div>
-          <button
+          {/* <button
             style={{ marginTop: "2rem" }}
             className={btnStyle.metamaskConnectBtn}
             onClick={() => {
@@ -286,10 +294,10 @@ const AuthModal = (props: IAuthModalProps) => {
                   src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
                   alt=""
                 />
-                <span>Metamask</span>
+                <span>Dataverse</span>
               </>
             )}
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
