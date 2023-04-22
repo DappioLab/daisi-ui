@@ -16,6 +16,7 @@ import { IFeedList } from "@/redux/dailySlice";
 
 interface IGridFeedListProps {
   updateList: () => void;
+  position: EFeedModalType;
   list: IFeedList[];
 }
 
@@ -33,7 +34,7 @@ const GridFeedList = (props: IGridFeedListProps) => {
             style={{ position: "relative", height: "100%" }}
             key={`${index}`}
             onClick={() => {
-              dispatch(updateFeedModalType(EFeedModalType.DISCOVER_ITEM));
+              dispatch(updateFeedModalType(props.position));
               dispatch(updateFeedModalIndex(index));
               dispatch(updateShowFeedModal(true));
             }}

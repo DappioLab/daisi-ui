@@ -15,15 +15,26 @@ import UserProfileEdit from "@/components/common/userProfileEdit";
 import GumFollowButton from "@/components/gum/gumFollowBtn";
 import { PublicKey } from "@solana/web3.js";
 import {
+  EFeedModalType,
   updateAuthModal,
   updateUserProfilePageData,
   updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
-import { fetchFollowers, fetchFollowings } from "@/utils/cyberConnect";
+import {
+  fetchFollowers,
+  fetchFollowings,
+  handleCreator,
+} from "@/utils/cyberConnect";
+import { setPostList } from "@/redux/cyberConnectSlice";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import useGum from "@/components/gum/useGum";
 import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
 import useCyberConnect from "@/components/cyberConnect/useCyberConnect";
+import dynamic from "next/dynamic";
+const DataVerseDid = dynamic(
+  () => import("../components/common/dataVerseDid"),
+  { ssr: false }
+);
 
 export interface IUser {
   id: string;
@@ -71,7 +82,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const { address: myAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
-  const [postList, setPostList] = useState<IFeedList[]>([]);
+  const [innerPostList, setInnerPostList] = useState<IFeedList[]>([]);
 
   const { fetchPostData, parseComments } = useCyberConnect();
   const { fetchPostData: fetchGumPostData } = useGum();
@@ -82,13 +93,16 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     } else {
       (async () => {
         const list = await fetchPostData(checkingAddress);
+        console.log(list, "list ===");
+
         if (list) {
-          setPostList(list);
+          setInnerPostList(list);
+          dispatch(setPostList(list));
           parseComments(list);
         }
       })();
     }
-  }, [checkingAddress, myAddress, cyberConnectList]);
+  }, [checkingAddress, myAddress]);
 
   const getUser = async () => {
     if (!checkingAddress) {
@@ -102,32 +116,36 @@ const ProfilePage = ({ user }: { user: IUser }) => {
     if (isCheckingSolanaAddress) {
       let gumAddress = new PublicKey(checkingAddress);
 
-      let profile = (
-        await sdk.profile.getProfilesByUser(gumAddress)
-      )[0].cl_pubkey.toString();
-      dispatch(updateUserProfilePageHandle(new PublicKey(profile)));
-
-      if (followersMap.size && followersMap.size && profile) {
-        let followProfiles = followersMap.get(profile);
-        if (followProfiles)
-          followers = followProfiles.map((acc) => {
-            return acc.profile.toString();
-          });
-        let followerProfile = followingMap.get(profile);
-        if (followerProfile)
-          followings = followerProfile.map((acc) => {
-            return acc.profile.toString();
-          });
+      if (isCheckingSolanaAddress) {
+        let profile = (
+          await sdk.profile.getProfilesByUser(gumAddress)
+        )[0].cl_pubkey.toString();
+        dispatch(updateUserProfilePageHandle(new PublicKey(profile)));
+        if (followersMap.size && followersMap.size && profile) {
+          let followProfiles = followersMap.get(profile);
+          if (followProfiles)
+            followers = followProfiles.map((acc) => {
+              return acc.profile.toString();
+            });
+          let followerProfile = followingMap.get(profile);
+          if (followerProfile)
+            followings = followerProfile.map((acc) => {
+              return acc.profile.toString();
+            });
+        }
+      } else {
+        followers = (
+          await fetchFollowers(checkingAddress, currentAddress)
+        )?.map((p) => p.owner.address);
+        followers = followers ? followers : [];
+        followings = (
+          await fetchFollowings(checkingAddress, currentAddress)
+        )?.map((p) => p.owner.address);
+        followings = followings ? followings : [];
       }
     } else {
-      followers = (await fetchFollowers(checkingAddress, currentAddress))?.map(
-        (p) => p.owner.address
-      );
-      followers = followers ? followers : [];
-      followings = (
-        await fetchFollowings(checkingAddress, currentAddress)
-      )?.map((p) => p.owner.address);
-      followings = followings ? followings : [];
+      const daisiHandle = handleCreator(checkingAddress);
+      dispatch(updateUserProfilePageHandle(daisiHandle));
     }
 
     setFetchedUser({ ...user.data, followings, followers });
@@ -222,14 +240,18 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       ) : null}
                       {accessToken && (
                         <>
-                          <span>
-                            @handle -{" "}
-                            {userProfilePageHandle.toString().substring(0, 6)}
-                          </span>
-                          <span>...</span>
-                          <span>
-                            {userProfilePageHandle.toString().slice(-6)}
-                          </span>
+                          <>
+                            <span>
+                              @handle -{" "}
+                              {userProfilePageHandle.toString().substring(0, 6)}
+                            </span>
+                            <span>...</span>
+                            <span>
+                              {userProfilePageHandle.toString().slice(-6)}
+                            </span>
+                          </>
+                          <br />
+                          <DataVerseDid />
                         </>
                       )}
                     </div>
@@ -252,11 +274,19 @@ const ProfilePage = ({ user }: { user: IUser }) => {
                       alt="icon"
                     />
                   ) : (
-                    <img
-                      className={style.icon}
-                      src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
-                      alt="icon"
-                    />
+                    <>
+                      <img
+                        className={style.icon}
+                        src="https://yt3.googleusercontent.com/9BS6z4-q-tUFIt3c-amgoNv0QRrEBIMG992Q1lmwsoJTxTmOK6uREjemm0ebe-18VbPOZzVFtw=s900-c-k-c0x00ffffff-no-rj"
+                        alt="icon"
+                      />
+                      <img
+                        className={style.icon}
+                        src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
+                        alt=""
+                      />
+                    </>
+
                     // <span>Cyber Connect</span>
                   )}
                 </div>
@@ -297,11 +327,19 @@ const ProfilePage = ({ user }: { user: IUser }) => {
           {isCheckingSolanaAddress ? (
             <>
               {gumPostList && gumPostList.length > 0 && (
-                <HorizontalFeedList updateList={() => {}} list={gumPostList} />
+                <HorizontalFeedList
+                  updateList={() => {}}
+                  list={gumPostList}
+                  position={EFeedModalType.PROFILE_GUM}
+                />
               )}
             </>
           ) : (
-            <HorizontalFeedList updateList={() => {}} list={postList} />
+            <HorizontalFeedList
+              updateList={() => {}}
+              list={innerPostList}
+              position={EFeedModalType.PROFILE_CC}
+            />
           )}
         </>
       ) : null}

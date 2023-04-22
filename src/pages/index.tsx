@@ -17,6 +17,7 @@ import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
 import GridFeedList from "@/components/homePage/gridFeedList";
 import API from "@/axios/api";
 import {
+  EFeedModalType,
   updateFeedModalData,
   updateFeedModalIndex,
   updateLoadingStatus,
@@ -323,10 +324,18 @@ const HomePage = () => {
         </div>
       )}
       {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
-        <GridFeedList updateList={updateList} list={feedList} />
+        <GridFeedList
+          updateList={updateList}
+          list={feedList}
+          position={EFeedModalType.DISCOVER_ITEM}
+        />
       ) : (
         <div>
-          <HorizontalFeedList updateList={updateList} list={feedList} />
+          <HorizontalFeedList
+            updateList={updateList}
+            list={feedList}
+            position={EFeedModalType.DISCOVER_ITEM}
+          />
         </div>
       )}
     </div>
