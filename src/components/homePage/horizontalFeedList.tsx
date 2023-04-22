@@ -16,6 +16,7 @@ import { useEffect } from "react";
 
 interface IHorizontalFeedListProps {
   list: IFeedList[];
+  position: EFeedModalType;
   updateList: () => void;
 }
 
@@ -39,7 +40,7 @@ const HorizontalFeedList = (props: IHorizontalFeedListProps) => {
                 style={{ marginTop: "2rem" }}
                 key={`${index}`}
                 onClick={() => {
-                  dispatch(updateFeedModalType(EFeedModalType.DISCOVER_ITEM));
+                  dispatch(updateFeedModalType(props.position));
                   dispatch(updateFeedModalIndex(index));
                   dispatch(updateShowFeedModal(true));
                 }}

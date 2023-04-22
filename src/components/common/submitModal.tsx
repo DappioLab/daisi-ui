@@ -216,7 +216,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
           modelName: "dapp001_post",
           streamContent: {
             appVersion: "0.1.0",
-            text: "This is from Daisi",
+            text: JSON.stringify(data),
             createdAt: currentTime,
             updatedAt: currentTime,
           },
