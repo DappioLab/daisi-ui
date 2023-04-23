@@ -35,9 +35,11 @@ const CyberConnectHorizontalPost = (props: ICyberConnectHorizontalPost) => {
     Map<string, boolean>
   >(new Map());
 
+  console.log(props.item, "props.item");
+
   const obj = {
     id: props.item.contentID,
-    itemTitle: props.item.body,
+    itemTitle: props.item.title,
     itemDescription: props.item.body.split("\n\n")[0],
     itemLink: props.item.body.split("\n\n").reverse()[0],
     itemImage: "",
