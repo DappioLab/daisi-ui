@@ -1,5 +1,4 @@
 import style from "@/styles/common/solanaConnectBtn.module.sass";
-import { IRootState } from "@/redux";
 import {
   setAddress,
   setAccessToken,
@@ -16,7 +15,6 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { IAuthData } from "./authModal";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 const WalletMultiButtonDynamic = dynamic(
@@ -28,11 +26,9 @@ const WalletMultiButtonDynamic = dynamic(
 const SolanaConnectBtn = () => {
   const wallet = useWallet();
   const dispatch = useDispatch();
-  const router = useRouter();
 
   useEffect(() => {
     if (wallet.connected) {
-      // dispatch(updateUserProfilePageHandle(null));
       dispatch(updateLoginStatus(true));
 
       // set CyberConnect slice to nulls

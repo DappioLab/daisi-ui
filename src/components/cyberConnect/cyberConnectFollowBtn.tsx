@@ -1,4 +1,3 @@
-import CyberConnect from "@cyberlab/cyberconnect-v2";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
 import {

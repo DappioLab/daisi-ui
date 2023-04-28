@@ -1,11 +1,4 @@
-import {
-  RuntimeConnector,
-  Apps,
-  ModelNames,
-  FileType,
-  MirrorFile,
-  Extension,
-} from "@dataverse/runtime-connector";
+import { RuntimeConnector, Extension } from "@dataverse/runtime-connector";
 import { useEffect, useState } from "react";
 const runtimeConnector = new RuntimeConnector(Extension);
 

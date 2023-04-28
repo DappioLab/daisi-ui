@@ -1,5 +1,4 @@
 import API from "@/axios/api";
-import axios from "axios";
 import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -71,12 +70,6 @@ const UserListModal = (props: IUserListModalProps) => {
       dispatch(updateUserData({ ...userData, followers, followings }));
       await props.getUser();
     }
-
-    // if (props.userListType === EUserListType.FOLLOWERS) {
-    //   await getFollowerUserList();
-    // } else {
-    //   await getFollowingUserList();
-    // }
   };
   const sdk = useGumSDK();
 

@@ -20,12 +20,6 @@ import {
 } from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
 
-interface PostAccount {
-  cl_pubkey: string;
-  metadatauri: string;
-  profile: string;
-  replyto?: string;
-}
 export interface ConnectionInterface {
   follow: PublicKey;
   cl_pubkey: PublicKey;
@@ -89,10 +83,9 @@ const useGumState = () => {
       }
     }
   };
+
   const fetchPostData = async () => {
     try {
-      // const allPostAccounts =
-      //   (await sdk?.post.getAllPosts()) as Array<PostAccount>;
       const allPostAccounts = [];
       // parts for reply
       let commentMap = new Map<string, ReplyInterface[]>();
@@ -230,6 +223,7 @@ const useGumState = () => {
       console.log("error", err);
     }
   };
+
   const fetchConnections = async () => {
     try {
       if (wallet.publicKey && userProfile) {
@@ -263,6 +257,7 @@ const useGumState = () => {
       console.log("error", err);
     }
   };
+
   const fetchAllConnection = async () => {
     if (allUser.size) {
       let connections = await sdk.connection.getALlConnectionAccounts();
@@ -295,6 +290,7 @@ const useGumState = () => {
       );
     }
   };
+
   const fetchReaction = async () => {
     let reactionAccounts = await sdk.reaction.getAllReactionAccounts();
     // let reactions = await sdk.reaction.getAllReactions();
@@ -316,6 +312,7 @@ const useGumState = () => {
     });
     dispatch(updateReactions(map));
   };
+
   const fetchUsers = async () => {
     let allUser = await sdk.profile.getProfileAccountsByUser();
     let userKey = await sdk.user.getAllUsersAccounts();
@@ -358,25 +355,6 @@ const useGumState = () => {
   }, [allUser]);
 };
 export default useGumState;
-
-// export const PostList = (prop: { profiles?: PublicKey[] }) => {
-//   const { allPosts } = useSelector(
-//     (state: IRootState) => state.persistedReducer.gum
-//   );
-//   let filtered = filterPostList(allPosts, prop.profiles);
-//   return (
-//     <div>
-//       {filtered.length > 0 &&
-//         filtered.map((post) => {
-//           return (
-//             <div key={post.cl_pubkey.toString()} className="">
-//               {/* <Post post={post} /> */}
-//             </div>
-//           );
-//         })}
-//     </div>
-//   );
-// };
 
 export function filterPostList(
   allPosts: postInterface[],

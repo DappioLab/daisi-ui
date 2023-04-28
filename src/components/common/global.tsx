@@ -1,7 +1,5 @@
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
-// import AuthModal from "./authModal";
-// import SubmitModal from "./submitModal";
 import style from "@/styles/common/global.module.sass";
 import {
   EFeedModalType,
@@ -13,7 +11,6 @@ import {
   updateShowCommentListModal,
 } from "@/redux/globalSlice";
 import { ReactNode, useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
 import FeedModal from "../homePage/feedModal";
 import { EFeedType } from "../homePage/horizontalFeed";
 import EventNotification from "./eventNotification";
@@ -170,17 +167,9 @@ const Global = (props: IGlobalProps) => {
           return;
         }
 
-        console.log(data, "####");
-
         data = data.map((item) => {
-          console.log(
-            gumCommentMap.get(item.cl_pubkey.toString()),
-            "gumCommentMap.get(item.cl_pubkey)"
-          );
-
           return {
             body: item.text,
-            // comments: [],
             comments: gumCommentMap.get(item.cl_pubkey.toString())
               ? gumCommentMap.get(item.cl_pubkey.toString())
               : [],

@@ -11,9 +11,7 @@ import {
   updateAuthModal,
   updateCurrentAddress,
   updateLoginStatus,
-  updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
-import { IAuthData } from "./authModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   signIn,
@@ -51,8 +49,6 @@ const MetamaskConnectBtn = () => {
       const daisiHandle = handleCreator(address);
       const profile = await getProfileByAddress(address);
       dispatch(updateCurrentAddress(address));
-
-      console.log(profile, "profile");
 
       if (!profile) {
         const ipfsClient = createIpfsClient();

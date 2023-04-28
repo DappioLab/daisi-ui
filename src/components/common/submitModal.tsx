@@ -10,9 +10,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useDispatch, useSelector } from "react-redux";
 import { ipfsClient, mainGateway } from "@/components/gum/gumStorage";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import { useEffect, useMemo, useState } from "react";
-import { Connection } from "@solana/web3.js";
-import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   checkNetwork,

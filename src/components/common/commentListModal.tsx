@@ -1,14 +1,11 @@
 import { IRootState } from "@/redux";
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Post } from "../cyberConnect/cyberConnectPostList";
 import style from "@/styles/common/commentListModal.module.sass";
 import {
   updateCurrentCheckingCommentParentId,
   updateShowCommentListModal,
 } from "@/redux/globalSlice";
 import CommentBox from "../cyberConnect/cyberConnectCommentBox";
-import { EFeedType } from "../homePage/horizontalFeed";
 
 interface ICommentListModalProps {
   list: any;
@@ -19,7 +16,7 @@ const CommentListModal = (props: ICommentListModalProps) => {
   const { currentCheckingCommentParentId, commentListType } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
-  const { commentMap, address } = useSelector(
+  const { address } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
 

@@ -1,5 +1,4 @@
 import API from "@/axios/api";
-import btnStyle from "@/styles/common/metamaskConnectBtn.module.sass";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
@@ -16,9 +15,6 @@ import { updateUserProfile } from "@/redux/gumSlice";
 import {
   RuntimeConnector,
   Extension,
-  Browser,
-  Apps,
-  ModelNames,
   METAMASK,
   CRYPTO_WALLET_TYPE,
 } from "@dataverse/runtime-connector";
@@ -75,7 +71,6 @@ const AuthModal = (props: IAuthModalProps) => {
       await fetchProfile();
       console.log(result);
     } catch (err) {}
-    // await fetchProfile();
   };
 
   const handleCreateProfile = async () => {
@@ -130,15 +125,6 @@ const AuthModal = (props: IAuthModalProps) => {
       return userKeys.map((account) => {
         return account.publicKey;
       });
-      // if (userKeys && userKeys.length > 0) {
-      //   dispatch(
-      //     updateUserAccounts(
-      //       userKeys.map((account) => {
-      //         return account.publicKey;
-      //       })
-      //     )
-      //   );
-      // }
     }
   };
 
@@ -269,35 +255,6 @@ const AuthModal = (props: IAuthModalProps) => {
               * Please switch to Solana devnet
             </div>
           </div>
-          {/* <button
-            style={{ marginTop: "2rem" }}
-            className={btnStyle.metamaskConnectBtn}
-            onClick={() => {
-              if (!identity) {
-                connectDataVerse();
-              }
-            }}
-          >
-            {identity ? (
-              <>
-                <img
-                  style={{ width: "3rem", height: "3rem" }}
-                  src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
-                  alt=""
-                />
-                <span>{identity.slice(0, 4) + "..." + identity.slice(-4)}</span>
-              </>
-            ) : (
-              <>
-                <img
-                  style={{ width: "3rem", height: "3rem" }}
-                  src="https://dataverse-os.com/assets/logo-header.da3b67c6.svg"
-                  alt=""
-                />
-                <span>Dataverse</span>
-              </>
-            )}
-          </button> */}
         </div>
       </div>
     </div>

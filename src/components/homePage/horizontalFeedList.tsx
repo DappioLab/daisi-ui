@@ -1,7 +1,6 @@
 import style from "@/styles/homePage/horizontalFeedList.module.sass";
 import { EFeedType } from "./horizontalFeed";
-import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "@/redux";
+import { useDispatch } from "react-redux";
 import {
   EFeedModalType,
   updateFeedModalIndex,
@@ -12,7 +11,6 @@ import CyberConnectHorizontalPost from "../cyberConnect/cyberConnectHorizontalPo
 import GumHorizontalPost from "../gum/gumHorizontalPost";
 import RssHorizontalPost from "../rss/rssHorizontalPost";
 import { IFeedList } from "@/redux/dailySlice";
-import { useEffect } from "react";
 
 interface IHorizontalFeedListProps {
   list: IFeedList[];
@@ -21,14 +19,7 @@ interface IHorizontalFeedListProps {
 }
 
 const HorizontalFeedList = (props: IHorizontalFeedListProps) => {
-  // const { feedList } = useSelector(
-  //   (state: IRootState) => state.persistedReducer.daily
-  // );
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    console.log(JSON.parse(JSON.stringify(props.list)), "/");
-  }, [props.list]);
 
   return (
     <div className={style.horizontalFeedList}>
