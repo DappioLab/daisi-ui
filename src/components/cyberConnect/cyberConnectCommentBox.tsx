@@ -20,16 +20,17 @@ const CommentBox = (props: CommentBoxProps) => {
       const provider = await connectWallet();
       await checkNetwork(provider);
       const cyberConnectClient = createCyberConnectClient(provider);
-      alert(message);
+
       await comment(
         props.contentId,
         message,
         props.address,
         cyberConnectClient
       );
-      await props.fetchData();
 
+      alert("Post comment successfully");
       setMessage("");
+      await props.fetchData();
     } catch (error) {
       console.log(error);
     }
@@ -42,9 +43,6 @@ const CommentBox = (props: CommentBoxProps) => {
           fontSize: "1.6rem",
           fontWeight: 500,
           marginTop: "1.5rem",
-          // display: "flex",
-          // flexDirection: "column",
-          // alignItems: "flex-end",
         }}
       >
         <textarea
@@ -53,8 +51,6 @@ const CommentBox = (props: CommentBoxProps) => {
             marginRight: "1rem",
             padding: "1rem",
             outline: "none",
-
-            // width: "30rem",
           }}
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => setMessage(e.target.value)}

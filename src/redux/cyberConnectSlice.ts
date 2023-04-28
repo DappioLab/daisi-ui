@@ -46,13 +46,7 @@ const cyberConnectSlice = createSlice({
     setPostList(state, action) {
       state.postList = action.payload;
     },
-    // updatePostList(state, action) {
-    //   state.postList = state.postList.map((post) =>
-    //     post.id == action.payload.id ? action.payload : post
-    //   );
-    // },
     setCommentMap(state, action) {
-      // @ts-ignore
       state.commentMap = action.payload;
     },
   },
@@ -65,6 +59,5 @@ export const {
   setLastPostsUpdateTime,
   setPostList,
   setCommentMap,
-  // updatePostList,
 } = cyberConnectSlice.actions;
 export default cyberConnectSlice.reducer;

@@ -1,7 +1,7 @@
 import style from "@/styles/homePage/feedModal.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { IFeedList, updateFeedList } from "@/redux/dailySlice";
 import API from "@/axios/api";
@@ -21,23 +21,11 @@ import {
 } from "@/utils/cyberConnect";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { SDK } from "./../../gpl-core/src";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
 
-// interface IFeedModal {
-// setShowModal: Dispatch<SetStateAction<boolean>>;
-// postModalIndex: number;
-// getPost: (id: string) => Promise<void>;
-// getCurrentModalIndex: (index: number) => number;
-// setPostModalIndex: Dispatch<SetStateAction<number | null>>;
-// }
-
 const FeedModal = () => {
-  // const { feedList } = useSelector(
-  //   (state: IRootState) => state.persistedReducer.daily
-  // );
   const connection = useMemo(
     () =>
       new Connection(
@@ -47,7 +35,7 @@ const FeedModal = () => {
     []
   );
 
-  const { userProfile, following, followers, userAccounts } = useSelector(
+  const { userProfile } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
   let sdk = useGumSDK(
@@ -180,24 +168,11 @@ const FeedModal = () => {
       let result = await createGumLike(feedModalData.cl_pubkey.toString());
 
       if (result.success) {
-        console.log("like update success");
-
         setTimeout(() => {
           dispatch(updateLoadingStatus(false));
           window.location.reload();
         }, 5000);
-
-        //   let likeOnDb = await API.updateRssItemLike(
-        //     post.post.cl_pubkey.toString(),
-        //     userData.id
-        //   );
-        //   console.log(likeOnDb);
       }
-
-      // setTimeout(() => {
-      //   console.log("in");
-
-      // }, 10000);
     } catch (err) {
       console.log(err);
     }
@@ -223,30 +198,6 @@ const FeedModal = () => {
     }
     return { success: true };
   };
-
-  // const updateLike = async () => {
-  //   if (!userData?.id || !isLogin) {
-  //     alert("Please login");
-  //     return;
-  //   }
-
-  //   const updatedItem = await API.updateRssItemLike(
-  //     feedModalData.id,
-  //     userData.id
-  //   );
-
-  //   if (updatedItem) {
-  //     const updatedList = feedList.map((item) => {
-  //       if (item.id === updatedItem.data._id) {
-  //         const obj = JSON.parse(JSON.stringify(item));
-  //         obj.likes = updatedItem.data.likes;
-  //         return obj;
-  //       }
-  //       return item;
-  //     });
-  //     dispatch(updateFeedList(updatedList));
-  //   }
-  // };
 
   const getAdjoiningPost = (value: number) => {
     const nextNumber = feedModalIndex + value;

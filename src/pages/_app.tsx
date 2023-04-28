@@ -5,11 +5,11 @@ import style from "@/styles/_app/index.module.sass";
 import "@/styles/global/index.sass";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { IRootState, store, persistor } from "@/redux";
+import { store, persistor } from "@/redux";
 import Nav from "@/components/common/nav";
 import { useRouter } from "next/router";
 import nProgress from "nprogress";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
@@ -17,13 +17,7 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
-  LedgerWalletAdapter,
   PhantomWalletAdapter,
-  SlopeWalletAdapter,
-  SolflareWalletAdapter,
-  SolletExtensionWalletAdapter,
-  SolletWalletAdapter,
-  TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import React, { useMemo } from "react";
@@ -49,15 +43,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const network = WalletAdapterNetwork.Devnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
   const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter({ network }),
-      new SlopeWalletAdapter(),
-      new SolflareWalletAdapter({ network }),
-      new TorusWalletAdapter(),
-      new LedgerWalletAdapter(),
-      new SolletWalletAdapter({ network }),
-      new SolletExtensionWalletAdapter({ network }),
-    ],
+    () => [new PhantomWalletAdapter({ network })],
     [network]
   );
 

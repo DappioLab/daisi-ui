@@ -54,6 +54,7 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         <div className={style.timeBlock}>
           {moment(parseInt(props.item.linkCreated)).format("MMMM DD, YYYY")}
         </div>
+        {/* Insert children */}
         <div className={style.socialActionBlock}>{props.children}</div>
       </div>
       <div className={style.itemImage}>

@@ -1,15 +1,9 @@
 import style from "@/styles/common/nav.module.sass";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
-import {
-  updateAuthModal,
-  updateLoginStatus,
-  updateShowSubmitModal,
-  updateUserData,
-} from "@/redux/globalSlice";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { updateAuthModal, updateShowSubmitModal } from "@/redux/globalSlice";
 
 const Nav = () => {
   const { userData, isLogin } = useSelector(

@@ -1,18 +1,9 @@
 import style from "@/styles/homePage/index.module.sass";
-import { useCallback, useEffect, useState } from "react";
-import { setPostList } from "@/redux/cyberConnectSlice";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  IApiRssListResponse,
-  IFeedList,
-  IParsedRssData,
-  IRssSourceItem,
-  updateFeedList,
-} from "@/redux/dailySlice";
+import { IFeedList, IRssSourceItem, updateFeedList } from "@/redux/dailySlice";
 import { IRootState } from "@/redux";
-import HorizontalFeed, {
-  EFeedType,
-} from "@/components/homePage/horizontalFeed";
+import { EFeedType } from "@/components/homePage/horizontalFeed";
 import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
 import GridFeedList from "@/components/homePage/gridFeedList";
 import API from "@/axios/api";
@@ -23,13 +14,12 @@ import {
   updateLoadingStatus,
   updateShowFeedModal,
 } from "@/redux/globalSlice";
-import { fetchFollowingsPosts, fetchPosts } from "@/utils/cyberConnect";
+import { fetchFollowingsPosts } from "@/utils/cyberConnect";
 import { IUser } from "@/pages/profile";
-import { toChecksumAddress } from "ethereum-checksum-address";
 import moment from "moment";
 import useGumState, { filterPostList } from "@/components/gum/useGumState";
-import { setCommentMap } from "@/redux/cyberConnectSlice";
-import { Post } from "@/components/cyberConnect/cyberConnectPostList";
+import { setPostList } from "@/redux/cyberConnectSlice";
+import useCyberConnect from "@/components/cyberConnect/useCyberConnect";
 
 export enum EDisplayMode {
   GRID = 0,
@@ -42,6 +32,10 @@ export interface IPostProps {
 }
 
 const HomePage = () => {
+  const { feedList } = useSelector(
+    (state: IRootState) => state.persistedReducer.daily
+  );
+
   const [displayMode, setDisplayMode] = useState(EDisplayMode.HORIZONTAL);
 
   const { screenWidth, userData, address } = useSelector(
@@ -59,11 +53,13 @@ const HomePage = () => {
     following,
     allUser,
   } = useSelector((state: IRootState) => state.persistedReducer.gum);
-  const dispatch = useDispatch();
   const [rssFeed, setRssFeed] = useState<IFeedList[]>([]);
-  useGumState();
   const [gumFeed, setGumFeed] = useState<IFeedList[]>([]);
   const [ccFeed, setCcFeed] = useState<IFeedList[]>([]);
+
+  const dispatch = useDispatch();
+  const { fetchPostData, parseComments } = useCyberConnect();
+  useGumState(); // Gum initialize state; need to be refactored - data flow, merge with useGum and useGumState
 
   const getRssList = async () => {
     const res = await API.getRssData();
@@ -72,53 +68,20 @@ const HomePage = () => {
 
   const updateCC = async () => {
     try {
-      let postUserData = {};
-      let parsedFollowingsPosts: IFeedList[] = [];
-
       if (address && userData.id && userData.id != "") {
         dispatch(updateLoadingStatus(true));
-        const ccUserPosts = await fetchPosts(address, address);
+        const ccUserPosts = await fetchPostData(address);
         const ccFollowingsPosts = await fetchFollowingsPosts(address);
-        const allCcPosts = [...ccUserPosts, ...ccFollowingsPosts];
+        const allCcPosts = [
+          ...ccUserPosts,
+          ...ccFollowingsPosts,
+        ] as unknown as IFeedList[];
 
-        for (let ccPost of allCcPosts) {
-          let user: IUser | null = null;
-          const userAddress = toChecksumAddress(ccPost.authorAddress);
-          if (!postUserData[userAddress]) {
-            user = await (await API.getUserByAddress(userAddress)).data;
-
-            if (!user) {
-              continue;
-            }
-            postUserData[userAddress] = user;
-          } else {
-            user = postUserData[userAddress];
-          }
-
-          const post: IFeedList = {
-            isUserPost: true,
-            userAddress,
-            sourceIcon: user.profilePicture,
-            sourceId: ccPost.contentID,
-            itemTitle: ccPost.title,
-            itemDescription: ccPost.body.split("\n\n")[0],
-            itemImage: "",
-            itemLink: ccPost.body.split("\n\n").reverse()[0],
-            likes: ccPost.likedStatus.liked
-              ? new Array(ccPost.likeCount).fill(userData.id)
-              : new Array(ccPost.likeCount).fill("123"),
-            forwards: [],
-            linkCreated: moment(ccPost.createdAt).valueOf().toString(),
-            id: ccPost.contentID,
-            type: EFeedType.CC_ITEM,
-            created: new Date(ccPost.createdAt).getTime().toString(),
-            ccPost: ccPost,
-          };
-
-          parsedFollowingsPosts.push(post);
-        }
-        setCcFeed(JSON.parse(JSON.stringify(parsedFollowingsPosts)));
+        setCcFeed(allCcPosts);
+        parseComments(allCcPosts);
         setGumFeed([]);
+        dispatch(setPostList(allCcPosts));
+
         dispatch(updateLoadingStatus(false));
       }
     } catch (err) {
@@ -128,11 +91,8 @@ const HomePage = () => {
   };
 
   const updateGum = async () => {
-    console.log(1);
-
     try {
       let gumFeeds: IFeedList[] = [];
-      console.log(2);
 
       if (
         userProfile &&
@@ -140,8 +100,6 @@ const HomePage = () => {
         allUser.size > 0 &&
         gumFeed.length <= 0
       ) {
-        console.log(3);
-
         dispatch(updateLoadingStatus(true));
         let gumFollowing = following.map((conn) => {
           return conn.follow;
@@ -190,9 +148,9 @@ const HomePage = () => {
 
   const updateList = async () => {
     try {
+      dispatch(updateLoadingStatus(true));
       updateCC();
       updateGum();
-      dispatch(updateLoadingStatus(true));
       let res: IFeedList[] = [];
 
       if (rssFeed.length <= 0) {
@@ -249,34 +207,7 @@ const HomePage = () => {
     dispatch(updateFeedList(allPosts));
   }, [rssFeed, gumFeed, ccFeed]);
 
-  useEffect(() => {
-    let parsedMap = new Map<string, Post>();
-
-    const recursive = (comments: any) => {
-      comments.map((item) => {
-        if (item.comments && item.comments.length > 0) {
-          parsedMap.set(item.contentID, item.comments);
-
-          recursive(item.comments);
-        }
-      });
-    };
-
-    const parseComments = () => {
-      const allPosts = ccFeed.map((item) => item.ccPost);
-
-      recursive(allPosts);
-
-      const objFromMap = Object.fromEntries(parsedMap);
-      dispatch(setCommentMap(objFromMap));
-    };
-    parseComments();
-  }, [ccFeed]);
-
-  const { feedList } = useSelector(
-    (state: IRootState) => state.persistedReducer.daily
-  );
-
+  // inline-style need to be refactored
   return (
     <div className={`pageContent ${style.homePage}`}>
       {screenWidth >= 960 && (
@@ -330,13 +261,11 @@ const HomePage = () => {
           position={EFeedModalType.DISCOVER_ITEM}
         />
       ) : (
-        <div>
-          <HorizontalFeedList
-            updateList={updateList}
-            list={feedList}
-            position={EFeedModalType.DISCOVER_ITEM}
-          />
-        </div>
+        <HorizontalFeedList
+          updateList={updateList}
+          list={feedList}
+          position={EFeedModalType.DISCOVER_ITEM}
+        />
       )}
     </div>
   );

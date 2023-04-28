@@ -8,7 +8,6 @@ import {
 import { useState } from "react";
 import moment from "moment";
 import { toChecksumAddress } from "ethereum-checksum-address";
-
 import { IPostProps } from "@/pages";
 import GridFeed from "../homePage/gridFeed";
 import CommentBox from "./cyberConnectCommentBox";
@@ -37,7 +36,7 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
 
   const obj = {
     id: props.item.id,
-    itemTitle: props.item.body,
+    itemTitle: props.item.title,
     itemDescription: props.item.body.split("\n\n")[0],
     itemLink: props.item.body.split("\n\n").reverse()[0],
     itemImage: "",
@@ -135,7 +134,7 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
               }}
               className="fa fa-comments"
               aria-hidden="true"
-            ></i>
+            />
             ({props.item.comments.length})
           </div>
         ) : null}
