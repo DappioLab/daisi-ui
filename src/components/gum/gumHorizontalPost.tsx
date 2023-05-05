@@ -1,4 +1,4 @@
-import style from "@/styles/gum/GumHorizontalPost.module.sass";
+import style from "@/styles/gum/gumHorizontalPost.module.sass";
 import BaseHorizontalPost from "../homePage/baseHorizontalPost";
 import GumLikeButton from "./gumLikeButton";
 import GumCommentBox from "./gumCommentBox";
