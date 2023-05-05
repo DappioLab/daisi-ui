@@ -1,15 +1,15 @@
 import API from "@/axios/api";
+import style from "@/styles/common/authModal.module.sass";
+import MetamaskConnectBtn from "./metamaskConnectBtn";
+import SolanaConnectBtn from "./solanaConnectBtn";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
 import { updateAuthModal, updateUserData } from "@/redux/globalSlice";
-import style from "@/styles/common/authModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import MetamaskConnectBtn from "./metamaskConnectBtn";
-import SolanaConnectBtn from "./solanaConnectBtn";
 import { GRAPHQL_ENDPOINTS } from "@/gpl-core/src";
 import { updateUserProfile } from "@/redux/gumSlice";
 import {
@@ -32,9 +32,7 @@ export interface IAuthData {
   profilePicture: string;
 }
 
-export interface IAuthModalProps {}
-
-const AuthModal = (props: IAuthModalProps) => {
+const AuthModal = () => {
   const { currentAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
@@ -63,9 +61,7 @@ const AuthModal = (props: IAuthModalProps) => {
       if (!solanaWallet.publicKey) {
         throw "wallet Not Connected";
       }
-      console.log("creating user");
       let user = await sdk?.user.create(solanaWallet.publicKey);
-
       let result = await user?.instructionMethodBuilder.rpc();
 
       await fetchProfile();
@@ -80,7 +76,6 @@ const AuthModal = (props: IAuthModalProps) => {
       }
 
       if (userAccounts.length > 0) {
-        console.log("creating profile");
         let result = await (
           await sdk?.profile.create(
             userAccounts[0],
@@ -226,34 +221,20 @@ const AuthModal = (props: IAuthModalProps) => {
       ></div>
       <div className={style.modalContainer}>
         <div>
-          <div
-            style={{
-              marginBottom: "3rem ",
-              fontSize: "2rem",
-              textAlign: "center",
-            }}
-          >
-            Sign In
-          </div>
+          <div className={style.signInBtn}>Sign In</div>
           <div>
             <MetamaskConnectBtn />
-            <div style={{ marginTop: ".5rem" }}>
-              * Please switch to BSC testnet{" "}
-            </div>
+            <div className={style.note}>* Please switch to BSC testnet </div>
             {identity ? (
-              <div style={{ marginTop: ".5rem" }}>
-                * Dataverse now is connected
-              </div>
+              <div className={style.note}>* Dataverse now is connected</div>
             ) : (
-              <div style={{ marginTop: ".5rem" }}>* Dataverse supported</div>
+              <div className={style.note}>* Dataverse supported</div>
             )}
           </div>
           <br />
           <div>
             <SolanaConnectBtn />
-            <div style={{ marginTop: ".5rem" }}>
-              * Please switch to Solana devnet
-            </div>
+            <div className={style.note}>* Please switch to Solana devnet</div>
           </div>
         </div>
       </div>

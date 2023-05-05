@@ -6,7 +6,6 @@ import {
   setAccessToken,
   setProfile,
 } from "@/redux/cyberConnectSlice";
-
 import {
   updateAuthModal,
   updateCurrentAddress,
@@ -34,7 +33,6 @@ const MetamaskConnectBtn = () => {
   const connect = async () => {
     try {
       await solanaWallet.disconnect();
-      // dispatch(updateUserProfilePageHandle(null));
 
       const provider = await connectWallet();
       await checkNetwork(provider);
@@ -76,7 +74,7 @@ const MetamaskConnectBtn = () => {
       {address ? (
         <>
           <img
-            style={{ width: "3rem", height: "3rem" }}
+            className={style.walletIcon}
             src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg"
             alt=""
           />
@@ -85,7 +83,6 @@ const MetamaskConnectBtn = () => {
       ) : (
         <>
           <img
-            style={{ width: "3rem", height: "3rem" }}
             src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg"
             alt=""
           />

@@ -1,3 +1,7 @@
+import style from "@/styles/gum/gumGridPost.module.sass";
+import BaseGridPost from "../homePage/baseGridPost";
+import GumLikeButton from "./gumLikeButton";
+import GumCommentBox from "./gumCommentBox";
 import { IPostProps } from "@/pages";
 import { IRootState } from "@/redux";
 import {
@@ -6,10 +10,7 @@ import {
 } from "@/redux/globalSlice";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import GridFeed from "../homePage/gridFeed";
-import GumLikeButton from "./gumLikeButton";
-import { EFeedType } from "../homePage/horizontalFeed";
-import GumCommentBox from "./gumCommentBox";
+import { EPostType } from "@/pages";
 
 interface IGumGridPostProps extends IPostProps {}
 
@@ -45,14 +46,8 @@ const GumGridPost = (props: IGumGridPostProps) => {
   };
 
   return (
-    <GridFeed item={props.item}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          marginTop: "1rem",
-        }}
-      >
+    <BaseGridPost item={props.item} updateList={props.updateList}>
+      <div className={style.gumGridPost}>
         <GumLikeButton
           post={props.item.gumPost}
           updateList={props.updateList}
@@ -60,10 +55,7 @@ const GumGridPost = (props: IGumGridPostProps) => {
         {commentMap.size > 0 && (
           <>
             <div
-              style={{
-                cursor: "pointer",
-                marginLeft: "2rem",
-              }}
+              className={style.commentBlock}
               onClick={(e) => {
                 e.stopPropagation();
                 toggleCommentInputBlock(
@@ -71,15 +63,7 @@ const GumGridPost = (props: IGumGridPostProps) => {
                 );
               }}
             >
-              <i
-                style={{
-                  fontSize: "1.6rem",
-                  fontWeight: 500,
-                  margin: "0 2rem 0 .5rem",
-                }}
-                className="fa fa-pencil"
-                aria-hidden="true"
-              ></i>
+              <i className={`fa fa-pencil ${style.icon}`} aria-hidden="true" />
               {isShowCommentInputBlock.get(
                 props.item.gumPost.cl_pubkey.toString()
               ) && (
@@ -89,11 +73,7 @@ const GumGridPost = (props: IGumGridPostProps) => {
             {commentMap.size > 0 &&
             commentMap.get(props.item.gumPost.cl_pubkey.toString()) ? (
               <div
-                style={{
-                  marginRight: "2rem",
-                  fontSize: "1.4rem",
-                  cursor: "pointer",
-                }}
+                className={style.commentsBlock}
                 onClick={(e) => {
                   e.stopPropagation();
                   const arr = JSON.parse(
@@ -105,20 +85,15 @@ const GumGridPost = (props: IGumGridPostProps) => {
                   }
                   arr.push(props.item.gumPost.cl_pubkey.toString());
 
-                  dispatch(updateCommentListType(EFeedType.GUM_ITEM));
+                  dispatch(updateCommentListType(EPostType.GUM_ITEM));
                   dispatch(updateCurrentCheckingCommentParentId(arr));
                   toggleCommentList(props.item.gumPost.cl_pubkey.toString());
                 }}
               >
                 <i
-                  style={{
-                    marginRight: ".5rem",
-                    fontSize: "1.4rem",
-                    cursor: "pointer",
-                  }}
-                  className="fa fa-comments"
+                  className={`fa fa-comments ${style.icon}`}
                   aria-hidden="true"
-                ></i>
+                />
                 (
                 {commentMap.get(props.item.gumPost.cl_pubkey.toString()).length}
                 )
@@ -127,7 +102,7 @@ const GumGridPost = (props: IGumGridPostProps) => {
           </>
         )}
       </div>
-    </GridFeed>
+    </BaseGridPost>
   );
 };
 

@@ -1,4 +1,3 @@
-// import { IFeed } from "@/components/homePage/feed";
 import { SDK } from "../gpl-core/src";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
@@ -148,22 +147,4 @@ export const fetchPostData = async (wallet: WalletContextState, sdk: SDK) => {
   } catch (err) {
     console.log("error", err);
   }
-};
-
-export const parseGumData = (raw: any) => {
-  // const gumParsedData = raw!.map((item: any) => {
-  //   const obj: IFeed = {
-  //     profile: item.profile,
-  //     title: item.content.blocks[1] && item.content.blocks[1].data.text!, // That's how the text stored now
-  //     id: item.cl_pubkey,
-  //     createdAt: "",
-  //     readTime: "",
-  //     image: item.content.blocks[2] && item.content.blocks[2].data.file!.url,
-  //     source: {
-  //       image: "",
-  //     },
-  //   };
-  //   return obj;
-  // });
-  // return gumParsedData;
 };

@@ -1,22 +1,21 @@
+import API from "@/axios/api";
+import moment from "moment";
 import { useCallback, useState } from "react";
-import { Post } from "./cyberConnectPostList";
 import { fetchPosts } from "@/utils/cyberConnect";
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
-import { IFeedList } from "@/redux/dailySlice";
+import { IPostList } from "@/redux/discoverSlice";
 import { IUser } from "@/pages/profile";
 import { toChecksumAddress } from "ethereum-checksum-address";
-import API from "@/axios/api";
-import moment from "moment";
-import { EFeedType } from "../homePage/horizontalFeed";
-import { setCommentMap } from "@/redux/cyberConnectSlice";
+import { EPostType } from "@/pages";
+import { Post, setCommentMap } from "@/redux/cyberConnectSlice";
 
 const useCyberConnect = () => {
   const { userData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
-  const [postList, setPostList] = useState<IFeedList[]>([]);
-  const { address: myAddress, lastPostsUpdateTime } = useSelector(
+  const [postList, setPostList] = useState<IPostList[]>([]);
+  const { address: myAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
   let parsedMap = new Map<string, Post>();
@@ -24,7 +23,7 @@ const useCyberConnect = () => {
 
   const fetchPostData = useCallback(async (address: string) => {
     let postUserData = {};
-    let parsedPosts: IFeedList[] = [];
+    let parsedPosts: IPostList[] = [];
 
     try {
       if (!(address && myAddress)) {
@@ -47,7 +46,7 @@ const useCyberConnect = () => {
           user = postUserData[userAddress];
         }
 
-        const post: IFeedList = {
+        const post: IPostList = {
           isUserPost: true,
           userAddress,
           sourceIcon: user.profilePicture,
@@ -62,7 +61,7 @@ const useCyberConnect = () => {
           forwards: [],
           linkCreated: moment(ccPost.createdAt).valueOf().toString(),
           id: ccPost.contentID,
-          type: EFeedType.CC_ITEM,
+          type: EPostType.CC_ITEM,
           created: new Date(ccPost.createdAt).getTime().toString(),
           ccPost: ccPost,
         };

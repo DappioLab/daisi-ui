@@ -6,7 +6,7 @@ import {
   ProfileAccount,
   ReplyInterface,
 } from "@/components/gum/useGumState";
-import { IFeedList } from "./dailySlice";
+import { IPostList } from "./discoverSlice";
 import { postInterface } from "@/components/gum/useGum";
 
 export interface IGumInitialState {
@@ -15,7 +15,7 @@ export interface IGumInitialState {
   following: ConnectionInterface[];
   followers: PublicKey[];
   reactions: Map<string, ReactionInterface[]>;
-  postList: IFeedList[] | null;
+  postList: IPostList[] | null;
   allPosts: postInterface[];
   allUser: Map<string, ProfileAccount>;
   followingMap: Map<string, ProfileAccount[]>;

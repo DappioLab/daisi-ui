@@ -1,4 +1,9 @@
-import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
+import moment from "moment";
+import style from "@/styles/cyberConnect/cyberConnectHorizontalPost.module.sass";
+import BaseHorizontalPost from "../homePage/baseHorizontalPost";
+import LikeButton from "../cyberConnect/cyberConnectLikeButton";
+import CommentBox from "../cyberConnect/cyberConnectCommentBox";
+import { EPostType } from "@/pages";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import {
@@ -6,9 +11,6 @@ import {
   updateCurrentCheckingCommentParentId,
 } from "@/redux/globalSlice";
 import { useState } from "react";
-import LikeButton from "../cyberConnect/cyberConnectLikeButton";
-import CommentBox from "../cyberConnect/cyberConnectCommentBox";
-import moment from "moment";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import { IPostProps } from "@/pages";
 
@@ -50,7 +52,7 @@ const CyberConnectHorizontalPost = (props: ICyberConnectHorizontalPost) => {
     linkCreated: moment(props.item.createdAt).valueOf().toString(),
     isUserPost: true,
     userAddress: toChecksumAddress(props.item.authorAddress),
-    type: EFeedType.CC_ITEM,
+    type: EPostType.CC_ITEM,
     sourceId: "",
     ccPost: props.item,
   };
@@ -68,34 +70,17 @@ const CyberConnectHorizontalPost = (props: ICyberConnectHorizontalPost) => {
   const dispatch = useDispatch();
 
   return (
-    <HorizontalFeed item={obj}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          marginTop: "1rem",
-        }}
-      >
+    <BaseHorizontalPost item={obj} updateList={props.updateList}>
+      <div className={style.cyberConnectHorizontalPost}>
         <LikeButton post={props.item} updateCC={props.updateList} />
         <div
-          style={{
-            cursor: "pointer",
-            marginLeft: "2rem",
-          }}
+          className={style.commentBlock}
           onClick={(e) => {
             e.stopPropagation();
             toggleCommentInputBlock(props.item.contentID);
           }}
         >
-          <i
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: 500,
-              margin: "0 2rem 0 .5rem",
-            }}
-            className="fa fa-pencil"
-            aria-hidden="true"
-          ></i>
+          <i className={`fa fa-pencil ${style.icon}`} aria-hidden="true" />
           {isShowCommentInputBlock.get(props.item.contentID) && (
             <CommentBox
               contentId={props.item.contentID}
@@ -106,11 +91,7 @@ const CyberConnectHorizontalPost = (props: ICyberConnectHorizontalPost) => {
         </div>
         {props.item.comments && props.item.comments.length > 0 ? (
           <div
-            style={{
-              marginRight: "2rem",
-              fontSize: "1.4rem",
-              cursor: "pointer",
-            }}
+            className={style.commentsBlock}
             onClick={(e) => {
               e.stopPropagation();
               const arr = JSON.parse(
@@ -120,29 +101,19 @@ const CyberConnectHorizontalPost = (props: ICyberConnectHorizontalPost) => {
               if (arr.includes(props.item.contentID)) {
                 return;
               }
-              console.log(props.item, "props.item.contentID");
 
               arr.push(props.item.contentID);
-
-              dispatch(updateCommentListType(EFeedType.CC_ITEM));
+              dispatch(updateCommentListType(EPostType.CC_ITEM));
               dispatch(updateCurrentCheckingCommentParentId(arr));
               toggleCommentList(props.item.contentID);
             }}
           >
-            <i
-              style={{
-                marginRight: ".5rem",
-                fontSize: "1.4rem",
-                cursor: "pointer",
-              }}
-              className="fa fa-comments"
-              aria-hidden="true"
-            ></i>
-            ({props.item.comments.length})
+            <i className={`fa fa-comments ${style.icon}`} aria-hidden="true" />(
+            {props.item.comments.length})
           </div>
         ) : null}
       </div>
-    </HorizontalFeed>
+    </BaseHorizontalPost>
   );
 };
 

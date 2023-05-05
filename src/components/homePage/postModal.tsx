@@ -1,31 +1,31 @@
-import style from "@/styles/homePage/feedModal.module.sass";
+import API from "@/axios/api";
+import style from "@/styles/homePage/postModal.module.sass";
 import moment from "moment";
 import { IRootState } from "@/redux";
 import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { IFeedList, updateFeedList } from "@/redux/dailySlice";
-import API from "@/axios/api";
-import {
-  updateAuthModal,
-  updateFeedModalData,
-  updateFeedModalIndex,
-  updateLoadingStatus,
-  updateShowFeedModal,
-} from "@/redux/globalSlice";
-import { EFeedType } from "./horizontalFeed";
+import { IPostList, updatePostList } from "@/redux/discoverSlice";
+import { EPostType } from "@/pages";
+import { setPostList } from "@/redux/cyberConnectSlice";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useGumSDK } from "@/hooks/useGumSDK";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
 import {
   like,
   fetchPostById,
   connectWallet,
   createCyberConnectClient,
 } from "@/utils/cyberConnect";
-import { setPostList } from "@/redux/cyberConnectSlice";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useGumSDK } from "@/hooks/useGumSDK";
-import { Connection, PublicKey } from "@solana/web3.js";
-import { GRAPHQL_ENDPOINTS } from "@gumhq/sdk";
+import {
+  updateAuthModal,
+  updatePostModalData,
+  updatePostModalIndex,
+  updateLoadingStatus,
+  updateShowPostModal,
+} from "@/redux/globalSlice";
 
-const FeedModal = () => {
+const PostModal = () => {
   const connection = useMemo(
     () =>
       new Connection(
@@ -44,21 +44,20 @@ const FeedModal = () => {
     "devnet",
     GRAPHQL_ENDPOINTS.devnet
   );
-  const { screenWidth, feedModalIndex, feedModalData } = useSelector(
+  const { screenWidth, postModalIndex, postModalData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
   const dispatch = useDispatch();
-  const { userData, isLogin, feedList, address, postList } = useSelector(
-    (state: IRootState) => {
+  const { userData, isLogin, discoverPostList, address, cyberConnectPostList } =
+    useSelector((state: IRootState) => {
       return {
         userData: state.persistedReducer.global.userData,
         isLogin: state.persistedReducer.global.isLogin,
-        feedList: state.persistedReducer.daily.feedList,
+        discoverPostList: state.persistedReducer.discover.postList,
         address: state.persistedReducer.cyberConnect.address,
-        postList: state.persistedReducer.cyberConnect.postList,
+        cyberConnectPostList: state.persistedReducer.cyberConnect.postList,
       };
-    }
-  );
+    });
   const wallet = useWallet();
 
   const updateLike = async () => {
@@ -68,15 +67,15 @@ const FeedModal = () => {
     }
 
     dispatch(updateLoadingStatus(true));
-    switch (feedModalData.type) {
-      case EFeedType.RSS_ITEM:
+    switch (postModalData.type) {
+      case EPostType.RSS_ITEM:
         const updatedItem = await API.updateRssItemLike(
-          feedModalData.id,
+          postModalData.id,
           userData.id
         );
 
         if (updatedItem) {
-          const updatedList = feedList.map((item) => {
+          const updatedList = discoverPostList.map((item) => {
             if (item.id === updatedItem.data._id) {
               const obj = JSON.parse(JSON.stringify(item));
               obj.likes = updatedItem.data.likes;
@@ -84,35 +83,35 @@ const FeedModal = () => {
             }
             return item;
           });
-          dispatch(updateFeedList(updatedList));
+          dispatch(updatePostList(updatedList));
         }
         break;
 
-      case EFeedType.CC_ITEM:
+      case EPostType.CC_ITEM:
         try {
           if (!address) {
             dispatch(updateAuthModal(true));
             return;
           }
-          if (!feedModalData.id) {
+          if (!postModalData.id) {
             dispatch(updateAuthModal(true));
             return;
           }
-          const isLiked = feedModalData.likes.includes(userData.id);
+          const isLiked = postModalData.likes.includes(userData.id);
 
           const provider = await connectWallet();
           const cyberConnectClient = createCyberConnectClient(provider);
-          await like(feedModalData.id, cyberConnectClient, !isLiked);
+          await like(postModalData.id, cyberConnectClient, !isLiked);
 
-          const updatedPost = await fetchPostById(feedModalData.id, address);
+          const updatedPost = await fetchPostById(postModalData.id, address);
 
           if (updatedPost) {
-            const post: IFeedList = {
-              type: EFeedType.CC_ITEM,
+            const post: IPostList = {
+              type: EPostType.CC_ITEM,
               created: new Date(updatedPost.createdAt).getTime().toString(),
               isUserPost: true,
-              userAddress: feedModalData.userAddress,
-              sourceIcon: feedModalData.sourceIcon,
+              userAddress: postModalData.userAddress,
+              sourceIcon: postModalData.sourceIcon,
               sourceId: updatedPost.contentID,
               itemTitle: updatedPost.title,
               itemDescription: updatedPost.body.split("\n\n")[0],
@@ -126,37 +125,32 @@ const FeedModal = () => {
               id: updatedPost.contentID,
             };
 
-            const updatedList = feedList.map((feed) => {
-              if (feed.id === updatedPost.contentID) {
+            const updatedList = discoverPostList.map((post) => {
+              if (post.id === updatedPost.contentID) {
                 return post;
               }
-              return feed;
+              return post;
             });
-            const updatedCCPosts = postList.map((p) => {
+            const updatedCCPosts = cyberConnectPostList.map((p) => {
               if (p.id === updatedPost.contentID) {
                 return post;
               }
               return p;
             });
             dispatch(setPostList(updatedCCPosts));
-            dispatch(updateFeedList(updatedList));
+            dispatch(updatePostList(updatedList));
           }
         } catch (err) {
           console.log(err);
         }
         break;
 
-      case EFeedType.GUM_ITEM:
+      case EPostType.GUM_ITEM:
         handleLike();
-        break;
-      case EFeedType.USER_POST:
-        // Deprecate
-        await API.updateUserPostLike(feedModalData.id, userData.id);
-        window.location.reload();
         break;
 
       default:
-        throw "ERROR: unknown feed type";
+        throw "ERROR: unknown post type";
     }
     dispatch(updateLoadingStatus(false));
   };
@@ -165,7 +159,7 @@ const FeedModal = () => {
     try {
       dispatch(updateLoadingStatus(true));
 
-      let result = await createGumLike(feedModalData.cl_pubkey.toString());
+      let result = await createGumLike(postModalData.cl_pubkey.toString());
 
       if (result.success) {
         setTimeout(() => {
@@ -200,42 +194,42 @@ const FeedModal = () => {
   };
 
   const getAdjoiningPost = (value: number) => {
-    const nextNumber = feedModalIndex + value;
+    const nextNumber = postModalIndex + value;
     if (nextNumber < 0) {
       return;
     }
-    dispatch(updateFeedModalIndex(feedModalIndex + value));
+    dispatch(updatePostModalIndex(postModalIndex + value));
   };
 
   return (
-    <div className={style.feedModal}>
+    <div className={style.postModal}>
       <div
         className={style.bg}
         onClick={() => {
-          dispatch(updateFeedModalData(null));
-          dispatch(updateShowFeedModal(false));
+          dispatch(updatePostModalData(null));
+          dispatch(updateShowPostModal(false));
         }}
       ></div>
       <div className={style.modalContainer}>
-        {feedModalData && (
+        {postModalData && (
           <>
             <div className={style.btnBlock}>
               <div className={style.quickBtnBlock}>
                 <div
                   onClick={() => getAdjoiningPost(-1)}
-                  className={`${feedModalIndex === 0 && style.disabledBtn}`}
+                  className={`${postModalIndex === 0 && style.disabledBtn}`}
                 >
                   <i className="fa fa-arrow-left"></i>
                 </div>
                 <br />
                 <div
                   onClick={() => getAdjoiningPost(1)}
-                  className={`${feedModalData.isLastItem && style.disabledBtn}`}
+                  className={`${postModalData.isLastItem && style.disabledBtn}`}
                 >
                   <i className="fa fa-arrow-right"></i>
                 </div>
               </div>
-              <a href={feedModalData.itemLink} target="_blank">
+              <a href={postModalData.itemLink} target="_blank">
                 <div
                   className={style.linkButton}
                   onClick={(e) => {
@@ -248,43 +242,31 @@ const FeedModal = () => {
               </a>
             </div>
 
-            <h1>{feedModalData.itemTitle}</h1>
-            {feedModalData.itemDescription !== "" && (
+            <h1>{postModalData.itemTitle}</h1>
+            {postModalData.itemDescription !== "" && (
               <div className={style.summaryBlock}>
                 <div className={style.title}>TL;DR</div>
                 <div>
-                  {feedModalData.itemDescription.split("- ").map((item) => {
+                  {postModalData.itemDescription.split("- ").map((item) => {
                     return <div>• {item}</div>;
                   })}
                 </div>
               </div>
             )}
-            {/* <div className={style.tagBlock}>
-          {feedModalData.post.tags.map((tag: string) => {
-            return (
-              <div key={tag} className={style.tag}>
-                #{tag}
-              </div>
-            );
-          })}
-        </div> */}
             <div className={style.timeBlock}>
-              {moment(parseInt(feedModalData.linkCreated)).format(
+              {moment(parseInt(postModalData.linkCreated)).format(
                 "MMMM DD, YYYY"
               )}
-              {/* <span> -{feedModalData.post.readTime} read time</span> */}
             </div>
             <img
               src={
-                feedModalData.itemImage && feedModalData.itemImage != ""
-                  ? feedModalData.itemImage
+                postModalData.itemImage && postModalData.itemImage != ""
+                  ? postModalData.itemImage
                   : `https://picsum.photos/200/300?${Math.random()}`
               }
-              // src={feedModalData.itemImage}
               alt="cover"
               className={style.coverImage}
             />
-
             <div className={style.interactNumBlock}>
               <div
                 className={style.socialActionBlock}
@@ -293,17 +275,17 @@ const FeedModal = () => {
                   updateLike();
                 }}
               >
-                {userData && feedModalData.likes.includes(userData.id) ? (
-                  <div style={{ fontSize: "1.6rem" }}>
-                    <i className="fa fa-heart " aria-hidden="true"></i>
+                {userData && postModalData.likes.includes(userData.id) ? (
+                  <div className={style.icon}>
+                    <i className="fa fa-heart " aria-hidden="true" />
                   </div>
                 ) : (
-                  <div style={{ fontSize: "1.6rem" }}>
-                    <i className="fa fa-heart-o"></i>
+                  <div className={style.icon}>
+                    <i className="fa fa-heart-o" />
                   </div>
                 )}
                 <div className={style.actionNumber}>
-                  {feedModalData.likes.length}
+                  {postModalData.likes.length}
                 </div>
               </div>
             </div>
@@ -314,4 +296,4 @@ const FeedModal = () => {
   );
 };
 
-export default FeedModal;
+export default PostModal;

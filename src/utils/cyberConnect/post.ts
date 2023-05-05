@@ -7,7 +7,7 @@ import {
   POST_BY_ADDRESS_QUERY,
   POST_BY_ID_QUERY,
 } from "@/graphql/cyberConnect/query";
-import { Post } from "@/components/cyberConnect/cyberConnectPostList";
+import { Post } from "@/redux/cyberConnectSlice";
 
 export const createPost = async (
   title: string,

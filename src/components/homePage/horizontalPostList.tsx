@@ -1,54 +1,54 @@
-import style from "@/styles/homePage/horizontalFeedList.module.sass";
-import { EFeedType } from "./horizontalFeed";
-import { useDispatch } from "react-redux";
-import {
-  EFeedModalType,
-  updateFeedModalIndex,
-  updateFeedModalType,
-  updateShowFeedModal,
-} from "@/redux/globalSlice";
+import style from "@/styles/homePage/horizontalPostList.module.sass";
 import CyberConnectHorizontalPost from "../cyberConnect/cyberConnectHorizontalPost";
 import GumHorizontalPost from "../gum/gumHorizontalPost";
 import RssHorizontalPost from "../rss/rssHorizontalPost";
-import { IFeedList } from "@/redux/dailySlice";
+import { EPostType } from "@/pages";
+import { useDispatch } from "react-redux";
+import { IPostList } from "@/redux/discoverSlice";
+import {
+  EPostModalType,
+  updatePostModalIndex,
+  updatePostModalType,
+  updateShowPostModal,
+} from "@/redux/globalSlice";
 
-interface IHorizontalFeedListProps {
-  list: IFeedList[];
-  position: EFeedModalType;
+interface IHorizontalPostListProps {
+  list: IPostList[];
+  position: EPostModalType;
   updateList: () => void;
 }
 
-const HorizontalFeedList = (props: IHorizontalFeedListProps) => {
+const HorizontalPostList = (props: IHorizontalPostListProps) => {
   const dispatch = useDispatch();
 
   return (
-    <div className={style.horizontalFeedList}>
+    <div className={style.horizontalPostList}>
       {props.list && props.list.length > 0 ? (
         <>
           {props.list.map((item, index) => {
             return (
               <div
-                style={{ marginTop: "2rem" }}
+                className={style.listItem}
                 key={`${index}`}
                 onClick={() => {
-                  dispatch(updateFeedModalType(props.position));
-                  dispatch(updateFeedModalIndex(index));
-                  dispatch(updateShowFeedModal(true));
+                  dispatch(updatePostModalType(props.position));
+                  dispatch(updatePostModalIndex(index));
+                  dispatch(updateShowPostModal(true));
                 }}
               >
-                {item.type === EFeedType.RSS_ITEM && (
+                {item.type === EPostType.RSS_ITEM && (
                   <RssHorizontalPost
                     item={item}
                     updateList={props.updateList}
                   />
                 )}
-                {item.type === EFeedType.GUM_ITEM && (
+                {item.type === EPostType.GUM_ITEM && (
                   <GumHorizontalPost
                     item={item}
                     updateList={props.updateList}
                   />
                 )}
-                {item.type === EFeedType.CC_ITEM && (
+                {item.type === EPostType.CC_ITEM && (
                   <CyberConnectHorizontalPost
                     item={item.ccPost}
                     updateList={props.updateList}
@@ -63,4 +63,4 @@ const HorizontalFeedList = (props: IHorizontalFeedListProps) => {
   );
 };
 
-export default HorizontalFeedList;
+export default HorizontalPostList;

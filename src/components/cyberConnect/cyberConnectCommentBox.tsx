@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import style from "@/styles/cyberConnect/cyberConnectCommentBox.module.sass";
+import { useState } from "react";
 import {
   checkNetwork,
   comment,
@@ -6,13 +7,13 @@ import {
   createCyberConnectClient,
 } from "@/utils/cyberConnect";
 
-interface CommentBoxProps {
+interface ICyberConnectCommentBoxProps {
   contentId: string;
   address: string;
   fetchData: () => void;
 }
 
-const CommentBox = (props: CommentBoxProps) => {
+const CyberConnectCommentBox = (props: ICyberConnectCommentBoxProps) => {
   const [message, setMessage] = useState("");
 
   const handleOnClick = async () => {
@@ -37,47 +38,27 @@ const CommentBox = (props: CommentBoxProps) => {
   };
 
   return (
-    <div>
-      <div
-        style={{
-          fontSize: "1.6rem",
-          fontWeight: 500,
-          marginTop: "1.5rem",
-        }}
-      >
-        <textarea
-          style={{
-            border: "solid 1px #eee",
-            marginRight: "1rem",
-            padding: "1rem",
-            outline: "none",
+    <div className={style.cyberConnectCommentBox}>
+      <textarea
+        className={style.inputBlock}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => setMessage(e.target.value)}
+        itemType="text"
+        placeholder="Leave some comment"
+      />
+      <div>
+        <button
+          className={style.submitBtn}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleOnClick();
           }}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => setMessage(e.target.value)}
-          itemType="text"
-          placeholder="Leave some comment"
-        />
-        <div>
-          <button
-            style={{
-              backgroundColor: "rgb(255, 203, 106)",
-              color: "#333",
-              padding: ".5rem 1.2rem",
-              borderRadius: "0.5rem",
-              cursor: "pointer",
-              border: "none",
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleOnClick();
-            }}
-          >
-            Submit
-          </button>
-        </div>
+        >
+          Submit
+        </button>
       </div>
     </div>
   );
 };
 
-export default CommentBox;
+export default CyberConnectCommentBox;

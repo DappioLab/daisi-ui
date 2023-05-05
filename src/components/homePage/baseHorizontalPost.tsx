@@ -1,27 +1,20 @@
-import style from "@/styles/homePage/horizontalFeed.module.sass";
+import style from "@/styles/homePage/baseHorizontalPost.module.sass";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
-import { IFeedProps } from "./gridFeed";
+import { IPostProps } from "@/pages";
 
-export enum EFeedType {
-  USER_POST = "USER POST",
-  RSS_ITEM = "RSS ITEM",
-  CC_ITEM = "CC ITEM",
-  GUM_ITEM = "GUM ITEM",
-}
-
-interface IHorizontalFeedProps extends IFeedProps {
+interface IBaseHorizontalPostProps extends IPostProps {
   children: ReactNode;
 }
 
-const HorizontalFeed = (props: IHorizontalFeedProps) => {
+const BaseHorizontalPost = (props: IBaseHorizontalPostProps) => {
   const router = useRouter();
   const [showLinkButton, setShowLinkButton] = useState(false);
 
   return (
     <div
-      className={style.horizontalFeed}
+      className={style.baseHorizontalPost}
       onMouseEnter={() => setShowLinkButton(true)}
       onMouseLeave={() => setShowLinkButton(false)}
     >
@@ -54,7 +47,6 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
         <div className={style.timeBlock}>
           {moment(parseInt(props.item.linkCreated)).format("MMMM DD, YYYY")}
         </div>
-        {/* Insert children */}
         <div className={style.socialActionBlock}>{props.children}</div>
       </div>
       <div className={style.itemImage}>
@@ -71,4 +63,4 @@ const HorizontalFeed = (props: IHorizontalFeedProps) => {
   );
 };
 
-export default HorizontalFeed;
+export default BaseHorizontalPost;

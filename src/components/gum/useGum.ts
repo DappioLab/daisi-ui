@@ -1,17 +1,17 @@
+import axios from "axios";
+import moment from "moment";
+import useGumState from "./useGumState";
 import { useState, useMemo, useCallback } from "react";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { GRAPHQL_ENDPOINTS } from "../../gpl-core/src";
-import axios from "axios";
 import { mainGateway } from "./gumStorage";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePostList } from "@/redux/gumSlice";
 import { IRootState } from "@/redux";
 import { updateUserProfilePageHandle } from "@/redux/globalSlice";
-import { IFeedList } from "@/redux/dailySlice";
-import { EFeedType } from "../homePage/horizontalFeed";
-import moment from "moment";
-import useGumState from "./useGumState";
+import { IPostList } from "@/redux/discoverSlice";
+import { EPostType } from "@/pages";
 
 export interface BlockInterface {
   id: string;
@@ -159,9 +159,9 @@ const useGum = () => {
       for (let item of data) {
         const daisiContent = item.daisiContent;
 
-        const obj: IFeedList = {
+        const obj: IPostList = {
           isUserPost: true,
-          type: EFeedType.GUM_ITEM,
+          type: EPostType.GUM_ITEM,
           sourceId: "",
           userAddress: address,
           id: "",
