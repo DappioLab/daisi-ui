@@ -1,13 +1,13 @@
 import API from "@/axios/api";
 import { IRootState } from "@/redux";
-import { updateFeedList } from "@/redux/dailySlice";
+import { updatePostList } from "@/redux/discoverSlice";
 import { updateLoadingStatus } from "@/redux/globalSlice";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const useRss = () => {
-  const { feedList } = useSelector(
-    (state: IRootState) => state.persistedReducer.daily
+  const { postList } = useSelector(
+    (state: IRootState) => state.persistedReducer.discover
   );
   const { userData, isLogin } = useSelector(
     (state: IRootState) => state.persistedReducer.global
@@ -24,7 +24,7 @@ const useRss = () => {
     const updatedItem = await API.updateRssItemLike(id, userData.id);
 
     if (updatedItem) {
-      const updatedList = feedList.map((item) => {
+      const updatedList = postList.map((item) => {
         if (item.id === updatedItem.data._id) {
           const obj = JSON.parse(JSON.stringify(item));
           obj.likes = updatedItem.data.likes;
@@ -32,9 +32,8 @@ const useRss = () => {
         }
         return item;
       });
-      dispatch(updateFeedList(updatedList));
+      dispatch(updatePostList(updatedList));
     }
-
     dispatch(updateLoadingStatus(false));
   }, []);
 

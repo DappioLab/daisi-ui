@@ -1,5 +1,4 @@
 import { useState } from "react";
-import style from "../../styles/cyberConnectPage/feed.module.sass";
 import { IProfile } from "@/redux/cyberConnectSlice";
 
 // This only stored on Arweave, didn't launch an Onchain event
@@ -40,31 +39,30 @@ export interface IFeed {
 // Implement CyberConnect's EssenceNFT with symbol equal to POST for now,
 // will add Arweave post soon.
 const Feed = ({ feed }: { feed: IFeed }) => {
-  const [feedImage, setFeedImage] = useState(
-    feed.metadata && feed.metadata.image
-      ? feed.metadata.image
-      : "/essence-placeholder.svg"
-  );
-
-  return (
-    <div className={style.feed}>
-      <div className={style.title}>{feed.createdBy.handle}</div>
-      {feed.metadata && feed.metadata.content ? (
-        <div className={style.content}>
-          {feed.metadata && feed.metadata.content
-            ? feed.metadata.content
-            : "No content"}
-        </div>
-      ) : (
-        <></>
-      )}
-      <img
-        className={style.articleImage}
-        src={feedImage}
-        onError={() => setFeedImage("/essence-placeholder.svg")}
-      ></img>
-    </div>
-  );
+  // const [feedImage, setFeedImage] = useState(
+  //   feed.metadata && feed.metadata.image
+  //     ? feed.metadata.image
+  //     : "/essence-placeholder.svg"
+  // );
+  // return (
+  //   <div className={style.feed}>
+  //     <div className={style.title}>{feed.createdBy.handle}</div>
+  //     {feed.metadata && feed.metadata.content ? (
+  //       <div className={style.content}>
+  //         {feed.metadata && feed.metadata.content
+  //           ? feed.metadata.content
+  //           : "No content"}
+  //       </div>
+  //     ) : (
+  //       <></>
+  //     )}
+  //     <img
+  //       className={style.articleImage}
+  //       src={feedImage}
+  //       onError={() => setFeedImage("/essence-placeholder.svg")}
+  //     ></img>
+  //   </div>
+  // );
 };
 
 export default Feed;

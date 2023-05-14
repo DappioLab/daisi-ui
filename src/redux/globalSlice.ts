@@ -1,15 +1,11 @@
-import { IAuthData, IAuthModal } from "@/components/common/authModal";
-import {
-  ISubmitModal,
-  ISubmitModalProps,
-} from "@/components/common/submitModal";
-import { EFeedType } from "@/components/homePage/horizontalFeed";
+import { ISubmitModal } from "@/components/common/submitModal";
+import { EPostType } from "@/pages";
 import { IUser } from "@/pages/profile";
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
-import { IFeedList, IRssSourceItem } from "./dailySlice";
+import { IPostList } from "./discoverSlice";
 
-export enum EFeedModalType {
+export enum EPostModalType {
   DISCOVER_ITEM = 1,
   PROFILE_CC = 2,
   PROFILE_GUM = 3,
@@ -26,12 +22,15 @@ export interface IGlobalInitialState {
   screenWidth: number | null;
   userProfilePageHandle: PublicKey | null;
   userProfilePageData: IUser;
-  showFeedModal: boolean;
-  feedModalIndex: number | null;
-  feedModalData: IFeedList | null;
-  feedModalType: EFeedModalType | null;
+
+  // Post Modal
+  showPostModal: boolean;
+  postModalIndex: number | null;
+  postModalData: IPostList | null;
+  postModalType: EPostModalType | null;
+
   eventNotificationQueue: string[];
-  commentListType: EFeedType;
+  commentListType: EPostType;
   currentCheckingCommentParentId: string[];
   showCommentListModal: boolean;
 }
@@ -60,10 +59,10 @@ const initialState: IGlobalInitialState = {
   screenWidth: null,
   userProfilePageHandle: null,
   userProfilePageData: null,
-  showFeedModal: false,
-  feedModalIndex: null,
-  feedModalData: null,
-  feedModalType: null,
+  showPostModal: false,
+  postModalIndex: null,
+  postModalData: null,
+  postModalType: null,
   eventNotificationQueue: [],
   commentListType: null,
   currentCheckingCommentParentId: [],
@@ -104,17 +103,17 @@ export const globalSlice = createSlice({
     updateUserProfilePageData: (state, action) => {
       state.userProfilePageData = action.payload;
     },
-    updateShowFeedModal: (state, action) => {
-      state.showFeedModal = action.payload;
+    updateShowPostModal: (state, action) => {
+      state.showPostModal = action.payload;
     },
-    updateFeedModalIndex: (state, action) => {
-      state.feedModalIndex = action.payload;
+    updatePostModalIndex: (state, action) => {
+      state.postModalIndex = action.payload;
     },
-    updateFeedModalData: (state, action) => {
-      state.feedModalData = action.payload;
+    updatePostModalData: (state, action) => {
+      state.postModalData = action.payload;
     },
-    updateFeedModalType: (state, action) => {
-      state.feedModalType = action.payload;
+    updatePostModalType: (state, action) => {
+      state.postModalType = action.payload;
     },
     updateEventNotificationQueue: (state, action) => {
       state.eventNotificationQueue = action.payload;
@@ -142,10 +141,10 @@ export const {
   updateShowSubmitModal,
   updateUserProfilePageHandle,
   updateUserProfilePageData,
-  updateShowFeedModal,
-  updateFeedModalIndex,
-  updateFeedModalData,
-  updateFeedModalType,
+  updateShowPostModal,
+  updatePostModalIndex,
+  updatePostModalData,
+  updatePostModalType,
   updateEventNotificationQueue,
   updateCurrentCheckingCommentParentId,
   updateShowCommentListModal,

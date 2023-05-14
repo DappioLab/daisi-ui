@@ -1,5 +1,5 @@
-import { updateShowSubmitModal } from "@/redux/globalSlice";
 import style from "@/styles/common/sidebar.module.sass";
+import { updateShowSubmitModal } from "@/redux/globalSlice";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDispatch } from "react-redux";

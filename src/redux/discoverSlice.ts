@@ -1,5 +1,4 @@
-// import { IFeed } from "@/components/homePage/feed";
-import { EFeedType } from "@/components/homePage/horizontalFeed";
+import { EPostType } from "@/pages";
 import { createSlice } from "@reduxjs/toolkit";
 import { PublicKey } from "@solana/web3.js";
 
@@ -32,12 +31,12 @@ export interface IApiRssListResponse extends IRssSourceData {
   items: IRssSourceItem[];
 }
 
-export interface IDailyInitialState {
-  feedList: IFeedList[];
+export interface IDiscoverInitialState {
+  postList: IPostList[];
 }
 
-export interface IFeedList extends IRssSourceItem {
-  type: EFeedType;
+export interface IPostList extends IRssSourceItem {
+  type: EPostType;
   sourceId: string;
   isUserPost: boolean;
   userAddress: string;
@@ -47,20 +46,20 @@ export interface IFeedList extends IRssSourceItem {
   ccPost?: any; // cc need this for update
 }
 
-const initialState: IDailyInitialState = {
-  feedList: [],
+const initialState: IDiscoverInitialState = {
+  postList: [],
 };
 
-export const dailySlice = createSlice({
-  name: "dailySlice",
+export const discoverSlice = createSlice({
+  name: "discoverSlice",
   initialState,
   reducers: {
-    updateFeedList: (state, action) => {
-      state.feedList = action.payload;
+    updatePostList: (state, action) => {
+      state.postList = action.payload;
     },
   },
 });
 
-export const { updateFeedList } = dailySlice.actions;
+export const { updatePostList } = discoverSlice.actions;
 
-export default dailySlice.reducer;
+export default discoverSlice.reducer;

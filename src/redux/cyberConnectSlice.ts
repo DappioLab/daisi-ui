@@ -1,6 +1,26 @@
-import { Post } from "@/components/cyberConnect/cyberConnectPostList";
 import { createSlice } from "@reduxjs/toolkit";
-import { IFeedList } from "./dailySlice";
+import { IPostList } from "./discoverSlice";
+
+export interface Post {
+  contentID: string;
+  authorHandle: string;
+  authorAddress: string;
+  title: string;
+  body: string;
+  digest: string;
+  arweaveTxHash: string;
+  createdAt: Date;
+  updatedAt: Date;
+  commentCount: number;
+  likeCount: number;
+  dislikeCount: number;
+  likedStatus: {
+    liked: boolean;
+    disliked: boolean;
+    proof: { arweaveTxHash: string | null };
+  };
+  comments: Post[];
+}
 
 export interface IProfile {
   profileID: number;
@@ -14,7 +34,7 @@ export interface ICyberConnectInitialState {
   accessToken: string | null;
   profile: IProfile | null;
   lastPostsUpdateTime: Date;
-  postList: IFeedList[];
+  postList: IPostList[];
   commentMap: Map<string, Post[]>;
 }
 

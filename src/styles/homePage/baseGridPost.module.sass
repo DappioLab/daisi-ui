@@ -1,17 +1,24 @@
-.feed
+
+@import '../global/colors'
+  
+.baseGridPost
   border: solid .1rem #A8B3CF33
-  width: 32rem
-  height: 38rem
+  width: 29rem
+  margin: auto
   border-radius: 2rem
   background-color: $black
   display: flex
   flex-direction: column
+  position: relative
+  cursor: pointer
+  height: 100%
   .articleIcon
     width: 3rem
     height: 3rem
     border-radius: 50%
     overflow: hidden
     margin: 2rem 0 0 2rem
+    cursor: pointer
     img
       width: 100%
       height: 100%
@@ -26,27 +33,40 @@
     -webkit-line-clamp: 3
     font-weight: 600
     margin: 2rem 2rem 0 2rem
-  .content
-    color: gray
-    font-size: 1.5rem
-    word-break: break-word
-    display: -webkit-box
-    -webkit-box-orient: vertical
-    overflow: hidden
-    text-overflow: ellipsis
-    -webkit-line-clamp: 3
-    font-weight: 600
-    margin: 2rem 2rem 0 2rem
-  .test
+  .space
     flex: 1
   .timeBlock
     margin: 1rem 0 0 2rem
     color: $white
   .articleImage
-    height: 30rem
+    height: 15rem
     border-radius: 1rem
     overflow: hidden
-    margin: 1rem .8rem 1rem .8rem
+    margin: 1rem .8rem 2rem .8rem
     img
       width: 100%
       height: 100%
+  .linkButton
+    position: absolute
+    right: 2rem
+    top: 2rem
+    color: $black
+    background-color: $white
+    padding: .8rem 1.2rem
+    border-radius: 1rem
+    font-weight: 700
+    font-size: 1.6rem
+    &:hover
+      opacity: .8
+    i
+      font-weight: 700
+  .socialActionBlock
+    display: flex
+    align-items: center
+    width: fit-content
+    margin-left: 3rem
+    cursor: pointer
+    margin-top: .5rem
+    margin-bottom: 2rem
+  .actionNumber
+    margin-left: 1rem

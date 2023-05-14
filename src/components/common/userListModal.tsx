@@ -1,9 +1,10 @@
 import API from "@/axios/api";
+import style from "@/styles/common/userListModal.module.sass";
+import FollowButton from "../gum/gumFollowBtn";
 import { IUser } from "@/pages/profile";
 import { IRootState } from "@/redux";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import style from "@/styles/common/userListModal.module.sass";
 import { updateLoadingStatus, updateUserData } from "@/redux/globalSlice";
 import { isAddress as isEvmAddress } from "ethers/lib/utils";
 import {
@@ -16,7 +17,6 @@ import {
 } from "@/utils/cyberConnect";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { PublicKey } from "@solana/web3.js";
-import FollowButton from "../gum/gumFollowBtn";
 import { useRouter } from "next/router";
 
 export interface IUserListModalProps {
@@ -26,6 +26,7 @@ export interface IUserListModalProps {
   setShowUserList: Dispatch<SetStateAction<boolean>>;
   getUser: () => Promise<void>;
 }
+
 export enum EUserListType {
   "FOLLOWINGS" = "followings",
   "FOLLOWERS" = "followers",

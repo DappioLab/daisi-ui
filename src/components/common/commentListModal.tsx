@@ -1,11 +1,11 @@
+import style from "@/styles/common/commentListModal.module.sass";
+import CommentBox from "../cyberConnect/cyberConnectCommentBox";
 import { IRootState } from "@/redux";
 import { useDispatch, useSelector } from "react-redux";
-import style from "@/styles/common/commentListModal.module.sass";
 import {
   updateCurrentCheckingCommentParentId,
   updateShowCommentListModal,
 } from "@/redux/globalSlice";
-import CommentBox from "../cyberConnect/cyberConnectCommentBox";
 
 interface ICommentListModalProps {
   list: any;
@@ -67,14 +67,9 @@ const CommentListModal = (props: ICommentListModalProps) => {
                   }}
                 >
                   <i
-                    style={{
-                      marginRight: ".5rem",
-                      fontSize: "1.4rem",
-                      cursor: "pointer",
-                    }}
-                    className="fa fa-comments"
+                    className={`fa fa-comments ${style.commentIcon}`}
                     aria-hidden="true"
-                  ></i>
+                  />
                   ({item.comments.length})
                 </div>
               )}

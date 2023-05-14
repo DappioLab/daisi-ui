@@ -1,4 +1,5 @@
 import style from "@/styles/common/solanaConnectBtn.module.sass";
+import dynamic from "next/dynamic";
 import {
   setAddress,
   setAccessToken,
@@ -8,11 +9,8 @@ import {
   updateAuthModal,
   updateCurrentAddress,
   updateLoginStatus,
-  updateUserProfilePageHandle,
 } from "@/redux/globalSlice";
 import { useWallet } from "@solana/wallet-adapter-react";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 require("@solana/wallet-adapter-react-ui/styles.css");
@@ -30,8 +28,6 @@ const SolanaConnectBtn = () => {
   useEffect(() => {
     if (wallet.connected) {
       dispatch(updateLoginStatus(true));
-
-      // set CyberConnect slice to nulls
       dispatch(setAddress(null));
       dispatch(setAccessToken(null));
       dispatch(setProfile(null));

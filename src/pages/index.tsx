@@ -1,29 +1,38 @@
-import style from "@/styles/homePage/index.module.sass";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { IFeedList, IRssSourceItem, updateFeedList } from "@/redux/dailySlice";
-import { IRootState } from "@/redux";
-import { EFeedType } from "@/components/homePage/horizontalFeed";
-import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
-import GridFeedList from "@/components/homePage/gridFeedList";
 import API from "@/axios/api";
-import {
-  EFeedModalType,
-  updateFeedModalData,
-  updateFeedModalIndex,
-  updateLoadingStatus,
-  updateShowFeedModal,
-} from "@/redux/globalSlice";
-import { fetchFollowingsPosts } from "@/utils/cyberConnect";
-import { IUser } from "@/pages/profile";
+import style from "@/styles/homePage/index.module.sass";
 import moment from "moment";
 import useGumState, { filterPostList } from "@/components/gum/useGumState";
-import { setPostList } from "@/redux/cyberConnectSlice";
 import useCyberConnect from "@/components/cyberConnect/useCyberConnect";
+import HorizontalPostList from "@/components/homePage/horizontalPostList";
+import GridPostList from "@/components/homePage/gridPostList";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  IPostList,
+  IRssSourceItem,
+  updatePostList,
+} from "@/redux/discoverSlice";
+import { IRootState } from "@/redux";
+import { setPostList } from "@/redux/cyberConnectSlice";
+import { fetchFollowingsPosts } from "@/utils/cyberConnect";
+import { IUser } from "@/pages/profile";
+import {
+  EPostModalType,
+  updatePostModalData,
+  updatePostModalIndex,
+  updateLoadingStatus,
+  updateShowPostModal,
+} from "@/redux/globalSlice";
 
 export enum EDisplayMode {
   GRID = 0,
   HORIZONTAL = 1,
+}
+
+export enum EPostType {
+  RSS_ITEM = "RSS ITEM",
+  CC_ITEM = "CC ITEM",
+  GUM_ITEM = "GUM ITEM",
 }
 
 export interface IPostProps {
@@ -32,8 +41,8 @@ export interface IPostProps {
 }
 
 const HomePage = () => {
-  const { feedList } = useSelector(
-    (state: IRootState) => state.persistedReducer.daily
+  const { postList } = useSelector(
+    (state: IRootState) => state.persistedReducer.discover
   );
 
   const [displayMode, setDisplayMode] = useState(EDisplayMode.HORIZONTAL);
@@ -53,9 +62,11 @@ const HomePage = () => {
     following,
     allUser,
   } = useSelector((state: IRootState) => state.persistedReducer.gum);
-  const [rssFeed, setRssFeed] = useState<IFeedList[]>([]);
-  const [gumFeed, setGumFeed] = useState<IFeedList[]>([]);
-  const [ccFeed, setCcFeed] = useState<IFeedList[]>([]);
+  const [rssPostList, setRssPostList] = useState<IPostList[]>([]);
+  const [gumPostList, setGumPostList] = useState<IPostList[]>([]);
+  const [cyberConnectPostList, setCyberConnectPostList] = useState<IPostList[]>(
+    []
+  );
 
   const dispatch = useDispatch();
   const { fetchPostData, parseComments } = useCyberConnect();
@@ -75,11 +86,11 @@ const HomePage = () => {
         const allCcPosts = [
           ...ccUserPosts,
           ...ccFollowingsPosts,
-        ] as unknown as IFeedList[];
+        ] as unknown as IPostList[];
 
-        setCcFeed(allCcPosts);
+        setCyberConnectPostList(allCcPosts);
         parseComments(allCcPosts);
-        setGumFeed([]);
+        setGumPostList([]);
         dispatch(setPostList(allCcPosts));
 
         dispatch(updateLoadingStatus(false));
@@ -92,13 +103,13 @@ const HomePage = () => {
 
   const updateGum = async () => {
     try {
-      let gumFeeds: IFeedList[] = [];
+      let gumPostList: IPostList[] = [];
 
       if (
         userProfile &&
         gumPosts.length > 0 &&
         allUser.size > 0 &&
-        gumFeed.length <= 0
+        gumPostList.length <= 0
       ) {
         dispatch(updateLoadingStatus(true));
         let gumFollowing = following.map((conn) => {
@@ -115,9 +126,9 @@ const HomePage = () => {
 
           if (user) {
             let daisiContent = post.daisiContent;
-            const feed: IFeedList = {
+            const postListItem: IPostList = {
               isUserPost: true,
-              type: EFeedType.GUM_ITEM,
+              type: EPostType.GUM_ITEM,
               sourceId: "",
               userAddress: address,
               id: post.cl_pubkey.toString(),
@@ -133,11 +144,11 @@ const HomePage = () => {
               cl_pubkey: post.cl_pubkey,
               gumPost: post,
             };
-            gumFeeds.push(feed);
+            gumPostList.push(postListItem);
           }
         }
-        setGumFeed(gumFeeds);
-        setCcFeed([]);
+        setGumPostList(gumPostList);
+        setCyberConnectPostList([]);
         dispatch(updateLoadingStatus(false));
       }
     } catch (err) {
@@ -151,12 +162,12 @@ const HomePage = () => {
       dispatch(updateLoadingStatus(true));
       updateCC();
       updateGum();
-      let res: IFeedList[] = [];
+      let res: IPostList[] = [];
 
-      if (rssFeed.length <= 0) {
+      if (rssPostList.length <= 0) {
         res = await getRssList();
         res = res.map((item: IRssSourceItem) => {
-          const obj: IFeedList = {
+          const obj: IPostList = {
             isUserPost: false,
             userAddress: null,
             sourceIcon: item.sourceIcon,
@@ -169,13 +180,13 @@ const HomePage = () => {
             forwards: [],
             linkCreated: item.linkCreated,
             id: item.id,
-            type: EFeedType.RSS_ITEM,
+            type: EPostType.RSS_ITEM,
             created: item.created,
           };
           return obj;
         });
 
-        setRssFeed(res);
+        setRssPostList(res);
       }
       dispatch(updateLoadingStatus(false));
     } catch (err) {
@@ -186,26 +197,28 @@ const HomePage = () => {
 
   useEffect(() => {
     updateList();
-    dispatch(updateFeedModalIndex(null));
-    dispatch(updateShowFeedModal(false));
-    dispatch(updateFeedModalData(null));
+    dispatch(updatePostModalIndex(null));
+    dispatch(updateShowPostModal(false));
+    dispatch(updatePostModalData(null));
   }, []);
 
   useEffect(() => {
     updateGum();
-  }, [following, userProfile, gumPosts, allUser, gumFeed]);
+  }, [following, userProfile, gumPosts, allUser, gumPostList]);
 
   useEffect(() => {
     updateCC();
   }, [address]);
 
   useEffect(() => {
-    let allPosts = [...rssFeed, ...ccFeed, ...gumFeed].sort((a, b) =>
-      Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1
-    );
+    let allPosts = [
+      ...rssPostList,
+      ...cyberConnectPostList,
+      ...gumPostList,
+    ].sort((a, b) => (Number(a.linkCreated) < Number(b.linkCreated) ? 1 : -1));
 
-    dispatch(updateFeedList(allPosts));
-  }, [rssFeed, gumFeed, ccFeed]);
+    dispatch(updatePostList(allPosts));
+  }, [rssPostList, gumPostList, cyberConnectPostList]);
 
   // inline-style need to be refactored
   return (
@@ -255,16 +268,16 @@ const HomePage = () => {
         </div>
       )}
       {screenWidth < 960 || displayMode === EDisplayMode.GRID ? (
-        <GridFeedList
+        <GridPostList
           updateList={updateList}
-          list={feedList}
-          position={EFeedModalType.DISCOVER_ITEM}
+          list={postList}
+          position={EPostModalType.DISCOVER_ITEM}
         />
       ) : (
-        <HorizontalFeedList
+        <HorizontalPostList
           updateList={updateList}
-          list={feedList}
-          position={EFeedModalType.DISCOVER_ITEM}
+          list={postList}
+          position={EPostModalType.DISCOVER_ITEM}
         />
       )}
     </div>

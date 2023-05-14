@@ -1,3 +1,5 @@
+import request from "graphql-request";
+import style from "@/styles/cyberConnect/followButton.module.sass";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
 import {
@@ -8,17 +10,15 @@ import {
   handleCreator,
 } from "@/utils/cyberConnect";
 import { useEffect, useState } from "react";
-import request from "graphql-request";
 import { CYBER_CONNECT_ENDPOINT } from "@/utils/cyberConnect/constants";
 import { GET_FOLLOW_STATUS_QUERY } from "@/graphql/cyberConnect/query";
-import style from "@/styles/cyberConnectPage/followButton.module.sass";
 
-interface IFollowBtnProps {
+interface ICyberConnectFollowBtnProps {
   checkingAddress: string;
   getUser: () => Promise<void>;
 }
 
-const FollowBtn = (props: IFollowBtnProps) => {
+const CyberConnectFollowBtn = (props: ICyberConnectFollowBtnProps) => {
   const { address: myAddress, accessToken } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
@@ -75,9 +75,7 @@ const FollowBtn = (props: IFollowBtnProps) => {
     >
       {isFollowing ? "Following" : "Follow"}
     </button>
-  ) : (
-    <></>
-  );
+  ) : null;
 };
 
-export default FollowBtn;
+export default CyberConnectFollowBtn;

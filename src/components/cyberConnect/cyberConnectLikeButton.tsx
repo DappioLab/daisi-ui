@@ -1,21 +1,18 @@
-import { Post } from "./cyberConnectPostList";
+import { Post } from "@/redux/cyberConnectSlice";
+import style from "@/styles/cyberConnect/cyberConnectLikeButton.module.sass";
 import {
   like,
-  fetchPosts,
   connectWallet,
   createCyberConnectClient,
   checkNetwork,
 } from "@/utils/cyberConnect";
-import { IRootState } from "@/redux";
-import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 
-interface ILikeButtonProps {
+interface ICyberConnectLikeButtonProps {
   post: Post;
   updateCC: () => void;
 }
 
-const LikeButton = (props: ILikeButtonProps) => {
+const CyberConnectLikeButton = (props: ICyberConnectLikeButtonProps) => {
   const handleOnClick = async (contentID: string, isLike: boolean) => {
     const provider = await connectWallet();
     await checkNetwork(provider);
@@ -25,43 +22,31 @@ const LikeButton = (props: ILikeButtonProps) => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        cursor: "pointer",
-      }}
-    >
+    <div className={style.cyberConnectLikeButton}>
       {props.post.likedStatus.liked ? (
         <div
-          style={{ fontSize: "1.6rem" }}
+          className={style.icon}
           onClick={(e) => {
             e.stopPropagation();
             handleOnClick(props.post.contentID, false);
           }}
         >
-          <i className="fa fa-heart " aria-hidden="true"></i>
+          <i className="fa fa-heart " aria-hidden="true" />
         </div>
       ) : (
         <div
-          style={{ fontSize: "1.6rem" }}
+          className={style.icon}
           onClick={(e) => {
             e.stopPropagation();
             handleOnClick(props.post.contentID, true);
           }}
         >
-          <i className="fa fa-heart-o"></i>
+          <i className="fa fa-heart-o" />
         </div>
       )}
-      <div
-        style={{
-          marginLeft: "1rem",
-        }}
-      >
-        {props.post.likeCount}
-      </div>
+      <div className={style.number}>{props.post.likeCount}</div>
     </div>
   );
 };
 
-export default LikeButton;
+export default CyberConnectLikeButton;

@@ -1,23 +1,25 @@
-import HorizontalFeed, { EFeedType } from "../homePage/horizontalFeed";
+import style from "@/styles/gum/gumHorizontalPost.module.sass";
+import BaseHorizontalPost from "../homePage/baseHorizontalPost";
+import GumLikeButton from "./gumLikeButton";
+import GumCommentBox from "./gumCommentBox";
+import { EPostType } from "@/pages";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
+import { useEffect, useState } from "react";
+import { IPostList } from "@/redux/discoverSlice";
 import {
   updateCommentListType,
   updateCurrentCheckingCommentParentId,
 } from "@/redux/globalSlice";
-import { useEffect, useState } from "react";
-import { IFeedList } from "@/redux/dailySlice";
-import GumLikeButton from "./gumLikeButton";
-import GumCommentBox from "./gumCommentBox";
 
 export interface IGumHorizontalPost {
-  item: IFeedList;
+  item: IPostList;
   updateList: () => void;
 }
 
 const GumHorizontalPost = (props: IGumHorizontalPost) => {
-  const { feedList } = useSelector(
-    (state: IRootState) => state.persistedReducer.daily
+  const { postList } = useSelector(
+    (state: IRootState) => state.persistedReducer.discover
   );
   const { commentMap } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
@@ -44,12 +46,12 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
 
   useEffect(() => {
     const isShowComment = new Map();
-    feedList.map((item) => {
+    postList.map((item) => {
       isShowComment.set(item.id, false);
     });
 
     setIsShowCommentList(() => isShowComment);
-  }, [feedList]);
+  }, [postList]);
 
   const toggleCommentList = (key: string) => {
     const updated = new Map(isShowCommentList);
@@ -59,15 +61,9 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
   };
 
   return (
-    <HorizontalFeed item={props.item}>
-      {props.item.type === EFeedType.GUM_ITEM && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            marginTop: "1rem",
-          }}
-        >
+    <BaseHorizontalPost item={props.item} updateList={props.updateList}>
+      {props.item.type === EPostType.GUM_ITEM && (
+        <div className={style.gumHorizontalPost}>
           <GumLikeButton
             post={props.item.gumPost}
             updateList={props.updateList}
@@ -75,10 +71,7 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
           {commentMap.size > 0 && (
             <>
               <div
-                style={{
-                  cursor: "pointer",
-                  marginLeft: "2rem",
-                }}
+                className={style.commentBlock}
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleCommentInputBlock(
@@ -87,14 +80,9 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
                 }}
               >
                 <i
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: 500,
-                    margin: "0 2rem 0 .5rem",
-                  }}
-                  className="fa fa-pencil"
+                  className={`fa fa-pencil ${style.icon}`}
                   aria-hidden="true"
-                ></i>
+                />
                 {isShowCommentInputBlock.get(
                   props.item.gumPost.cl_pubkey.toString()
                 ) && (
@@ -106,11 +94,7 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
               {commentMap.size > 0 &&
               commentMap.get(props.item.gumPost.cl_pubkey.toString()) ? (
                 <div
-                  style={{
-                    marginRight: "2rem",
-                    fontSize: "1.4rem",
-                    cursor: "pointer",
-                  }}
+                  className={style.commentsBlock}
                   onClick={(e) => {
                     e.stopPropagation();
                     const arr = JSON.parse(
@@ -122,20 +106,15 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
                     }
                     arr.push(props.item.gumPost.cl_pubkey.toString());
 
-                    dispatch(updateCommentListType(EFeedType.GUM_ITEM));
+                    dispatch(updateCommentListType(EPostType.GUM_ITEM));
                     dispatch(updateCurrentCheckingCommentParentId(arr));
                     toggleCommentList(props.item.gumPost.cl_pubkey.toString());
                   }}
                 >
                   <i
-                    style={{
-                      marginRight: ".5rem",
-                      fontSize: "1.4rem",
-                      cursor: "pointer",
-                    }}
-                    className="fa fa-comments"
+                    className={`fa fa-comments ${style.icon}`}
                     aria-hidden="true"
-                  ></i>
+                  />
                   (
                   {
                     commentMap.get(props.item.gumPost.cl_pubkey.toString())
@@ -148,7 +127,7 @@ const GumHorizontalPost = (props: IGumHorizontalPost) => {
           )}
         </div>
       )}
-    </HorizontalFeed>
+    </BaseHorizontalPost>
   );
 };
 

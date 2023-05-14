@@ -1,21 +1,21 @@
-import style from "@/styles/gumPage/followButton.module.sass";
+import style from "@/styles/gum/followButton.module.sass";
 import { PublicKey } from "@solana/web3.js";
 import { IRootState } from "@/redux/index";
 import { useSelector } from "react-redux";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useGumSDK } from "@/hooks/useGumSDK";
 
-interface followButtonProp {
+interface IGumFollowBtnProps {
   toProfile: PublicKey;
 }
 
-const FollowButton = (prop: followButtonProp) => {
+const GumFollowBtn = (props: IGumFollowBtnProps) => {
   const { userProfile, following } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
   const wallet = useWallet();
   const sdk = useGumSDK();
-  const toProfile = prop.toProfile;
+  const toProfile = props.toProfile;
 
   const createGunFollow = async (profile: string) => {
     try {
@@ -36,6 +36,7 @@ const FollowButton = (prop: followButtonProp) => {
     }
     return { success: true };
   };
+
   const handleFollow = async (e: any) => {
     try {
       let result = await createGunFollow(toProfile.toString());
@@ -43,6 +44,7 @@ const FollowButton = (prop: followButtonProp) => {
       console.log(err);
     }
   };
+
   const handleUnfollow = async (e: any) => {
     try {
       if (!wallet.publicKey) {
@@ -93,4 +95,4 @@ const FollowButton = (prop: followButtonProp) => {
   }
   return <>{followButton}</>;
 };
-export default FollowButton;
+export default GumFollowBtn;

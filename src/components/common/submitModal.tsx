@@ -1,11 +1,11 @@
+import API from "@/axios/api";
+import style from "@/styles/common/submitModal.module.sass";
 import { IRootState } from "@/redux";
 import {
   updateEventNotificationQueue,
   updateLoadingStatus,
   updateShowSubmitModal,
-  updateSubmitModalData,
 } from "@/redux/globalSlice";
-import style from "@/styles/common/submitModal.module.sass";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useDispatch, useSelector } from "react-redux";
 import { ipfsClient, mainGateway } from "@/components/gum/gumStorage";
@@ -19,36 +19,26 @@ import {
   createPost as createCyberConnectPost,
 } from "@/utils/cyberConnect";
 import { setLastPostsUpdateTime } from "@/redux/cyberConnectSlice";
-import API from "@/axios/api";
-export interface ISubmitModal {
-  title: string;
-  description: string;
-  link: "";
-}
 import {
   RuntimeConnector,
-  Apps,
-  ModelNames,
   FileType,
-  MirrorFile,
   Extension,
 } from "@dataverse/runtime-connector";
 
-const runtimeConnector = new RuntimeConnector(Extension);
-
-export interface ISubmitModalProps {}
-
-// export enum ESubmitModalTypes {
-//   submitLink = "Submit link",
-//   suggestNewSource = "Suggest new source",
-// }
+export interface ISubmitModal {
+  title: string;
+  description: string;
+  link: string;
+}
 
 export enum EPostType {
   CYBER_CONNECT = "CYBER_CONNECT",
   GUM = "GUM",
 }
 
-const SubmitModal = (props: ISubmitModalProps) => {
+const runtimeConnector = new RuntimeConnector(Extension);
+
+const SubmitModal = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const solanaWallet = useWallet();
@@ -75,12 +65,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
   const CREATED_IN_DAISI_TAG = "Created in Daisi";
 
   const closeModal = () => {
-    // const data: ISubmitModalProps = {
-    //   title: "",
-    //   description: "",
-    //   showSubmitModal: false,
-    // };
-
     dispatch(updateShowSubmitModal(false));
   };
 
@@ -332,7 +316,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
       <div className={style.modalContainer}>
         <div className={style.titleBlock}>
           <div>Post</div>
-          {/* <div className={style.title}>{props.title}</div> */}
           <div
             className={style.closeBtn}
             onClick={() => {
@@ -342,7 +325,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
             x
           </div>
         </div>
-        {/* <div className={style.description}>{props.description}</div> */}
         <div className={style.formBlock}>
           <div className={style.inputBlock}>
             <div className={style.inputLabel}>Link</div>
@@ -364,20 +346,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
             {form.title != "" && (
               <div className={style.input}>{form.title}</div>
             )}
-            {/* <input
-              type="text"
-              placeholder="title"
-              className={style.input}
-              value={form.title}
-              onChange={(e) => {
-                setForm((old) => {
-                  old.title = e.target.value;
-                  return JSON.parse(JSON.stringify(old));
-                });
-              }}
-            /> */}
           </div>
-
           <div className={style.inputBlock}>
             {form.description != "" && (
               <div className={style.inputLabel}>Description</div>
@@ -385,18 +354,6 @@ const SubmitModal = (props: ISubmitModalProps) => {
             {form.description != "" && (
               <div className={style.input}>{form.description} </div>
             )}
-            {/* <textarea
-              style={{ height: "400px" }}
-              placeholder="description"
-              className={style.input}
-              value={form.description}
-              onChange={(e) => {
-                setForm((old) => {
-                  old.description = e.target.value;
-                  return JSON.parse(JSON.stringify(old));
-                });
-              }}
-            ></textarea> */}
           </div>
           {showGeneratingLoading && (
             <div className={style.loadingText}>Generating summary{dots}</div>
@@ -405,7 +362,7 @@ const SubmitModal = (props: ISubmitModalProps) => {
 
         <div className={style.bottomBlock}>
           {!solanaWallet.connected && !accessToken ? (
-            <div className={style.operateBtn} style={{ pointerEvents: "none" }}>
+            <div className={`${style.operateBtn} ${style.operateBtn}`}>
               Please connect wallet first to send the link.
             </div>
           ) : (

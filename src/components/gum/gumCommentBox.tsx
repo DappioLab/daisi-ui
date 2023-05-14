@@ -1,18 +1,17 @@
+import style from "@/styles/gum/gumCommentBox.module.sass";
 import { useState } from "react";
-
 import { ipfsClient, mainGateway } from "./gumStorage";
 import { useGumSDK } from "@/hooks/useGumSDK";
 import { IRootState } from "@/redux/index";
 import { useSelector } from "react-redux";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import style from "@/styles/gumPage/post.module.sass";
 
-interface IReplyFormProps {
+interface IGumCommentBoxProps {
   post: string;
 }
 
-const GumCommentBox = (props: IReplyFormProps) => {
+const GumCommentBox = (props: IGumCommentBoxProps) => {
   const [open, setOpen] = useState(false);
   const [reply, setReply] = useState("");
   const sdk = useGumSDK();
@@ -20,6 +19,7 @@ const GumCommentBox = (props: IReplyFormProps) => {
   const { userProfile } = useSelector(
     (state: IRootState) => state.persistedReducer.gum
   );
+
   const handleReply = async () => {
     let data: any = {
       content: { content: reply },
@@ -48,41 +48,19 @@ const GumCommentBox = (props: IReplyFormProps) => {
   };
 
   return (
-    <div
-      style={{
-        fontSize: "1.6rem",
-        fontWeight: 500,
-        marginTop: "1.5rem",
-        // display: "flex",
-        // flexDirection: "column",
-        // alignItems: "flex-end",
-      }}
-    >
+    <div className={style.gumCommentBox}>
       <textarea
-        style={{
-          border: "solid 1px #eee",
-          marginRight: "1rem",
-          padding: "1rem",
-          // width: "30rem",
-        }}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => {
           setReply(e.target.value);
         }}
         itemType="text"
         placeholder="Leave some comment"
-        className={style.replyform}
+        className={style.inputBlock}
       />
       <div>
         <button
-          style={{
-            backgroundColor: "rgb(255, 203, 106)",
-            color: "#333",
-            padding: ".5rem 1.2rem",
-            borderRadius: "0.5rem",
-            cursor: "pointer",
-            border: "none",
-          }}
+          className={style.submitBtn}
           onClick={(e) => {
             e.stopPropagation();
             handleReply();

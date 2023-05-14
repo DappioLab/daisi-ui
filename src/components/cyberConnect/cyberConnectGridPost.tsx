@@ -1,4 +1,9 @@
-import { EFeedType } from "../homePage/horizontalFeed";
+import style from "@/styles/cyberConnect/cyberConnectGridPost.module.sass";
+import moment from "moment";
+import BaseGridPost from "../homePage/baseGridPost";
+import CommentBox from "./cyberConnectCommentBox";
+import LikeButton from "./cyberConnectLikeButton";
+import { EPostType } from "@/pages";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/redux";
 import {
@@ -6,16 +11,12 @@ import {
   updateCurrentCheckingCommentParentId,
 } from "@/redux/globalSlice";
 import { useState } from "react";
-import moment from "moment";
 import { toChecksumAddress } from "ethereum-checksum-address";
 import { IPostProps } from "@/pages";
-import GridFeed from "../homePage/gridFeed";
-import CommentBox from "./cyberConnectCommentBox";
-import LikeButton from "./cyberConnectLikeButton";
 
-interface ICyberConnectGridFeedProps extends IPostProps {}
+interface ICyberConnectGridPostProps extends IPostProps {}
 
-const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
+const CyberConnectGridPost = (props: ICyberConnectGridPostProps) => {
   const { address: myAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
@@ -49,7 +50,7 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
     linkCreated: moment(props.item.createdAt).valueOf().toString(),
     isUserPost: true,
     userAddress: toChecksumAddress(props.item.authorAddress),
-    type: EFeedType.CC_ITEM,
+    type: EPostType.CC_ITEM,
     sourceId: "",
     ccPost: props.item,
   };
@@ -67,34 +68,17 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
   const dispatch = useDispatch();
 
   return (
-    <GridFeed item={obj}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          marginTop: "1rem",
-        }}
-      >
+    <BaseGridPost item={obj} updateList={props.updateList}>
+      <div className={style.cyberConnectGridPost}>
         <LikeButton post={props.item} updateCC={props.updateList} />
         <div
-          style={{
-            cursor: "pointer",
-            marginLeft: "2rem",
-          }}
+          className={style.commentBlock}
           onClick={(e) => {
             e.stopPropagation();
             toggleCommentInputBlock(props.item.id);
           }}
         >
-          <i
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: 500,
-              margin: "0 2rem 0 .5rem",
-            }}
-            className="fa fa-pencil"
-            aria-hidden="true"
-          ></i>
+          <i className={`fa fa-pencil ${style.icon}`} aria-hidden="true" />
           {isShowCommentInputBlock.get(props.item.id) && (
             <CommentBox
               contentId={props.item.id}
@@ -105,11 +89,7 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
         </div>
         {props.item.comments && props.item.comments.length > 0 ? (
           <div
-            style={{
-              marginRight: "2rem",
-              fontSize: "1.4rem",
-              cursor: "pointer",
-            }}
+            className={style.commentsBlock}
             onClick={(e) => {
               e.stopPropagation();
               const arr = JSON.parse(
@@ -121,25 +101,17 @@ const CyberConnectGridPost = (props: ICyberConnectGridFeedProps) => {
               }
               arr.push(props.item.id);
 
-              dispatch(updateCommentListType(EFeedType.CC_ITEM));
+              dispatch(updateCommentListType(EPostType.CC_ITEM));
               dispatch(updateCurrentCheckingCommentParentId(arr));
               toggleCommentList(props.item.id);
             }}
           >
-            <i
-              style={{
-                marginRight: ".5rem",
-                fontSize: "1.4rem",
-                cursor: "pointer",
-              }}
-              className="fa fa-comments"
-              aria-hidden="true"
-            />
-            ({props.item.comments.length})
+            <i className={`fa fa-comments ${style.icon}`} aria-hidden="true" />(
+            {props.item.comments.length})
           </div>
         ) : null}
       </div>
-    </GridFeed>
+    </BaseGridPost>
   );
 };
 

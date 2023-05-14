@@ -1,21 +1,25 @@
+import moment from "moment";
 import API from "@/axios/api";
+import dynamic from "next/dynamic";
+import style from "@/styles/profile/id.module.sass";
+import useGum from "@/components/gum/useGum";
+import HorizontalPostList from "@/components/homePage/horizontalPostList";
+import useCyberConnect from "@/components/cyberConnect/useCyberConnect";
+import CyberConnectFollowBtn from "@/components/cyberConnect/cyberConnectFollowBtn";
+import UserProfileEdit from "@/components/common/userProfileEdit";
+import GumFollowButton from "@/components/gum/gumFollowBtn";
 import UserListModal, {
   EUserListType,
 } from "@/components/common/userListModal";
 import { IRootState } from "@/redux";
-import { IFeedList } from "@/redux/dailySlice";
+import { IPostList } from "@/redux/discoverSlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import style from "@/styles/profile/id.module.sass";
-import moment from "moment";
 import { useWallet } from "@solana/wallet-adapter-react";
-import CyberConnectFollowBtn from "@/components/cyberConnect/cyberConnectFollowBtn";
-import UserProfileEdit from "@/components/common/userProfileEdit";
-import GumFollowButton from "@/components/gum/gumFollowBtn";
 import { PublicKey } from "@solana/web3.js";
 import {
-  EFeedModalType,
+  EPostModalType,
   updateAuthModal,
   updateUserProfilePageData,
   updateUserProfilePageHandle,
@@ -27,10 +31,7 @@ import {
 } from "@/utils/cyberConnect";
 import { setPostList } from "@/redux/cyberConnectSlice";
 import { useGumSDK } from "@/hooks/useGumSDK";
-import useGum from "@/components/gum/useGum";
-import HorizontalFeedList from "@/components/homePage/horizontalFeedList";
-import useCyberConnect from "@/components/cyberConnect/useCyberConnect";
-import dynamic from "next/dynamic";
+
 const DataVerseDid = dynamic(
   () => import("../components/common/dataVerseDid"),
   { ssr: false }
@@ -82,7 +83,7 @@ const ProfilePage = ({ user }: { user: IUser }) => {
   const { address: myAddress } = useSelector(
     (state: IRootState) => state.persistedReducer.cyberConnect
   );
-  const [innerPostList, setInnerPostList] = useState<IFeedList[]>([]);
+  const [innerPostList, setInnerPostList] = useState<IPostList[]>([]);
 
   const { fetchPostData, parseComments } = useCyberConnect();
   const { fetchPostData: fetchGumPostData } = useGum();
@@ -326,18 +327,18 @@ const ProfilePage = ({ user }: { user: IUser }) => {
           {isCheckingSolanaAddress ? (
             <>
               {gumPostList && gumPostList.length > 0 && (
-                <HorizontalFeedList
+                <HorizontalPostList
                   updateList={() => {}}
                   list={gumPostList}
-                  position={EFeedModalType.PROFILE_GUM}
+                  position={EPostModalType.PROFILE_GUM}
                 />
               )}
             </>
           ) : (
-            <HorizontalFeedList
+            <HorizontalPostList
               updateList={() => {}}
               list={innerPostList}
-              position={EFeedModalType.PROFILE_CC}
+              position={EPostModalType.PROFILE_CC}
             />
           )}
         </>

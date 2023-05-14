@@ -1,38 +1,39 @@
+import BaseGridPost from "../homePage/baseGridPost";
+import useRss from "./useRss";
+import style from "@/styles/rss/rssGridPost.module.sass";
 import { IPostProps } from "@/pages";
 import { IRootState } from "@/redux";
 import { useSelector } from "react-redux";
-import GridFeed from "../homePage/gridFeed";
-import useRss from "./useRss";
 
-interface IRssGridFeedProps extends IPostProps {}
+interface IRssGridPostProps extends IPostProps {}
 
-const RssGridPost = (props: IRssGridFeedProps) => {
+const RssGridPost = (props: IRssGridPostProps) => {
   const { userData } = useSelector(
     (state: IRootState) => state.persistedReducer.global
   );
-
   const { updateLike } = useRss();
 
   return (
-    <GridFeed item={props.item}>
+    <BaseGridPost item={props.item} updateList={props.updateList}>
       <div
+        className={style.rssGridPost}
         onClick={(e) => {
           e.stopPropagation();
           updateLike(props.item.id);
         }}
       >
         {userData && props.item.likes.includes(userData.id) ? (
-          <div style={{ fontSize: "1.6rem" }}>
-            <i className="fa fa-heart " aria-hidden="true"></i>
+          <div className={style.icon}>
+            <i className="fa fa-heart " aria-hidden="true" />
           </div>
         ) : (
-          <div style={{ fontSize: "1.6rem" }}>
-            <i className="fa fa-heart-o"></i>
+          <div className={style.icon}>
+            <i className="fa fa-heart-o" />
           </div>
         )}
         <div>{props.item.likes.length}</div>
       </div>
-    </GridFeed>
+    </BaseGridPost>
   );
 };
 

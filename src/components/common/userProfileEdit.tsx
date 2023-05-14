@@ -1,17 +1,17 @@
+import app from "@/firebase";
+import API from "@/axios/api";
 import style from "@/styles/common/userProfileEdit.module.sass";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IUser } from "@/pages/profile";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "@/redux";
+import { updateLoadingStatus } from "@/redux/globalSlice";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import app from "@/firebase";
-import API from "@/axios/api";
-import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "@/redux";
-import { updateLoadingStatus } from "@/redux/globalSlice";
 
 interface IUserProfileEditProps {
   user: IUser;
@@ -115,9 +115,6 @@ const UserProfileEdit = (props: IUserProfileEditProps) => {
             <img src={form.profilePicture} alt="avatar" />
           </div>
           <div className={style.uploadBtnBlock}>
-            {/* {imgUploadProgress > 0 ? (
-              <div>Uploading {imgUploadProgress} %</div>
-            ) : ( */}
             <>
               <div className={style.uploadBtn}>
                 <label htmlFor="file-upload">Upload</label>

@@ -1,6 +1,6 @@
+import style from "@/styles/common/eventNotification.module.sass";
 import { IRootState } from "@/redux";
 import { updateEventNotificationQueue } from "@/redux/globalSlice";
-import style from "@/styles/common/eventNotification.module.sass";
 import { cloneDeep } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
